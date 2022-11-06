@@ -78,18 +78,18 @@ MainWindow::MainWindow(QWidget *parent) :
 
     contextMenu = new QMenu(this);
 
-    contextMenu->addAction(actionManager.cloneAction("open"));
-    contextMenu->addAction(actionManager.cloneAction("openurl"));
+    actionManager.addCloneOfAction(contextMenu, "open");
+    actionManager.addCloneOfAction(contextMenu, "openurl");
     contextMenu->addMenu(actionManager.buildRecentsMenu(true, contextMenu));
     contextMenu->addMenu(actionManager.buildOpenWithMenu(contextMenu));
-    contextMenu->addAction(actionManager.cloneAction("opencontainingfolder"));
-    contextMenu->addAction(actionManager.cloneAction("showfileinfo"));
+    actionManager.addCloneOfAction(contextMenu, "opencontainingfolder");
+    actionManager.addCloneOfAction(contextMenu, "showfileinfo");
     contextMenu->addSeparator();
-    contextMenu->addAction(actionManager.cloneAction("rename"));
-    contextMenu->addAction(actionManager.cloneAction("delete"));
+    actionManager.addCloneOfAction(contextMenu, "rename");
+    actionManager.addCloneOfAction(contextMenu, "delete");
     contextMenu->addSeparator();
-    contextMenu->addAction(actionManager.cloneAction("nextfile"));
-    contextMenu->addAction(actionManager.cloneAction("previousfile"));
+    actionManager.addCloneOfAction(contextMenu, "nextfile");
+    actionManager.addCloneOfAction(contextMenu, "previousfile");
     contextMenu->addSeparator();
     contextMenu->addMenu(actionManager.buildViewMenu(true, contextMenu));
     contextMenu->addMenu(actionManager.buildToolsMenu(true, contextMenu));
@@ -117,7 +117,7 @@ MainWindow::MainWindow(QWidget *parent) :
     const auto &actionKeys = actionManager.getActionLibrary().keys();
     for (const QString &key : actionKeys)
     {
-        virtualMenu->addAction(actionManager.cloneAction(key));
+        actionManager.addCloneOfAction(virtualMenu, key);
     }
     addActions(virtualMenu->actions());
     connect(virtualMenu, &QMenu::triggered, this, [this](QAction *triggeredAction){
@@ -376,13 +376,24 @@ void MainWindow::populateOpenWithMenu(const QList<OpenWith::OpenWithItem> openWi
             if (i < openWithItems.length())
             {
                 auto openWithItem = openWithItems.value(i);
+                auto data = action->data().toList();
 
                 action->setVisible(true);
-                action->setText(openWithItem.name);
-                action->setIcon(openWithItem.icon);
-                auto data = action->data().toList();
+
+#ifdef Q_OS_MACOS
+                // On macOS, it's relatively expensive to call setIcon() with a non-empty icon, or setData() if the
+                // action has a non-empty icon. So we'll avoid updating this action if possible. If we do need to update
+                // it, clear out the icon and call setData() first to at least avoid half of the performance hit.
+                const auto &existingOpenWithItem = data.at(1).value<OpenWith::OpenWithItem>();
+                if (openWithItem.exec == existingOpenWithItem.exec && openWithItem.args == existingOpenWithItem.args)
+                    continue;
+                action->setIcon(QIcon());
+#endif
+
                 data.replace(1, QVariant::fromValue(openWithItem));
                 action->setData(data);
+                action->setText(openWithItem.name);
+                action->setIcon(openWithItem.icon);
             }
             else
             {
@@ -459,6 +470,8 @@ void MainWindow::setWindowSize()
     if (!(windowResizeMode == 2 || (windowResizeMode == 1 && justLaunchedWithImage)))
         return;
 
+    justLaunchedWithImage = false;
+
     //check if window is maximized or fullscreened
     if (windowState() == Qt::WindowMaximized || windowState() == Qt::WindowFullScreen)
         return;
@@ -467,8 +480,6 @@ void MainWindow::setWindowSize()
     qreal minWindowResizedPercentage = qvApp->getSettingsManager().getInteger("minwindowresizedpercentage")/100.0;
     qreal maxWindowResizedPercentage = qvApp->getSettingsManager().getInteger("maxwindowresizedpercentage")/100.0;
 
-
-    justLaunchedWithImage = false;
 
     QSize imageSize = getCurrentFileDetails().loadedPixmapSize;
     imageSize -= QSize(4, 4);
