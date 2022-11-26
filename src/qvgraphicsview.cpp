@@ -118,10 +118,45 @@ void QVGraphicsView::enterEvent(QEnterEvent *event)
     viewport()->setCursor(Qt::ArrowCursor);
 }
 
+void QVGraphicsView::mousePressEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton)
+    {
+        pressedMouseButton = Qt::LeftButton;
+        viewport()->setCursor(Qt::ClosedHandCursor);
+        lastMousePos = event->pos();
+        scrollHelper.begin(horizontalScrollBar(), verticalScrollBar());
+        return;
+    }
+
+    QGraphicsView::mousePressEvent(event);
+}
+
 void QVGraphicsView::mouseReleaseEvent(QMouseEvent *event)
 {
+    if (pressedMouseButton == Qt::LeftButton)
+    {
+        pressedMouseButton = Qt::NoButton;
+        viewport()->setCursor(Qt::ArrowCursor);
+        scrollHelper.end();
+        return;
+    }
+
     QGraphicsView::mouseReleaseEvent(event);
     viewport()->setCursor(Qt::ArrowCursor);
+}
+
+void QVGraphicsView::mouseMoveEvent(QMouseEvent *event)
+{
+    if (pressedMouseButton == Qt::LeftButton)
+    {
+        QPoint mouseDelta = event->pos() - lastMousePos;
+        scrollHelper.move(getScaledContentSize().toSize(), getUsableViewportRect(), -mouseDelta.x(), -mouseDelta.y());
+        lastMousePos = event->pos();
+        return;
+    }
+
+    QGraphicsView::mouseMoveEvent(event);
 }
 
 bool QVGraphicsView::event(QEvent *event)
@@ -313,8 +348,7 @@ void QVGraphicsView::scaleExpensively()
     }
 
     // Map size of the original pixmap to the scale acquired in fitting with modification from zooming percentage
-    const QRectF mappedRect = absoluteTransform.mapRect(QRectF({}, getCurrentFileDetails().loadedPixmapSize));
-    const QSizeF mappedPixmapSize = mappedRect.size() * devicePixelRatioF();
+    const QSizeF mappedPixmapSize = getScaledContentSize() * devicePixelRatioF();
 
     // Undo mirror/flip before new transform
     if (mirrored)
@@ -655,6 +689,23 @@ void QVGraphicsView::centerOn(qreal x, qreal y)
 void QVGraphicsView::centerOn(const QGraphicsItem *item)
 {
     centerOn(item->sceneBoundingRect().center());
+}
+
+QSizeF QVGraphicsView::getScaledContentSize() const
+{
+    return absoluteTransform.mapRect(QRectF({}, getCurrentFileDetails().loadedPixmapSize)).size();
+}
+
+QRect QVGraphicsView::getUsableViewportRect() const
+{
+#ifdef COCOA_LOADED
+    int obscuredHeight = QVCocoaFunctions::getObscuredHeight(window()->windowHandle());
+#else
+    int obscuredHeight = 0;
+#endif
+    QRect rect = viewport()->rect();
+    rect.setTop(obscuredHeight);
+    return rect;
 }
 
 void QVGraphicsView::error(int errorNum, const QString &errorString, const QString &fileName)

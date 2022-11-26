@@ -2,6 +2,7 @@
 #define QVGRAPHICSVIEW_H
 
 #include "qvimagecore.h"
+#include "scrollhelper.h"
 #include <QGraphicsView>
 #include <QImageReader>
 #include <QMimeData>
@@ -90,7 +91,11 @@ protected:
     void enterEvent(QEnterEvent *event) override;
 #endif
 
+    void mousePressEvent(QMouseEvent *event) override;
+
     void mouseReleaseEvent(QMouseEvent *event) override;
+
+    void mouseMoveEvent(QMouseEvent *event) override;
 
     bool event(QEvent *event) override;
 
@@ -102,6 +107,10 @@ protected:
     void centerOn(qreal x, qreal y);
 
     void centerOn(const QGraphicsItem *item);
+
+    QSizeF getScaledContentSize() const;
+
+    QRect getUsableViewportRect() const;
 
 
 private slots:
@@ -145,5 +154,9 @@ private:
 
     QTimer *expensiveScaleTimerNew;
     QPointF centerPoint;
+
+    ScrollHelper scrollHelper;
+    Qt::MouseButton pressedMouseButton;
+    QPoint lastMousePos;
 };
 #endif // QVGRAPHICSVIEW_H
