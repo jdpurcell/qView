@@ -99,6 +99,8 @@ protected:
 
     bool event(QEvent *event) override;
 
+    bool viewportEvent(QEvent *event) override;
+
     void fitInViewMarginless(const QRectF &rect);
     void fitInViewMarginless(const QGraphicsItem *item);
 
@@ -111,7 +113,6 @@ protected:
     QSizeF getScaledContentSize() const;
 
     QRect getUsableViewportRect() const;
-
 
 private slots:
     void animatedFrameChanged(QRect rect);
@@ -158,5 +159,6 @@ private:
     ScrollHelper scrollHelper;
     Qt::MouseButton pressedMouseButton;
     QPoint lastMousePos;
+    bool isTouching2Fingers = false;
 };
 #endif // QVGRAPHICSVIEW_H

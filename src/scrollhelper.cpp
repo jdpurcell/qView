@@ -2,14 +2,19 @@
 
 void ScrollHelper::begin(QScrollBar *hScrollBar, QScrollBar *vScrollBar)
 {
+    if (isInProgress)
+        return;
     this->hScrollBar = hScrollBar;
     this->vScrollBar = vScrollBar;
     lastMoveRoundingError = {};
     overscrollDistance = {};
+    isInProgress = true;
 }
 
-void ScrollHelper::move(QSize scaledContentSize, QRect usableViewportRect, int deltaX, int deltaY)
+void ScrollHelper::move(QSize scaledContentSize, QRect usableViewportRect, qreal deltaX, qreal deltaY)
 {
+    if (!isInProgress)
+        return;
     int hMin, hMax, vMin, vMax;
     calculateScrollRange(scaledContentSize.width(), usableViewportRect.width(), -usableViewportRect.left(), hMin, hMax);
     calculateScrollRange(scaledContentSize.height(), usableViewportRect.height(), -usableViewportRect.top(), vMin, vMax);
@@ -35,10 +40,13 @@ void ScrollHelper::move(QSize scaledContentSize, QRect usableViewportRect, int d
 
 void ScrollHelper::end()
 {
+    if (!isInProgress)
+        return;
     if (overscrollDistance.x() != 0)
         hScrollBar->setValue(hScrollBar->value() - overscrollDistance.x());
     if (overscrollDistance.y() != 0)
         vScrollBar->setValue(vScrollBar->value() - overscrollDistance.y());
+    isInProgress = false;
 }
 
 void ScrollHelper::calculateScrollRange(int contentDimension, int viewportDimension, int offset, int &minValue, int &maxValue)
@@ -56,7 +64,7 @@ void ScrollHelper::calculateScrollRange(int contentDimension, int viewportDimens
     }
 }
 
-qreal ScrollHelper::calculateScrollDelta(qreal currentValue, int minValue, int maxValue, int proposedDelta)
+qreal ScrollHelper::calculateScrollDelta(qreal currentValue, int minValue, int maxValue, qreal proposedDelta)
 {
     const double overflowScaleFactor = 0.05;
     if (proposedDelta < 0 && currentValue + proposedDelta < minValue)

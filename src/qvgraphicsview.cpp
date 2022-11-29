@@ -20,6 +20,7 @@ QVGraphicsView::QVGraphicsView(QWidget *parent) : QGraphicsView(parent)
     setDragMode(QGraphicsView::ScrollHandDrag);
     setFrameShape(QFrame::NoFrame);
     setTransformationAnchor(QGraphicsView::NoAnchor);
+    setAttribute(Qt::WA_AcceptTouchEvents);
 
     // part of a pathetic attempt at gesture support
     grabGesture(Qt::PinchGesture);
@@ -187,6 +188,45 @@ bool QVGraphicsView::event(QEvent *event)
     return QGraphicsView::event(event);
 }
 
+bool QVGraphicsView::viewportEvent(QEvent *event)
+{
+    auto setIsTouching2Fingers = [this](bool value)
+    {
+        if (isTouching2Fingers == value)
+            return;
+        isTouching2Fingers = value;
+        if (!isTouching2Fingers)
+            scrollHelper.end();
+    };
+
+    switch (event->type())
+    {
+    case QEvent::TouchBegin:
+    {
+        return true;
+    }
+    case QEvent::TouchUpdate:
+    {
+        auto *touchEvent = static_cast<QTouchEvent*>(event);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        setIsTouching2Fingers(touchEvent->touchPoints().count() == 2);
+#else
+        setIsTouching2Fingers(touchEvent->pointCount() == 2);
+#endif
+        return true;
+    }
+    case QEvent::TouchEnd:
+    {
+        setIsTouching2Fingers(false);
+        return true;
+    }
+    default:
+    {
+        return QGraphicsView::viewportEvent(event);
+    }
+    }
+}
+
 void QVGraphicsView::wheelEvent(QWheelEvent *event)
 {
     #if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
@@ -202,10 +242,18 @@ void QVGraphicsView::wheelEvent(QWheelEvent *event)
 
     if (!willZoom)
     {
-        if (event->modifiers() == (Qt::ControlModifier | Qt::ShiftModifier) || event->modifiers() == Qt::ShiftModifier)
-            translate(event->angleDelta().y()/2.0, event->angleDelta().x()/2.0);
-        else
-            translate(event->angleDelta().x()/2.0, event->angleDelta().y()/2.0);
+        qreal deltaX = -event->angleDelta().x() / 2.0;
+        qreal deltaY = -event->angleDelta().y() / 2.0;
+
+        if (event->modifiers() & Qt::ShiftModifier)
+            std::swap(deltaX, deltaY);
+
+        scrollHelper.begin(horizontalScrollBar(), verticalScrollBar());
+
+        scrollHelper.move(getScaledContentSize().toSize(), getUsableViewportRect(), deltaX, deltaY);
+
+        if (!isTouching2Fingers)
+            scrollHelper.end();
 
         return;
     }

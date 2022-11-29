@@ -8,15 +8,16 @@ class ScrollHelper
 public:
     void begin(QScrollBar *hScrollBar, QScrollBar *vScrollBar);
 
-    void move(QSize scaledContentSize, QRect usableViewportRect, int deltaX, int deltaY);
+    void move(QSize scaledContentSize, QRect usableViewportRect, qreal deltaX, qreal deltaY);
 
     void end();
 
 private:
     static void calculateScrollRange(int contentDimension, int viewportDimension, int offset, int &minValue, int &maxValue);
 
-    static qreal calculateScrollDelta(qreal currentValue, int minValue, int maxValue, int proposedDelta);
+    static qreal calculateScrollDelta(qreal currentValue, int minValue, int maxValue, qreal proposedDelta);
 
+    bool isInProgress {false};
     QScrollBar *hScrollBar;
     QScrollBar *vScrollBar;
     QPointF lastMoveRoundingError;
