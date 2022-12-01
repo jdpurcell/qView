@@ -99,8 +99,6 @@ protected:
 
     bool event(QEvent *event) override;
 
-    bool viewportEvent(QEvent *event) override;
-
     void fitInViewMarginless(const QRectF &rect);
     void fitInViewMarginless(const QGraphicsItem *item);
 
@@ -135,6 +133,7 @@ private:
     bool isScrollZoomsEnabled;
     bool isLoopFoldersEnabled;
     bool isCursorZoomEnabled;
+    bool isConstrainedPositioningEnabled;
     int cropMode;
     qreal scaleFactor;
 
@@ -154,11 +153,11 @@ private:
     QVImageCore imageCore;
 
     QTimer *expensiveScaleTimerNew;
+    QTimer *constrainBoundsTimer;
     QPointF centerPoint;
 
-    ScrollHelper scrollHelper;
+    ScrollHelper *scrollHelper;
     Qt::MouseButton pressedMouseButton;
     QPoint lastMousePos;
-    bool isTouching2Fingers = false;
 };
 #endif // QVGRAPHICSVIEW_H

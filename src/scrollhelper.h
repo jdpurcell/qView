@@ -1,27 +1,44 @@
 #ifndef SCROLLHELPER_H
 #define SCROLLHELPER_H
 
+#include "QtCore/qelapsedtimer.h"
+#include "QtWidgets/qabstractscrollarea.h"
 #include "QtWidgets/qscrollbar.h"
 
-class ScrollHelper
+typedef std::function<void(QSize &, QRect &, bool &)> GetParametersCallback;
+
+class ScrollHelper : public QObject
 {
+    Q_OBJECT
 public:
-    void begin(QScrollBar *hScrollBar, QScrollBar *vScrollBar);
+    explicit ScrollHelper(QAbstractScrollArea *parent, GetParametersCallback getParametersCallback);
 
-    void move(QSize scaledContentSize, QRect usableViewportRect, qreal deltaX, qreal deltaY);
+    void move(QPointF delta);
 
-    void end();
+    void constrain();
+
+    void cancelAnimation();
 
 private:
+    void beginAnimatedScroll(QPoint delta);
+
+    void handleAnimatedScroll();
+
     static void calculateScrollRange(int contentDimension, int viewportDimension, int offset, int &minValue, int &maxValue);
 
     static qreal calculateScrollDelta(qreal currentValue, int minValue, int maxValue, qreal proposedDelta);
 
-    bool isInProgress {false};
     QScrollBar *hScrollBar;
     QScrollBar *vScrollBar;
-    QPointF lastMoveRoundingError;
-    QPoint overscrollDistance;
+    GetParametersCallback getParametersCallback;
+    QPointF lastMoveRoundingError {};
+    QPoint overscrollDistance {};
+
+    QTimer *animatedScrollTimer;
+    QPoint animatedScrollTotalDelta;
+    QPoint animatedScrollAppliedDelta;
+    QElapsedTimer animatedScrollElapsed;
+    const qreal animatedScrollDuration {500.0};
 };
 
 #endif // SCROLLHELPER_H

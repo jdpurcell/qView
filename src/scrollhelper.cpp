@@ -1,52 +1,96 @@
 #include "scrollhelper.h"
+#include "QtCore/qtimer.h"
 
-void ScrollHelper::begin(QScrollBar *hScrollBar, QScrollBar *vScrollBar)
+ScrollHelper::ScrollHelper(QAbstractScrollArea *parent, GetParametersCallback getParametersCallback) : QObject(parent)
 {
-    if (isInProgress)
-        return;
-    this->hScrollBar = hScrollBar;
-    this->vScrollBar = vScrollBar;
-    lastMoveRoundingError = {};
-    overscrollDistance = {};
-    isInProgress = true;
+    hScrollBar = parent->horizontalScrollBar();
+    vScrollBar = parent->verticalScrollBar();
+    this->getParametersCallback = getParametersCallback;
+
+    animatedScrollTimer = new QTimer(this);
+    animatedScrollTimer->setSingleShot(true);
+    animatedScrollTimer->setTimerType(Qt::PreciseTimer);
+    animatedScrollTimer->setInterval(10);
+    connect(animatedScrollTimer, &QTimer::timeout, this, [this]{ handleAnimatedScroll(); });
 }
 
-void ScrollHelper::move(QSize scaledContentSize, QRect usableViewportRect, qreal deltaX, qreal deltaY)
+void ScrollHelper::move(QPointF delta)
 {
-    if (!isInProgress)
-        return;
+    QSize scaledContentSize;
+    QRect usableViewportRect;
+    bool shouldConstrain;
+    getParametersCallback(scaledContentSize, usableViewportRect, shouldConstrain);
     int hMin, hMax, vMin, vMax;
     calculateScrollRange(scaledContentSize.width(), usableViewportRect.width(), -usableViewportRect.left(), hMin, hMax);
     calculateScrollRange(scaledContentSize.height(), usableViewportRect.height(), -usableViewportRect.top(), vMin, vMax);
     QPointF scrollLocation = QPointF(hScrollBar->value(), vScrollBar->value()) + lastMoveRoundingError;
-    qreal scrollDeltaX = calculateScrollDelta(scrollLocation.x(), hMin, hMax, hScrollBar->isRightToLeft() ? -deltaX : deltaX);
-    qreal scrollDeltaY = calculateScrollDelta(scrollLocation.y(), vMin, vMax, deltaY);
+    qreal scrollDeltaX = hScrollBar->isRightToLeft() ? -delta.x() : delta.x();
+    qreal scrollDeltaY = delta.y();
+    if (shouldConstrain)
+    {
+        scrollDeltaX = calculateScrollDelta(scrollLocation.x(), hMin, hMax, scrollDeltaX);
+        scrollDeltaY = calculateScrollDelta(scrollLocation.y(), vMin, vMax, scrollDeltaY);
+    }
     scrollLocation += QPointF(scrollDeltaX, scrollDeltaY);
     int scrollValueX = qRound(scrollLocation.x());
     int scrollValueY = qRound(scrollLocation.y());
     lastMoveRoundingError = QPointF(scrollLocation.x() - scrollValueX, scrollLocation.y() - scrollValueY);
     int overscrollDistanceX =
-        scrollValueX < hMin ? scrollValueX - hMin :
-        scrollValueX > hMax ? scrollValueX - hMax :
+        shouldConstrain && scrollValueX < hMin ? scrollValueX - hMin :
+        shouldConstrain && scrollValueX > hMax ? scrollValueX - hMax :
         0;
     int overscrollDistanceY =
-        scrollValueY < vMin ? scrollValueY - vMin :
-        scrollValueY > vMax ? scrollValueY - vMax :
+        shouldConstrain && scrollValueY < vMin ? scrollValueY - vMin :
+        shouldConstrain && scrollValueY > vMax ? scrollValueY - vMax :
         0;
     overscrollDistance = QPoint(overscrollDistanceX, overscrollDistanceY);
     hScrollBar->setValue(scrollValueX);
     vScrollBar->setValue(scrollValueY);
 }
 
-void ScrollHelper::end()
+void ScrollHelper::constrain()
 {
-    if (!isInProgress)
+    move(QPointF());
+    beginAnimatedScroll(-overscrollDistance);
+}
+
+void ScrollHelper::cancelAnimation()
+{
+    animatedScrollTimer->stop();
+}
+
+void ScrollHelper::beginAnimatedScroll(QPoint delta)
+{
+    if (delta.isNull())
         return;
-    if (overscrollDistance.x() != 0)
-        hScrollBar->setValue(hScrollBar->value() - overscrollDistance.x());
-    if (overscrollDistance.y() != 0)
-        vScrollBar->setValue(vScrollBar->value() - overscrollDistance.y());
-    isInProgress = false;
+    animatedScrollTotalDelta = delta;
+    animatedScrollAppliedDelta = {};
+    animatedScrollElapsed.start();
+    animatedScrollTimer->start();
+}
+
+void ScrollHelper::handleAnimatedScroll()
+{
+    auto applyScrollDelta = [this](QPoint delta)
+    {
+        if (delta.x() != 0)
+            hScrollBar->setValue(hScrollBar->value() + delta.x());
+        if (delta.y() != 0)
+            vScrollBar->setValue(vScrollBar->value() + delta.y());
+        animatedScrollAppliedDelta += delta;
+    };
+    qreal elapsed = animatedScrollElapsed.elapsed();
+    if (elapsed >= animatedScrollDuration)
+    {
+        applyScrollDelta(animatedScrollTotalDelta - animatedScrollAppliedDelta);
+    }
+    else
+    {
+        const qreal percent = qPow(1.0 - ((qCos(elapsed / animatedScrollDuration * M_PI) + 1.0) / 2.0), 0.2);
+        QPoint intermediateDelta = animatedScrollTotalDelta * percent;
+        applyScrollDelta(intermediateDelta - animatedScrollAppliedDelta);
+        animatedScrollTimer->start();
+    }
 }
 
 void ScrollHelper::calculateScrollRange(int contentDimension, int viewportDimension, int offset, int &minValue, int &maxValue)
