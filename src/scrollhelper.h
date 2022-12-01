@@ -1,9 +1,10 @@
 #ifndef SCROLLHELPER_H
 #define SCROLLHELPER_H
 
-#include "QtCore/qelapsedtimer.h"
-#include "QtWidgets/qabstractscrollarea.h"
-#include "QtWidgets/qscrollbar.h"
+#include <QAbstractScrollArea>
+#include <QElapsedTimer>
+#include <QScrollBar>
+#include <QTimer>
 
 typedef std::function<void(QSize &, QRect &, bool &)> GetParametersCallback;
 

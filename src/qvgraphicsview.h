@@ -85,12 +85,6 @@ protected:
 
     void dragLeaveEvent(QDragLeaveEvent *event) override;
 
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    void enterEvent(QEvent *event) override;
-#else
-    void enterEvent(QEnterEvent *event) override;
-#endif
-
     void mousePressEvent(QMouseEvent *event) override;
 
     void mouseReleaseEvent(QMouseEvent *event) override;

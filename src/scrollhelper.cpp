@@ -1,5 +1,5 @@
 #include "scrollhelper.h"
-#include "QtCore/qtimer.h"
+#include <QtMath>
 
 ScrollHelper::ScrollHelper(QAbstractScrollArea *parent, GetParametersCallback getParametersCallback) : QObject(parent)
 {

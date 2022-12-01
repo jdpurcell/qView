@@ -17,7 +17,6 @@ QVGraphicsView::QVGraphicsView(QWidget *parent) : QGraphicsView(parent)
     // GraphicsView setup
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    setDragMode(QGraphicsView::ScrollHandDrag);
     setFrameShape(QFrame::NoFrame);
     setTransformationAnchor(QGraphicsView::NoAnchor);
 
@@ -121,16 +120,6 @@ void QVGraphicsView::dragLeaveEvent(QDragLeaveEvent *event)
     event->accept();
 }
 
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-void QVGraphicsView::enterEvent(QEvent *event)
-#else
-void QVGraphicsView::enterEvent(QEnterEvent *event)
-#endif
-{
-    QGraphicsView::enterEvent(event);
-    viewport()->setCursor(Qt::ArrowCursor);
-}
-
 void QVGraphicsView::mousePressEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton)
@@ -155,7 +144,6 @@ void QVGraphicsView::mouseReleaseEvent(QMouseEvent *event)
     }
 
     QGraphicsView::mouseReleaseEvent(event);
-    viewport()->setCursor(Qt::ArrowCursor);
 }
 
 void QVGraphicsView::mouseMoveEvent(QMouseEvent *event)
