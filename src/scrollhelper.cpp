@@ -9,7 +9,6 @@ ScrollHelper::ScrollHelper(QAbstractScrollArea *parent, GetScrollParametersCallb
     this->getParametersCallback = getParametersCallback;
 
     animatedScrollTimer = new QTimer(this);
-    animatedScrollTimer->setSingleShot(true);
     animatedScrollTimer->setTimerType(Qt::PreciseTimer);
     animatedScrollTimer->setInterval(10);
     connect(animatedScrollTimer, &QTimer::timeout, this, [this]{ handleAnimatedScroll(); });
@@ -85,13 +84,13 @@ void ScrollHelper::handleAnimatedScroll()
     if (elapsed >= animatedScrollDuration)
     {
         applyScrollDelta(animatedScrollTotalDelta - animatedScrollAppliedDelta);
+        animatedScrollTimer->stop();
     }
     else
     {
         const qreal percent = qPow(1.0 - ((qCos(elapsed / animatedScrollDuration * M_PI) + 1.0) / 2.0), 0.2);
         QPoint intermediateDelta = animatedScrollTotalDelta * percent;
         applyScrollDelta(intermediateDelta - animatedScrollAppliedDelta);
-        animatedScrollTimer->start();
     }
 }
 
