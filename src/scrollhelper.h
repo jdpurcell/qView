@@ -39,7 +39,7 @@ private:
     QPoint animatedScrollTotalDelta;
     QPoint animatedScrollAppliedDelta;
     QElapsedTimer animatedScrollElapsed;
-    const qreal animatedScrollDuration {500.0};
+    const qreal animatedScrollDuration {250.0};
 };
 
 #endif // SCROLLHELPER_H
