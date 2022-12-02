@@ -36,6 +36,7 @@ QVGraphicsView::QVGraphicsView(QWidget *parent) : QGraphicsView(parent)
     isLoopFoldersEnabled = true;
     isCursorZoomEnabled = true;
     isConstrainedPositioningEnabled = true;
+    isConstrainedSmallCenteringEnabled = true;
     cropMode = 0;
     scaleFactor = 1.25;
     lastZoomEventPos = QPoint(-1, -1);
@@ -50,11 +51,12 @@ QVGraphicsView::QVGraphicsView(QWidget *parent) : QGraphicsView(parent)
     zoomBasisScaleFactor = 1.0;
 
     scrollHelper = new ScrollHelper(this,
-        [this](QSize &scaledContentSize, QRect &usableViewportRect, bool &shouldConstrain)
+        [this](QSize &scaledContentSize, QRect &usableViewportRect, bool &shouldConstrain, bool &shouldCenter)
         {
             scaledContentSize = getScaledContentSize().toSize();
             usableViewportRect = getUsableViewportRect();
             shouldConstrain = isConstrainedPositioningEnabled;
+            shouldCenter = isConstrainedSmallCenteringEnabled;
         });
 
     connect(&imageCore, &QVImageCore::animatedFrameChanged, this, &QVGraphicsView::animatedFrameChanged);
@@ -782,6 +784,9 @@ void QVGraphicsView::settingsUpdated()
 
     //constrained positioning
     isConstrainedPositioningEnabled = settingsManager.getBoolean("constrainimageposition");
+
+    //constrained small centering
+    isConstrainedSmallCenteringEnabled = settingsManager.getBoolean("constraincentersmallimage");
 
     //loop folders
     isLoopFoldersEnabled = settingsManager.getBoolean("loopfoldersenabled");

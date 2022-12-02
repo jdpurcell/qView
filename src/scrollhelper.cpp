@@ -1,7 +1,8 @@
 #include "scrollhelper.h"
+#include <QDebug>
 #include <QtMath>
 
-ScrollHelper::ScrollHelper(QAbstractScrollArea *parent, GetParametersCallback getParametersCallback) : QObject(parent)
+ScrollHelper::ScrollHelper(QAbstractScrollArea *parent, GetScrollParametersCallback getParametersCallback) : QObject(parent)
 {
     hScrollBar = parent->horizontalScrollBar();
     vScrollBar = parent->verticalScrollBar();
@@ -19,10 +20,11 @@ void ScrollHelper::move(QPointF delta)
     QSize scaledContentSize;
     QRect usableViewportRect;
     bool shouldConstrain;
-    getParametersCallback(scaledContentSize, usableViewportRect, shouldConstrain);
+    bool shouldCenter;
+    getParametersCallback(scaledContentSize, usableViewportRect, shouldConstrain, shouldCenter);
     int hMin, hMax, vMin, vMax;
-    calculateScrollRange(scaledContentSize.width(), usableViewportRect.width(), -usableViewportRect.left(), hMin, hMax);
-    calculateScrollRange(scaledContentSize.height(), usableViewportRect.height(), -usableViewportRect.top(), vMin, vMax);
+    calculateScrollRange(scaledContentSize.width(), usableViewportRect.width(), -usableViewportRect.left(), shouldCenter, hMin, hMax);
+    calculateScrollRange(scaledContentSize.height(), usableViewportRect.height(), -usableViewportRect.top(), shouldCenter, vMin, vMax);
     QPointF scrollLocation = QPointF(hScrollBar->value(), vScrollBar->value()) + lastMoveRoundingError;
     qreal scrollDeltaX = hScrollBar->isRightToLeft() ? -delta.x() : delta.x();
     qreal scrollDeltaY = delta.y();
@@ -93,7 +95,7 @@ void ScrollHelper::handleAnimatedScroll()
     }
 }
 
-void ScrollHelper::calculateScrollRange(int contentDimension, int viewportDimension, int offset, int &minValue, int &maxValue)
+void ScrollHelper::calculateScrollRange(int contentDimension, int viewportDimension, int offset, bool shouldCenter, int &minValue, int &maxValue)
 {
     int overflow = contentDimension - viewportDimension;
     if (overflow >= 0)
@@ -101,10 +103,15 @@ void ScrollHelper::calculateScrollRange(int contentDimension, int viewportDimens
         minValue = offset;
         maxValue = overflow + offset;
     }
-    else
+    else if (shouldCenter)
     {
         minValue = overflow / 2 + offset;
         maxValue = minValue;
+    }
+    else
+    {
+        minValue = overflow + offset;
+        maxValue = offset;
     }
 }
 

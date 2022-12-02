@@ -128,6 +128,7 @@ private:
     bool isLoopFoldersEnabled;
     bool isCursorZoomEnabled;
     bool isConstrainedPositioningEnabled;
+    bool isConstrainedSmallCenteringEnabled;
     int cropMode;
     qreal scaleFactor;
 

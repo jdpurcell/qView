@@ -6,13 +6,13 @@
 #include <QScrollBar>
 #include <QTimer>
 
-typedef std::function<void(QSize &, QRect &, bool &)> GetParametersCallback;
+typedef std::function<void(QSize &, QRect &, bool &, bool &)> GetScrollParametersCallback;
 
 class ScrollHelper : public QObject
 {
     Q_OBJECT
 public:
-    explicit ScrollHelper(QAbstractScrollArea *parent, GetParametersCallback getParametersCallback);
+    explicit ScrollHelper(QAbstractScrollArea *parent, GetScrollParametersCallback getParametersCallback);
 
     void move(QPointF delta);
 
@@ -25,13 +25,13 @@ private:
 
     void handleAnimatedScroll();
 
-    static void calculateScrollRange(int contentDimension, int viewportDimension, int offset, int &minValue, int &maxValue);
+    static void calculateScrollRange(int contentDimension, int viewportDimension, int offset, bool shouldCenter, int &minValue, int &maxValue);
 
     static qreal calculateScrollDelta(qreal currentValue, int minValue, int maxValue, qreal proposedDelta);
 
     QScrollBar *hScrollBar;
     QScrollBar *vScrollBar;
-    GetParametersCallback getParametersCallback;
+    GetScrollParametersCallback getParametersCallback;
     QPointF lastMoveRoundingError {};
     QPoint overscrollDistance {};
 

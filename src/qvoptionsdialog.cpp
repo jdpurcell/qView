@@ -24,6 +24,7 @@ QVOptionsDialog::QVOptionsDialog(QWidget *parent) :
     connect(ui->shortcutsTable, &QTableWidget::cellDoubleClicked, this, &QVOptionsDialog::shortcutCellDoubleClicked);
     connect(ui->bgColorCheckbox, &QCheckBox::stateChanged, this, &QVOptionsDialog::bgColorCheckboxStateChanged);
     connect(ui->scalingCheckbox, &QCheckBox::stateChanged, this, &QVOptionsDialog::scalingCheckboxStateChanged);
+    connect(ui->constrainImagePositionCheckbox, &QCheckBox::stateChanged, this, &QVOptionsDialog::constrainImagePositionCheckboxStateChanged);
 
     populateLanguages();
 
@@ -181,6 +182,12 @@ void QVOptionsDialog::syncSettings(bool defaults, bool makeConnections)
     syncCheckbox(ui->pastActualSizeCheckbox, "pastactualsizeenabled", defaults, makeConnections);
     // constrainimageposition
     syncCheckbox(ui->constrainImagePositionCheckbox, "constrainimageposition", defaults, makeConnections);
+    if (ui->constrainImagePositionCheckbox->isChecked())
+        ui->constrainCentersSmallImageCheckbox->setEnabled(true);
+    else
+        ui->constrainCentersSmallImageCheckbox->setEnabled(false);
+    // constraincentersmallimage
+    syncCheckbox(ui->constrainCentersSmallImageCheckbox, "constraincentersmallimage", defaults, makeConnections);
     // colorspaceconversion
     syncComboBox(ui->colorSpaceConversionComboBox, "colorspaceconversion", defaults, makeConnections);
     // language
@@ -463,6 +470,14 @@ void QVOptionsDialog::windowResizeComboBoxCurrentIndexChanged(int index)
         ui->maxWindowResizeLabel->setEnabled(true);
         ui->maxWindowResizeSpinBox->setEnabled(true);
     }
+}
+
+void QVOptionsDialog::constrainImagePositionCheckboxStateChanged(int arg1)
+{
+    if (arg1 > 0)
+        ui->constrainCentersSmallImageCheckbox->setEnabled(true);
+    else
+        ui->constrainCentersSmallImageCheckbox->setEnabled(false);
 }
 
 void QVOptionsDialog::populateLanguages()
