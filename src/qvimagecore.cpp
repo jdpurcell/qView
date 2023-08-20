@@ -146,7 +146,14 @@ QVImageCore::ReadData QVImageCore::readFile(const QString &fileName, const QColo
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
     // Assume image is sRGB if it doesn't specify
     if (!readImage.colorSpace().isValid())
+    {
+        qInfo() << "Image color space not detected; assuming sRGB";
         readImage.setColorSpace(QColorSpace::SRgb);
+    }
+    else
+    {
+        qInfo() << "Image color space:" << readImage.colorSpace();
+    }
 
     // Convert image color space if we have a target that's different
     if (targetColorSpace.isValid() && readImage.colorSpace() != targetColorSpace)
