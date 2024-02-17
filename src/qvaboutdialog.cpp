@@ -53,12 +53,19 @@ QVAboutDialog::QVAboutDialog(QWidget *parent) :
     //set infolabel2 font, text, and properties
     QFont font4 = QFont("Lato", 8 + modifier);
     font4.setStyleName("Regular");
-    const QString labelText2 = tr("Built with Qt %1 (%2)<br>"
+#if QT_VERSION >= QT_VERSION_CHECK(6, 1, 0)
+    QString a = QSslSocket::availableBackends().join(",");
+    QString b = QSslSocket::activeBackend();
+#else
+    QString a = "";
+    QString b = "";
+#endif
+    const QString labelText2 = tr("Built with Qt %1 (%2) %3 %4<br>"
                                   "Licensed under the GNU GPLv3<br>"
                                   R"(Derivative of official qView: <a style="color: #03A9F4; text-decoration:none;" href="https://interversehq.com/qview/">Website</a>, <a style="color: #03A9F4; text-decoration:none;" href="https://github.com/jurplel/qView">GitHub</a><br>)"
                                   "Icon glyph created by Guilhem from the Noun Project<br>"
                                   "Copyright © %3 jurplel, jdpurcell, and qView contributors")
-                                  .arg(QT_VERSION_STR, QSysInfo::buildCpuArchitecture(), "2018-2024");
+                                  .arg(QT_VERSION_STR, QSysInfo::buildCpuArchitecture(), a, b, "2018-2024");
 
     ui->infoLabel2->setFont(font4);
     ui->infoLabel2->setText(labelText2);
