@@ -2,9 +2,8 @@
 #define SCROLLHELPER_H
 
 #include <QAbstractScrollArea>
-#include <QElapsedTimer>
 #include <QScrollBar>
-#include <QTimer>
+#include <QVariantAnimation>
 
 class ScrollHelper : public QObject
 {
@@ -31,15 +30,13 @@ public:
 private:
     void beginAnimatedScroll(QPoint delta);
 
-    void handleAnimatedScroll();
+    QPoint getScrollPosition();
 
-    void applyScrollDelta(QPoint delta);
+    void setScrollPosition(QPoint pos);
 
     static void calculateScrollRange(int contentDimension, int viewportDimension, int offset, bool shouldCenter, int &minValue, int &maxValue);
 
     static qreal calculateScrollDelta(qreal currentValue, int minValue, int maxValue, qreal proposedDelta);
-
-    static qreal smoothAnimation(qreal x);
 
     QScrollBar *hScrollBar;
     QScrollBar *vScrollBar;
@@ -47,11 +44,8 @@ private:
     QPointF lastMoveRoundingError;
     QPoint overscrollDistance;
 
-    QTimer *animatedScrollTimer;
-    QPoint animatedScrollTotalDelta;
-    QPoint animatedScrollAppliedDelta;
-    QElapsedTimer animatedScrollElapsed;
-    const qreal animatedScrollDuration {250.0};
+    QVariantAnimation *scrollAnimation;
+    const int animatedScrollDuration {250};
 };
 
 #endif // SCROLLHELPER_H

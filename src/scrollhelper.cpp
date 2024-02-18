@@ -8,11 +8,12 @@ ScrollHelper::ScrollHelper(QAbstractScrollArea *parent, GetParametersCallback ge
     vScrollBar = parent->verticalScrollBar();
     this->getParametersCallback = getParametersCallback;
 
-    animatedScrollTimer = new QTimer(this);
-    animatedScrollTimer->setSingleShot(true);
-    animatedScrollTimer->setTimerType(Qt::PreciseTimer);
-    animatedScrollTimer->setInterval(10);
-    connect(animatedScrollTimer, &QTimer::timeout, this, [this]{ handleAnimatedScroll(); });
+    scrollAnimation = new QVariantAnimation(this);
+    scrollAnimation->setDuration(animatedScrollDuration);
+    scrollAnimation->setEasingCurve(QEasingCurve::OutCirc);
+    connect(scrollAnimation, &QVariantAnimation::valueChanged, this, [this](const QVariant &value) {
+        setScrollPosition(value.toPoint());
+    });
 }
 
 void ScrollHelper::move(QPointF delta)
@@ -44,7 +45,7 @@ void ScrollHelper::move(QPointF delta)
         vMin,
         vMax
     );
-    QPointF scrollLocation = QPointF(hScrollBar->value(), vScrollBar->value()) + lastMoveRoundingError;
+    QPointF scrollLocation = getScrollPosition() + lastMoveRoundingError;
     qreal scrollDeltaX = delta.x();
     qreal scrollDeltaY = delta.y();
     if (p.shouldConstrain)
@@ -75,48 +76,35 @@ void ScrollHelper::constrain(bool skipAnimation)
     move(QPointF());
 
     if (skipAnimation)
-        applyScrollDelta(-overscrollDistance);
+        setScrollPosition(getScrollPosition() - overscrollDistance);
     else
         beginAnimatedScroll(-overscrollDistance);
 }
 
 void ScrollHelper::cancelAnimation()
 {
-    animatedScrollTimer->stop();
+    scrollAnimation->stop();
 }
 
 void ScrollHelper::beginAnimatedScroll(QPoint delta)
 {
     if (delta.isNull())
         return;
-    animatedScrollTotalDelta = delta;
-    animatedScrollAppliedDelta = {};
-    animatedScrollElapsed.start();
-    animatedScrollTimer->start();
+    QPoint startPos = getScrollPosition();
+    scrollAnimation->setStartValue(startPos);
+    scrollAnimation->setEndValue(startPos + delta);
+    scrollAnimation->start();
 }
 
-void ScrollHelper::handleAnimatedScroll()
+QPoint ScrollHelper::getScrollPosition()
 {
-    qreal elapsed = animatedScrollElapsed.elapsed();
-    if (elapsed >= animatedScrollDuration)
-    {
-        applyScrollDelta(animatedScrollTotalDelta - animatedScrollAppliedDelta);
-    }
-    else
-    {
-        QPoint intermediateDelta = animatedScrollTotalDelta * smoothAnimation(elapsed / animatedScrollDuration);
-        applyScrollDelta(intermediateDelta - animatedScrollAppliedDelta);
-        animatedScrollAppliedDelta = intermediateDelta;
-        animatedScrollTimer->start();
-    }
+    return QPoint(hScrollBar->value(), vScrollBar->value());
 }
 
-void ScrollHelper::applyScrollDelta(QPoint delta)
+void ScrollHelper::setScrollPosition(QPoint pos)
 {
-    if (delta.x() != 0)
-        hScrollBar->setValue(hScrollBar->value() + delta.x());
-    if (delta.y() != 0)
-        vScrollBar->setValue(vScrollBar->value() + delta.y());
+    hScrollBar->setValue(pos.x());
+    vScrollBar->setValue(pos.y());
 }
 
 void ScrollHelper::calculateScrollRange(int contentDimension, int viewportDimension, int offset, bool shouldCenter, int &minValue, int &maxValue)
@@ -153,11 +141,4 @@ qreal ScrollHelper::calculateScrollDelta(qreal currentValue, int minValue, int m
             (maxValue - currentValue) + ((currentValue + proposedDelta) - maxValue) * overflowScaleFactor;
     }
     return proposedDelta;
-}
-
-// Converts linear motion from [0,1] into something that looks more natural. Derived from the
-// formula for a circle, i.e. the graph of this is literally the top-left quarter of a circle.
-qreal ScrollHelper::smoothAnimation(qreal x)
-{
-    return qPow(1.0 - qPow(x - 1.0, 2.0), 0.5);
 }
