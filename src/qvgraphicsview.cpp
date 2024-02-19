@@ -20,6 +20,7 @@ QVGraphicsView::QVGraphicsView(QWidget *parent) : QGraphicsView(parent)
     setFrameShape(QFrame::NoFrame);
     setTransformationAnchor(QGraphicsView::NoAnchor);
     viewport()->setAutoFillBackground(false);
+    viewport()->setMouseTracking(true);
     grabGesture(Qt::PinchGesture);
 
     // Scene setup
@@ -52,6 +53,11 @@ QVGraphicsView::QVGraphicsView(QWidget *parent) : QGraphicsView(parent)
     emitZoomLevelChangedTimer->setSingleShot(true);
     emitZoomLevelChangedTimer->setInterval(50);
     connect(emitZoomLevelChangedTimer, &QTimer::timeout, this, [this]{emit zoomLevelChanged();});
+
+    hideCursorTimer = new QTimer(this);
+    hideCursorTimer->setSingleShot(true);
+    hideCursorTimer->setInterval(1000);
+    connect(hideCursorTimer, &QTimer::timeout, this, [this]{setCursorVisible(false);});
 
     loadedPixmapItem = new QGraphicsPixmapItem();
     scene->addItem(loadedPixmapItem);
@@ -171,6 +177,8 @@ void QVGraphicsView::mouseReleaseEvent(QMouseEvent *event)
 
 void QVGraphicsView::mouseMoveEvent(QMouseEvent *event)
 {
+    setCursorVisible(true);
+
     if (pressedMouseButton != Qt::NoButton)
     {
         const bool isAltAction = mousePressModifiers.testFlag(Qt::ControlModifier);
@@ -759,6 +767,30 @@ void QVGraphicsView::centerImage()
     verticalScrollBar()->setValue(vOffset + (vOverflow / 2));
 
     scrollHelper->cancelAnimation();
+}
+
+void QVGraphicsView::setCursorVisible(const bool visible)
+{
+    const bool autoHideCursor = true;
+    if (visible)
+    {
+        if (autoHideCursor)
+            hideCursorTimer->start();
+        else
+            hideCursorTimer->stop();
+
+        if (isCursorVisible) return;
+
+        viewport()->setCursor(Qt::ArrowCursor);
+        isCursorVisible = true;
+    }
+    else
+    {
+        if (!isCursorVisible) return;
+
+        viewport()->setCursor(Qt::BlankCursor);
+        isCursorVisible = false;
+    }
 }
 
 const QJsonObject QVGraphicsView::getSessionState() const

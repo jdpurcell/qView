@@ -95,6 +95,8 @@ public:
 
     int getFitOverscan() const { return fitOverscan; }
 
+    // TODO: protected?
+    void setCursorVisible(const bool visible);
 signals:
     void cancelSlideshow();
 
@@ -198,12 +200,14 @@ private:
     qreal appliedExpensiveScaleZoomLevel {0.0};
     std::optional<QPoint> lastZoomEventPos;
     QPointF lastZoomRoundingError;
+    bool isCursorVisible {true};
 
     QVImageCore imageCore {this};
 
     QTimer *expensiveScaleTimer;
     QTimer *constrainBoundsTimer;
     QTimer *emitZoomLevelChangedTimer;
+    QTimer *hideCursorTimer;
 
     ScrollHelper *scrollHelper;
     AxisLocker scrollAxisLocker;
