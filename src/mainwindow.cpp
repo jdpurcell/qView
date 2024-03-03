@@ -1221,27 +1221,27 @@ void MainWindow::flip()
 
 void MainWindow::firstFile()
 {
-    graphicsView->goToFile(QVGraphicsView::GoToFileMode::first);
+    graphicsView->goToFile(Qv::GoToFileMode::First);
 }
 
 void MainWindow::previousFile()
 {
-    graphicsView->goToFile(QVGraphicsView::GoToFileMode::previous);
+    graphicsView->goToFile(Qv::GoToFileMode::Previous);
 }
 
 void MainWindow::nextFile()
 {
-    graphicsView->goToFile(QVGraphicsView::GoToFileMode::next);
+    graphicsView->goToFile(Qv::GoToFileMode::Next);
 }
 
 void MainWindow::lastFile()
 {
-    graphicsView->goToFile(QVGraphicsView::GoToFileMode::last);
+    graphicsView->goToFile(Qv::GoToFileMode::Last);
 }
 
 void MainWindow::randomFile()
 {
-    graphicsView->goToFile(QVGraphicsView::GoToFileMode::random);
+    graphicsView->goToFile(Qv::GoToFileMode::Random);
 }
 
 void MainWindow::saveFrameAs()

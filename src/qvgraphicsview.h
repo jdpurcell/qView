@@ -22,17 +22,6 @@ class QVGraphicsView : public QGraphicsView
 public:
     QVGraphicsView(QWidget *parent = nullptr);
 
-    enum class GoToFileMode
-    {
-       constant,
-       first,
-       previous,
-       next,
-       last,
-       random
-    };
-    Q_ENUM(GoToFileMode)
-
     struct SwipeData
     {
         int totalDelta;
@@ -74,7 +63,7 @@ public:
 
     void setLoadIsFromSessionRestore(const bool value);
 
-    void goToFile(const GoToFileMode &mode, int index = 0);
+    void goToFile(const Qv::GoToFileMode mode, const int index = 0);
 
     void settingsUpdated();
 
@@ -169,7 +158,6 @@ private:
     bool isScalingTwoEnabled {true};
     std::optional<qreal> fitZoomLimit;
     int fitOverscan {0};
-    bool isLoopFoldersEnabled {true};
     bool isCursorZoomEnabled {true};
     bool isOneToOnePixelSizingEnabled {true};
     bool isConstrainedPositioningEnabled {true};
@@ -216,7 +204,7 @@ private:
     Qt::KeyboardModifiers mousePressModifiers {Qt::KeyboardModifier::NoModifier};
     QPoint lastMousePos;
 
-    std::optional<GoToFileMode> turboNavMode;
+    std::optional<Qv::GoToFileMode> turboNavMode;
     QList<QKeySequence> navPrevShortcuts;
     QList<QKeySequence> navNextShortcuts;
     QElapsedTimer lastTurboNav;

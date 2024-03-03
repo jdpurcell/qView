@@ -3,6 +3,7 @@ SOURCES += \
     $$PWD/main.cpp \
     $$PWD/mainwindow.cpp \
     $$PWD/openwith.cpp \
+    $$PWD/qvfileenumerator.cpp \
     $$PWD/qvgraphicsview.cpp \
     $$PWD/qvoptionsdialog.cpp \
     $$PWD/qvapplication.cpp \
@@ -26,6 +27,7 @@ HEADERS += \
     $$PWD/axislocker.h \
     $$PWD/mainwindow.h \
     $$PWD/openwith.h \
+    $$PWD/qvfileenumerator.h \
     $$PWD/qvgraphicsview.h \
     $$PWD/qvnamespace.h \
     $$PWD/qvoptionsdialog.h \

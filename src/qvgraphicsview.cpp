@@ -150,12 +150,12 @@ void QVGraphicsView::mousePressEvent(QMouseEvent *event)
     }
     else if (event->button() == Qt::MouseButton::BackButton)
     {
-        goToFile(GoToFileMode::previous);
+        goToFile(Qv::GoToFileMode::Previous);
         return;
     }
     else if (event->button() == Qt::MouseButton::ForwardButton)
     {
-        goToFile(GoToFileMode::next);
+        goToFile(Qv::GoToFileMode::Next);
         return;
     }
 
@@ -304,7 +304,7 @@ void QVGraphicsView::keyPressEvent(QKeyEvent *event)
         const bool navNext = actionManager.wouldTriggerAction(event, "nextfile");
         if (navPrev || navNext)
         {
-            const GoToFileMode navMode = navPrev ? GoToFileMode::previous : GoToFileMode::next;
+            const Qv::GoToFileMode navMode = navPrev ? Qv::GoToFileMode::Previous : Qv::GoToFileMode::Next;
             if (event->isAutoRepeat())
             {
                 turboNavMode = navMode;
@@ -435,9 +435,9 @@ void QVGraphicsView::executeScrollAction(const Qv::ViewportScrollAction action, 
         if (qAbs(swipeData.totalDelta) >= deltaPerWheelStep)
         {
             if (swipeData.totalDelta < 0)
-                goToFile(GoToFileMode::next);
+                goToFile(Qv::GoToFileMode::Next);
             else
-                goToFile(GoToFileMode::previous);
+                goToFile(Qv::GoToFileMode::Previous);
             swipeData.triggeredAction = true;
             swipeData.totalDelta %= deltaPerWheelStep;
         }
@@ -859,107 +859,12 @@ void QVGraphicsView::setLoadIsFromSessionRestore(const bool value)
     loadIsFromSessionRestore = value;
 }
 
-void QVGraphicsView::goToFile(const GoToFileMode &mode, int index)
+void QVGraphicsView::goToFile(const Qv::GoToFileMode mode, const int index)
 {
-    bool shouldRetryFolderInfoUpdate = false;
+    const QVImageCore::GoToFileResult result = imageCore.goToFile(mode, index);
 
-    // Update folder info only after a little idle time as an optimization for when
-    // the user is rapidly navigating through files.
-    if (!getCurrentFileDetails().timeSinceLoaded.isValid() || getCurrentFileDetails().timeSinceLoaded.hasExpired(3000))
-    {
-        // Make sure the file still exists because if it disappears from the file listing we'll lose
-        // track of our index within the folder. Use the static 'exists' method to avoid caching.
-        // If we skip updating now, flag it for retry later once we locate a new file.
-        if (QFile::exists(getCurrentFileDetails().fileInfo.absoluteFilePath()))
-            imageCore.updateFolderInfo();
-        else
-            shouldRetryFolderInfoUpdate = true;
-    }
-
-    const auto &fileList = getCurrentFileDetails().folderFileInfoList;
-    if (fileList.isEmpty())
-        return;
-
-    int newIndex = getCurrentFileDetails().loadedIndexInFolder;
-    int searchDirection = 0;
-
-    switch (mode) {
-    case GoToFileMode::constant:
-    {
-        newIndex = index;
-        break;
-    }
-    case GoToFileMode::first:
-    {
-        newIndex = 0;
-        searchDirection = 1;
-        break;
-    }
-    case GoToFileMode::previous:
-    {
-        if (newIndex == 0)
-        {
-            if (isLoopFoldersEnabled)
-                newIndex = fileList.size()-1;
-            else
-                emit cancelSlideshow();
-        }
-        else
-            newIndex--;
-        searchDirection = -1;
-        break;
-    }
-    case GoToFileMode::next:
-    {
-        if (fileList.size()-1 == newIndex)
-        {
-            if (isLoopFoldersEnabled)
-                newIndex = 0;
-            else
-                emit cancelSlideshow();
-        }
-        else
-            newIndex++;
-        searchDirection = 1;
-        break;
-    }
-    case GoToFileMode::last:
-    {
-        newIndex = fileList.size()-1;
-        searchDirection = -1;
-        break;
-    }
-    case GoToFileMode::random:
-    {
-        if (fileList.size() > 1)
-        {
-            int randomIndex = QRandomGenerator::global()->bounded(fileList.size()-1);
-            newIndex = randomIndex + (randomIndex >= newIndex ? 1 : 0);
-        }
-        searchDirection = 1;
-        break;
-    }
-    }
-
-    while (searchDirection == 1 && newIndex < fileList.size()-1 && !QFile::exists(fileList.value(newIndex).absoluteFilePath))
-        newIndex++;
-    while (searchDirection == -1 && newIndex > 0 && !QFile::exists(fileList.value(newIndex).absoluteFilePath))
-        newIndex--;
-
-    const QString nextImageFilePath = fileList.value(newIndex).absoluteFilePath;
-
-    if (!QFile::exists(nextImageFilePath) || nextImageFilePath == getCurrentFileDetails().fileInfo.absoluteFilePath())
-        return;
-
-    if (shouldRetryFolderInfoUpdate)
-    {
-        // If the user just deleted a file through qView, closeImage will have been called which empties
-        // currentFileDetails.fileInfo. In this case updateFolderInfo can't infer the directory from
-        // fileInfo like it normally does, so we'll explicity pass in the folder here.
-        imageCore.updateFolderInfo(QFileInfo(nextImageFilePath).path());
-    }
-
-    loadFile(nextImageFilePath);
+    if (result.reachedEnd)
+        emit cancelSlideshow();
 }
 
 void QVGraphicsView::fitOrConstrainImage()
@@ -1102,9 +1007,6 @@ void QVGraphicsView::settingsUpdated()
 
     //nav speed
     turboNavInterval = settingsManager.getInteger("navspeed");
-
-    //loop folders
-    isLoopFoldersEnabled = settingsManager.getBoolean("loopfoldersenabled");
 
     //mouse actions
     doubleClickAction = settingsManager.getEnum<Qv::ViewportClickAction>("viewportdoubleclickaction");

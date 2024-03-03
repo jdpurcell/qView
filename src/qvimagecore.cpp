@@ -4,7 +4,6 @@
 #include "qvcocoafunctions.h"
 #include "qvlinuxx11functions.h"
 #include <cstring>
-#include <random>
 #include <QMessageBox>
 #include <QDir>
 #include <QUrl>
@@ -282,141 +281,110 @@ QVImageCore::FileDetails QVImageCore::getEmptyFileDetails()
     };
 }
 
-// All file logic, sorting, etc should be moved to a different class or file
-QList<QVImageCore::CompatibleFile> QVImageCore::getCompatibleFiles(const QString &dirPath)
+QVImageCore::GoToFileResult QVImageCore::goToFile(const Qv::GoToFileMode mode, const int index)
 {
-    QList<CompatibleFile> fileList;
+    GoToFileResult result;
+    bool shouldRetryFolderInfoUpdate = false;
 
-    QMimeDatabase mimeDb;
-    const auto &extensions = qvApp->getFileExtensionSet();
-    const auto &disabledExtensions = qvApp->getDisabledFileExtensions();
-    const auto &mimeTypes = qvApp->getMimeTypeNameSet();
-
-    QMimeDatabase::MatchMode mimeMatchMode = allowMimeContentDetection ? QMimeDatabase::MatchDefault : QMimeDatabase::MatchExtension;
-
-    QDir::Filters filters = QDir::Files;
-    if (!skipHiddenFiles)
-        filters |= QDir::Hidden;
-
-    const QFileInfoList currentFolder = QDir(dirPath).entryInfoList(filters, QDir::Unsorted);
-    for (const QFileInfo &fileInfo : currentFolder)
+    // Update folder info only after a little idle time as an optimization for when
+    // the user is rapidly navigating through files.
+    if (!currentFileDetails.timeSinceLoaded.isValid() || currentFileDetails.timeSinceLoaded.hasExpired(3000))
     {
-        const QString absoluteFilePath = fileInfo.absoluteFilePath();
-        const QString fileName = fileInfo.fileName();
-        const QString suffix = fileInfo.suffix().toLower();
-        bool matched = !suffix.isEmpty() && extensions.contains("." + suffix);
-        QString mimeType;
+        // Make sure the file still exists because if it disappears from the file listing we'll lose
+        // track of our index within the folder. Use the static 'exists' method to avoid caching.
+        // If we skip updating now, flag it for retry later once we locate a new file.
+        if (QFile::exists(currentFileDetails.fileInfo.absoluteFilePath()))
+            updateFolderInfo();
+        else
+            shouldRetryFolderInfoUpdate = true;
+    }
 
-        if (!matched || sortMode == Qv::SortMode::Type)
+    const auto &fileList = currentFileDetails.folderFileInfoList;
+    if (fileList.isEmpty())
+        return result;
+
+    int newIndex = currentFileDetails.loadedIndexInFolder;
+    int searchDirection = 0;
+
+    switch (mode) {
+    case Qv::GoToFileMode::Constant:
+    {
+        newIndex = index;
+        break;
+    }
+    case Qv::GoToFileMode::First:
+    {
+        newIndex = 0;
+        searchDirection = 1;
+        break;
+    }
+    case Qv::GoToFileMode::Previous:
+    {
+        if (newIndex == 0)
         {
-            mimeType = mimeDb.mimeTypeForFile(absoluteFilePath, mimeMatchMode).name();
-            matched |= mimeTypes.contains(mimeType) && (suffix.isEmpty() || !disabledExtensions.contains("." + suffix));
+            if (fileEnumerator.getIsLoopFoldersEnabled())
+                newIndex = fileList.size()-1;
+            else
+                result.reachedEnd = true;
         }
-
-        // ignore macOS ._ metadata files
-        if (fileName.startsWith("._"))
+        else
+            newIndex--;
+        searchDirection = -1;
+        break;
+    }
+    case Qv::GoToFileMode::Next:
+    {
+        if (fileList.size()-1 == newIndex)
         {
-            matched = false;
+            if (fileEnumerator.getIsLoopFoldersEnabled())
+                newIndex = 0;
+            else
+                result.reachedEnd = true;
         }
-
-        if (matched)
+        else
+            newIndex++;
+        searchDirection = 1;
+        break;
+    }
+    case Qv::GoToFileMode::Last:
+    {
+        newIndex = fileList.size()-1;
+        searchDirection = -1;
+        break;
+    }
+    case Qv::GoToFileMode::Random:
+    {
+        if (fileList.size() > 1)
         {
-            fileList.append({
-                absoluteFilePath,
-                fileName,
-                sortMode == Qv::SortMode::DateModified ? fileInfo.lastModified().toMSecsSinceEpoch() : 0,
-#if QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
-                sortMode == Qv::SortMode::DateCreated ? fileInfo.birthTime().toMSecsSinceEpoch() : 0,
-#else
-                sortMode == Qv::SortMode::DateCreated ? fileInfo.created().toMSecsSinceEpoch() : 0,
-#endif
-                sortMode == Qv::SortMode::Size ? fileInfo.size() : 0,
-                sortMode == Qv::SortMode::Type ? mimeType : QString()
-            });
+            int randomIndex = QRandomGenerator::global()->bounded(fileList.size()-1);
+            newIndex = randomIndex + (randomIndex >= newIndex ? 1 : 0);
         }
+        searchDirection = 1;
+        break;
+    }
     }
 
-    return fileList;
-}
+    while (searchDirection == 1 && newIndex < fileList.size()-1 && !QFile::exists(fileList.value(newIndex).absoluteFilePath))
+        newIndex++;
+    while (searchDirection == -1 && newIndex > 0 && !QFile::exists(fileList.value(newIndex).absoluteFilePath))
+        newIndex--;
 
-void QVImageCore::sortCompatibleFiles(QList<CompatibleFile> &fileList)
-{
-    if (sortMode == Qv::SortMode::Name)
-    {
-        QCollator collator;
-        collator.setNumericMode(true);
-        std::sort(fileList.begin(),
-                  fileList.end(),
-                  [&collator, this](const CompatibleFile &file1, const CompatibleFile &file2)
-        {
-            if (sortDescending)
-                return collator.compare(file1.fileName, file2.fileName) > 0;
-            else
-                return collator.compare(file1.fileName, file2.fileName) < 0;
-        });
-    }
-    else if (sortMode == Qv::SortMode::DateModified)
-    {
-        std::sort(fileList.begin(),
-                  fileList.end(),
-                  [this](const CompatibleFile &file1, const CompatibleFile &file2)
-        {
-            if (sortDescending)
-                return file1.lastModified < file2.lastModified;
-            else
-                return file1.lastModified > file2.lastModified;
-        });
-    }
-    else if (sortMode == Qv::SortMode::DateCreated)
-    {
-        std::sort(fileList.begin(),
-                  fileList.end(),
-                  [this](const CompatibleFile &file1, const CompatibleFile &file2)
-        {
-            if (sortDescending)
-                return file1.lastCreated < file2.lastCreated;
-            else
-                return file1.lastCreated > file2.lastCreated;
-        });
+    const QString nextImageFilePath = fileList.value(newIndex).absoluteFilePath;
 
-    }
-    else if (sortMode == Qv::SortMode::Size)
-    {
-        std::sort(fileList.begin(),
-                  fileList.end(),
-                  [this](const CompatibleFile &file1, const CompatibleFile &file2)
-        {
-            if (sortDescending)
-                return file1.size < file2.size;
-            else
-                return file1.size > file2.size;
-        });
-    }
-    else if (sortMode == Qv::SortMode::Type)
-    {
-        QCollator collator;
-        std::sort(fileList.begin(),
-                  fileList.end(),
-                  [&collator, this](const CompatibleFile &file1, const CompatibleFile &file2)
-        {
-            if (sortDescending)
-                return collator.compare(file1.mimeType, file2.mimeType) > 0;
-            else
-                return collator.compare(file1.mimeType, file2.mimeType) < 0;
-        });
-    }
-    else if (sortMode == Qv::SortMode::Random)
-    {
-        unsigned randomSortSeed = getRandomSortSeed(QFileInfo(fileList.value(0).absoluteFilePath).path(), fileList.count());
-        std::shuffle(fileList.begin(), fileList.end(), std::default_random_engine(randomSortSeed));
-    }
-}
+    if (!QFile::exists(nextImageFilePath) || nextImageFilePath == currentFileDetails.fileInfo.absoluteFilePath())
+        return result;
 
-unsigned QVImageCore::getRandomSortSeed(const QString &dirPath, const int fileCount)
-{
-    QString seed = QString::number(baseRandomSortSeed, 16) + dirPath + QString::number(fileCount, 16);
-    QByteArray hash = QCryptographicHash::hash(seed.toUtf8(), QCryptographicHash::Md5);
-    return hash.toHex().left(8).toUInt(nullptr, 16);
+    if (shouldRetryFolderInfoUpdate)
+    {
+        // If the user just deleted a file through qView, closeImage will have been called which empties
+        // currentFileDetails.fileInfo. In this case updateFolderInfo can't infer the directory from
+        // fileInfo like it normally does, so we'll explicity pass in the folder here.
+        updateFolderInfo(QFileInfo(nextImageFilePath).path());
+    }
+
+    loadFile(nextImageFilePath);
+
+    return result;
 }
 
 void QVImageCore::updateFolderInfo(QString dirPath)
@@ -431,10 +399,7 @@ void QVImageCore::updateFolderInfo(QString dirPath)
     }
 
     // Get file listing
-    currentFileDetails.folderFileInfoList = getCompatibleFiles(dirPath);
-
-    // Sorting
-    sortCompatibleFiles(currentFileDetails.folderFileInfoList);
+    currentFileDetails.folderFileInfoList = fileEnumerator.getCompatibleFiles(dirPath);
 
     // Set current file index variable
     currentFileDetails.updateLoadedIndexInFolder();
@@ -458,7 +423,7 @@ void QVImageCore::requestCaching()
         int index = i;
 
         //keep within index range
-        if (isLoopFoldersEnabled)
+        if (fileEnumerator.getIsLoopFoldersEnabled())
         {
             if (index > currentFileDetails.folderFileInfoList.length()-1)
                 index = index-(currentFileDetails.folderFileInfoList.length());
@@ -690,9 +655,6 @@ void QVImageCore::settingsUpdated()
 {
     auto &settingsManager = qvApp->getSettingsManager();
 
-    //loop folders
-    isLoopFoldersEnabled = settingsManager.getBoolean("loopfoldersenabled");
-
     //preloading mode
     preloadingMode = settingsManager.getEnum<Qv::PreloadMode>("preloadingmode");
     switch (preloadingMode) {
@@ -710,19 +672,8 @@ void QVImageCore::settingsUpdated()
         break;
     }
 
-    //sort mode
-    sortMode = settingsManager.getEnum<Qv::SortMode>("sortmode");
-
-    //sort ascending
-    sortDescending = settingsManager.getBoolean("sortdescending");
-
-    //allow mime content detection
-    allowMimeContentDetection = settingsManager.getBoolean("allowmimecontentdetection");
-
-    //skip hidden files
-    skipHiddenFiles = settingsManager.getBoolean("skiphidden");
-
     //update folder info to reflect new settings (e.g. sort order)
+    fileEnumerator.loadSettings();
     updateFolderInfo();
 
     //colorspaceconversion

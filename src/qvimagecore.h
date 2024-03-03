@@ -2,6 +2,7 @@
 #define QVIMAGECORE_H
 
 #include "qvnamespace.h"
+#include "qvfileenumerator.h"
 #include <optional>
 #include <QObject>
 #include <QImageReader>
@@ -24,18 +25,6 @@ class QVImageCore : public QObject
     Q_OBJECT
 
 public:
-    struct CompatibleFile
-    {
-        QString absoluteFilePath;
-        QString fileName;
-
-        // Only populated if needed for sorting
-        qint64 lastModified;
-        qint64 lastCreated;
-        qint64 size;
-        QString mimeType;
-    };
-
     struct ErrorData
     {
         int errorNum;
@@ -45,7 +34,7 @@ public:
     struct FileDetails
     {
         QFileInfo fileInfo;
-        QList<CompatibleFile> folderFileInfoList;
+        QList<QVFileEnumerator::CompatibleFile> folderFileInfoList;
         int loadedIndexInFolder = -1;
         bool isLoadRequested = false;
         bool isPixmapLoaded = false;
@@ -68,15 +57,18 @@ public:
         std::optional<ErrorData> errorData;
     };
 
+    struct GoToFileResult
+    {
+        bool reachedEnd = false;
+    };
+
     explicit QVImageCore(QObject *parent = nullptr);
 
     void loadFile(const QString &fileName, bool isReloading = false);
     ReadData readFile(const QString &fileName, const QColorSpace &targetColorSpace);
     void loadPixmap(const ReadData &readData);
     void closeImage();
-    QList<CompatibleFile> getCompatibleFiles(const QString &dirPath);
-    void sortCompatibleFiles(QList<CompatibleFile> &fileList);
-    unsigned getRandomSortSeed(const QString &dirPath, const int fileCount);
+    GoToFileResult goToFile(const Qv::GoToFileMode mode, const int index = 0);
     void updateFolderInfo(QString dirPath = QString());
     void requestCaching();
     void requestCachingFile(const QString &filePath, const QColorSpace &targetColorSpace);
@@ -109,6 +101,8 @@ protected:
     FileDetails getEmptyFileDetails();
 
 private:
+    QVFileEnumerator fileEnumerator {this};
+
     QPixmap loadedPixmap;
     QMovie loadedMovie;
 
@@ -116,17 +110,10 @@ private:
 
     QFutureWatcher<ReadData> loadFutureWatcher;
 
-    bool isLoopFoldersEnabled {true};
     Qv::PreloadMode preloadingMode {Qv::PreloadMode::Adjacent};
-    Qv::SortMode sortMode {Qv::SortMode::Name};
-    bool sortDescending {false};
-    bool allowMimeContentDetection {false};
-    bool skipHiddenFiles {false};
     Qv::ColorSpaceConversion colorSpaceConversion {Qv::ColorSpaceConversion::AutoDetect};
 
     static QCache<QString, ReadData> pixmapCache;
-
-    quint32 baseRandomSortSeed {static_cast<quint32>(std::chrono::system_clock::now().time_since_epoch().count())};
 
     QStringList lastFilesPreloaded;
     QSet<QString> preloadsInProgress;

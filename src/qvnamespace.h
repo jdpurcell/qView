@@ -7,7 +7,11 @@
 
 namespace Qv
 {
+    // Data constants
+
     inline constexpr int SessionStateVersion = 1;
+
+    // Settings value enums
 
     enum class AfterDelete
     {
@@ -108,6 +112,20 @@ namespace Qv
         WhenLaunching = 1,
         WhenOpeningImages = 2
     };
+
+    // Other enums
+
+    enum class GoToFileMode
+    {
+        Constant,
+        First,
+        Previous,
+        Next,
+        Last,
+        Random
+    };
+
+    // Helper functions
 
     inline QSet<QString> listToSet(const QStringList &list)
     {
