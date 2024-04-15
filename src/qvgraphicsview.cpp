@@ -120,6 +120,7 @@ void QVGraphicsView::mousePressEvent(QMouseEvent *event)
     const auto initializeDrag = [this, event]() {
         pressedMouseButton = event->button();
         mousePressModifiers = event->modifiers();
+        setCursorVisible(true);
         viewport()->setCursor(Qt::ClosedHandCursor);
         lastMousePos = event->pos();
     };
@@ -167,6 +168,7 @@ void QVGraphicsView::mouseReleaseEvent(QMouseEvent *event)
     {
         pressedMouseButton = Qt::NoButton;
         mousePressModifiers = Qt::NoModifier;
+        setCursorVisible(true);
         viewport()->setCursor(Qt::ArrowCursor);
         scrollHelper->constrain();
         return;
@@ -419,7 +421,10 @@ void QVGraphicsView::executeScrollAction(const Qv::ViewportScrollAction action, 
         if (uniAxisDelta < 0)
             zoomFactor = qPow(zoomFactor, -1);
 
-        zoomRelative(zoomFactor, mousePos);
+        if (isCursorVisible)
+            setCursorVisible(true);
+
+        zoomRelative(zoomFactor, isCursorVisible ? std::make_optional(mousePos) : std::nullopt);
     }
     else if (action == Qv::ViewportScrollAction::Navigate)
     {
@@ -588,6 +593,7 @@ void QVGraphicsView::zoomAbsolute(const qreal absoluteLevel, const std::optional
     }
     else if (!loadIsFromSessionRestore)
     {
+        // TODO: View to center viewport, not center image
         centerImage();
     }
 
@@ -774,7 +780,7 @@ void QVGraphicsView::setCursorVisible(const bool visible)
     const bool autoHideCursor = true;
     if (visible)
     {
-        if (autoHideCursor)
+        if (autoHideCursor && pressedMouseButton == Qt::NoButton)
             hideCursorTimer->start();
         else
             hideCursorTimer->stop();
