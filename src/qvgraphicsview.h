@@ -200,7 +200,7 @@ private:
     qreal appliedExpensiveScaleZoomLevel {0.0};
     std::optional<QPoint> lastZoomEventPos;
     QPointF lastZoomRoundingError;
-    std::optional<Qv::CursorAutoHideType> cursorAutoHideType;
+    bool isCursorAutoHideFullscreenEnabled;
     bool isCursorVisible {true};
 
     QVImageCore imageCore {this};

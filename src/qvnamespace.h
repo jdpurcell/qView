@@ -44,12 +44,6 @@ namespace Qv
         DisplayP3 = 3
     };
 
-    enum class CursorAutoHideType
-    {
-        FullScreenOnly = 0,
-        Always = 1
-    };
-
     enum class PreloadMode
     {
         Disabled = 0,

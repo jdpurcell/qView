@@ -979,7 +979,7 @@
            <x>0</x>
            <y>0</y>
            <width>467</width>
-           <height>711</height>
+           <height>685</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -1274,7 +1274,7 @@
               <number>10</number>
              </property>
              <item row="0" column="0">
-              <widget class="QCheckBox" name="cursorAutoHideCheckbox">
+              <widget class="QCheckBox" name="cursorAutoHideFullscreenCheckbox">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
                  <horstretch>0</horstretch>
@@ -1282,15 +1282,12 @@
                 </sizepolicy>
                </property>
                <property name="text">
-                <string>Auto-hide:</string>
+                <string>Auto-hide in fullscreen:</string>
                </property>
               </widget>
              </item>
              <item row="0" column="1">
-              <widget class="QComboBox" name="cursorAutoHideTypeComboBox"/>
-             </item>
-             <item row="1" column="1">
-              <widget class="QDoubleSpinBox" name="cursorAutoHideDelaySpinBox">
+              <widget class="QDoubleSpinBox" name="cursorAutoHideFullscreenDelaySpinBox">
                <property name="suffix">
                 <string> sec delay</string>
                </property>

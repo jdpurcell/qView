@@ -776,9 +776,7 @@ void QVGraphicsView::centerImage()
 
 void QVGraphicsView::setCursorVisible(const bool visible)
 {
-    const bool autoHideCursor =
-        cursorAutoHideType == Qv::CursorAutoHideType::Always ||
-        (cursorAutoHideType == Qv::CursorAutoHideType::FullScreenOnly && window()->isFullScreen());
+    const bool autoHideCursor = isCursorAutoHideFullscreenEnabled && window()->isFullScreen();
     if (visible)
     {
         if (autoHideCursor && pressedMouseButton == Qt::NoButton)
@@ -788,6 +786,7 @@ void QVGraphicsView::setCursorVisible(const bool visible)
 
         if (isCursorVisible) return;
 
+        window()->setCursor(Qt::ArrowCursor);
         viewport()->setCursor(Qt::ArrowCursor);
         isCursorVisible = true;
     }
@@ -795,6 +794,7 @@ void QVGraphicsView::setCursorVisible(const bool visible)
     {
         if (!isCursorVisible) return;
 
+        window()->setCursor(Qt::BlankCursor);
         viewport()->setCursor(Qt::BlankCursor);
         isCursorVisible = false;
     }
@@ -1123,8 +1123,8 @@ void QVGraphicsView::settingsUpdated()
     scrollActionCooldown = settingsManager.getBoolean("scrollactioncooldown");
 
     //cursor auto-hiding
-    cursorAutoHideType = settingsManager.getBoolean("cursorautohideenabled") ? std::make_optional(settingsManager.getEnum<Qv::CursorAutoHideType>("cursorautohidetype")) : std::nullopt;
-    hideCursorTimer->setInterval(settingsManager.getDouble("cursorautohidedelay") * 1000.0);
+    isCursorAutoHideFullscreenEnabled = settingsManager.getBoolean("cursorautohidefullscreenenabled");
+    hideCursorTimer->setInterval(settingsManager.getDouble("cursorautohidefullscreendelay") * 1000.0);
 
     // End of settings variables
 

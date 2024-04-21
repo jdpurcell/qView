@@ -31,7 +31,7 @@ QVOptionsDialog::QVOptionsDialog(QWidget *parent) :
     connect(ui->scalingCheckbox, &QCheckBox::stateChanged, this, &QVOptionsDialog::scalingCheckboxStateChanged);
     connect(ui->fitZoomLimitCheckbox, &QCheckBox::stateChanged, this, &QVOptionsDialog::fitZoomLimitCheckboxStateChanged);
     connect(ui->constrainImagePositionCheckbox, &QCheckBox::stateChanged, this, &QVOptionsDialog::constrainImagePositionCheckboxStateChanged);
-    connect(ui->cursorAutoHideCheckbox, &QCheckBox::stateChanged, this, &QVOptionsDialog::cursorAutoHideCheckboxStateChanged);
+    connect(ui->cursorAutoHideFullscreenCheckbox, &QCheckBox::stateChanged, this, &QVOptionsDialog::cursorAutoHideFullscreenCheckboxStateChanged);
     connect(ui->middleButtonModeClickRadioButton, &QRadioButton::clicked, this, &QVOptionsDialog::middleButtonModeChanged);
     connect(ui->middleButtonModeDragRadioButton, &QRadioButton::clicked, this, &QVOptionsDialog::middleButtonModeChanged);
     connect(ui->titlebarComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &QVOptionsDialog::titlebarComboBoxCurrentIndexChanged);
@@ -264,10 +264,9 @@ void QVOptionsDialog::syncSettings(bool defaults, bool makeConnections)
     syncComboBox(ui->altVerticalScrollComboBox, "viewportaltverticalscrollaction", defaults, makeConnections);
     syncComboBox(ui->altHorizontalScrollComboBox, "viewportalthorizontalscrollaction", defaults, makeConnections);
     syncCheckbox(ui->scrollActionCooldownCheckbox, "scrollactioncooldown", defaults, makeConnections);
-    syncCheckbox(ui->cursorAutoHideCheckbox, "cursorautohideenabled", defaults, makeConnections);
-    cursorAutoHideCheckboxStateChanged(ui->cursorAutoHideCheckbox->checkState());
-    syncComboBox(ui->cursorAutoHideTypeComboBox, "cursorautohidetype", defaults, makeConnections);
-    syncDoubleSpinBox(ui->cursorAutoHideDelaySpinBox, "cursorautohidedelay", defaults, makeConnections);
+    syncCheckbox(ui->cursorAutoHideFullscreenCheckbox, "cursorautohidefullscreenenabled", defaults, makeConnections);
+    cursorAutoHideFullscreenCheckboxStateChanged(ui->cursorAutoHideFullscreenCheckbox->checkState());
+    syncDoubleSpinBox(ui->cursorAutoHideFullscreenDelaySpinBox, "cursorautohidefullscreendelay", defaults, makeConnections);
 }
 
 void QVOptionsDialog::syncCheckbox(QCheckBox *checkbox, const QString &key, bool defaults, bool makeConnection)
@@ -573,11 +572,9 @@ void QVOptionsDialog::constrainImagePositionCheckboxStateChanged(int state)
     ui->constrainCentersSmallImageCheckbox->setEnabled(static_cast<bool>(state));
 }
 
-void QVOptionsDialog::cursorAutoHideCheckboxStateChanged(int state)
+void QVOptionsDialog::cursorAutoHideFullscreenCheckboxStateChanged(int state)
 {
-    const bool isChecked = static_cast<bool>(state);
-    ui->cursorAutoHideTypeComboBox->setEnabled(isChecked);
-    ui->cursorAutoHideDelaySpinBox->setEnabled(isChecked);
+    ui->cursorAutoHideFullscreenDelaySpinBox->setEnabled(static_cast<bool>(state));
 }
 
 void QVOptionsDialog::populateCategories()
@@ -688,13 +685,6 @@ const Ui::ComboBoxItems<Qv::ColorSpaceConversion> QVOptionsDialog::mapColorSpace
         { Qv::ColorSpaceConversion::AutoDetect, tr("Auto-detect") },
         { Qv::ColorSpaceConversion::SRgb, tr("sRGB") },
         { Qv::ColorSpaceConversion::DisplayP3, tr("Display P3") }
-    };
-}
-
-const Ui::ComboBoxItems<Qv::CursorAutoHideType> QVOptionsDialog::mapCursorAutoHideType() {
-    return {
-        { Qv::CursorAutoHideType::FullScreenOnly, tr("Fullscreen only") },
-        { Qv::CursorAutoHideType::Always, tr("Always") }
     };
 }
 
@@ -815,6 +805,4 @@ void QVOptionsDialog::populateComboBoxes()
     populateComboBox(ui->horizontalScrollComboBox, mapViewportScrollAction());
     populateComboBox(ui->altVerticalScrollComboBox, mapViewportScrollAction());
     populateComboBox(ui->altHorizontalScrollComboBox, mapViewportScrollAction());
-
-    populateComboBox(ui->cursorAutoHideTypeComboBox, mapCursorAutoHideType());
 }
