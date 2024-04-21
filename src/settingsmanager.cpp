@@ -240,4 +240,7 @@ void SettingsManager::initializeSettingsLibrary()
 #else
     settingsLibrary.insert("scrollactioncooldown", {false, {}});
 #endif
+    settingsLibrary.insert("cursorautohideenabled", {true, {}});
+    settingsLibrary.insert("cursorautohidetype", {static_cast<int>(Qv::CursorAutoHideType::FullScreenOnly), {}});
+    settingsLibrary.insert("cursorautohidedelay", {2, {}});
 }

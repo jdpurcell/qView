@@ -1392,6 +1392,8 @@ void MainWindow::toggleFullScreen()
         showFullScreen();
     }
     setUpdatesEnabled(true);
+
+    graphicsView->setCursorVisible(true);
 }
 
 void MainWindow::toggleTitlebarHidden()

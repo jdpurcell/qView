@@ -66,6 +66,8 @@ public:
 
     void centerImage();
 
+    void setCursorVisible(const bool visible);
+
     const QJsonObject getSessionState() const;
 
     void loadSessionState(const QJsonObject &state);
@@ -95,8 +97,6 @@ public:
 
     int getFitOverscan() const { return fitOverscan; }
 
-    // TODO: protected?
-    void setCursorVisible(const bool visible);
 signals:
     void cancelSlideshow();
 
@@ -192,7 +192,7 @@ private:
     Qv::ViewportScrollAction altHorizontalScrollAction {Qv::ViewportScrollAction::None};
     bool scrollActionCooldown {false};
 
-    std::optional<Qv::CalculatedZoomMode> calculatedZoomMode {Qv::CalculatedZoomMode::ZoomToFit};
+    std::optional<Qv::CalculatedZoomMode> calculatedZoomMode;
     bool navigationResetsZoom {true};
     bool loadIsFromSessionRestore {false};
     qreal zoomLevel {1.0};
@@ -200,6 +200,7 @@ private:
     qreal appliedExpensiveScaleZoomLevel {0.0};
     std::optional<QPoint> lastZoomEventPos;
     QPointF lastZoomRoundingError;
+    std::optional<Qv::CursorAutoHideType> cursorAutoHideType;
     bool isCursorVisible {true};
 
     QVImageCore imageCore {this};

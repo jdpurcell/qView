@@ -424,7 +424,7 @@ void QVGraphicsView::executeScrollAction(const Qv::ViewportScrollAction action, 
         if (isCursorVisible)
             setCursorVisible(true);
 
-        zoomRelative(zoomFactor, isCursorVisible ? std::make_optional(mousePos) : std::nullopt);
+        zoomRelative(zoomFactor, mousePos);
     }
     else if (action == Qv::ViewportScrollAction::Navigate)
     {
@@ -561,7 +561,7 @@ void QVGraphicsView::zoomAbsolute(const qreal absoluteLevel, const std::optional
     if (!isApplyingCalculation || !Qv::calculatedZoomModeIsSticky(calculatedZoomMode.value()))
         setCalculatedZoomMode({});
 
-    const std::optional<QPoint> pos = !mousePos.has_value() ? std::nullopt : isCursorZoomEnabled ? mousePos : getUsableViewportRect().center();
+    const std::optional<QPoint> pos = !mousePos.has_value() ? std::nullopt : isCursorZoomEnabled && isCursorVisible ? mousePos : getUsableViewportRect().center();
     if (pos != lastZoomEventPos)
     {
         lastZoomEventPos = pos;
@@ -593,7 +593,6 @@ void QVGraphicsView::zoomAbsolute(const qreal absoluteLevel, const std::optional
     }
     else if (!loadIsFromSessionRestore)
     {
-        // TODO: View to center viewport, not center image
         centerImage();
     }
 
@@ -777,7 +776,9 @@ void QVGraphicsView::centerImage()
 
 void QVGraphicsView::setCursorVisible(const bool visible)
 {
-    const bool autoHideCursor = true;
+    const bool autoHideCursor =
+        cursorAutoHideType == Qv::CursorAutoHideType::Always ||
+        (cursorAutoHideType == Qv::CursorAutoHideType::FullScreenOnly && window()->isFullScreen());
     if (visible)
     {
         if (autoHideCursor && pressedMouseButton == Qt::NoButton)
@@ -1121,11 +1122,17 @@ void QVGraphicsView::settingsUpdated()
     altHorizontalScrollAction = settingsManager.getEnum<Qv::ViewportScrollAction>("viewportalthorizontalscrollaction");
     scrollActionCooldown = settingsManager.getBoolean("scrollactioncooldown");
 
+    //cursor auto-hiding
+    cursorAutoHideType = settingsManager.getBoolean("cursorautohideenabled") ? std::make_optional(settingsManager.getEnum<Qv::CursorAutoHideType>("cursorautohidetype")) : std::nullopt;
+    hideCursorTimer->setInterval(settingsManager.getDouble("cursorautohidedelay") * 1000.0);
+
     // End of settings variables
 
     handleDpiAdjustmentChange();
 
     fitOrConstrainImage();
+
+    setCursorVisible(true);
 }
 
 void QVGraphicsView::closeImage()

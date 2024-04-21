@@ -54,6 +54,7 @@ protected:
     const Ui::ComboBoxItems<Qv::AfterMatchingSize> mapAfterMatchingSize();
     const Ui::ComboBoxItems<Qv::CalculatedZoomMode> mapCalculatedZoomMode();
     const Ui::ComboBoxItems<Qv::ColorSpaceConversion> mapColorSpaceConversion();
+    const Ui::ComboBoxItems<Qv::CursorAutoHideType> mapCursorAutoHideType();
     const Ui::ComboBoxItems<Qv::PreloadMode> mapPreloadMode();
     const Ui::ComboBoxItems<Qv::SlideshowDirection> mapSlideshowDirection();
     const Ui::ComboBoxItems<Qv::SortMode> mapSortMode();
@@ -79,6 +80,8 @@ private slots:
     void fitZoomLimitCheckboxStateChanged(int state);
 
     void constrainImagePositionCheckboxStateChanged(int state);
+
+    void cursorAutoHideCheckboxStateChanged(int state);
 
     void languageComboBoxCurrentIndexChanged(int index);
 
