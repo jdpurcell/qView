@@ -75,6 +75,10 @@ public:
 
     ActionManager &getActionManager() { return actionManager; }
 
+    void ensureFontLoaded(const QString &path);
+
+    static QIcon iconFromFont(const QString &fontFamily, const QChar &codePoint, const int pixelSize, const qreal pixelRatio);
+
     static qreal getPerceivedBrightness(const QColor &color);
 
 private:
@@ -101,6 +105,8 @@ private:
 #ifndef QV_DISABLE_ONLINE_VERSION_CHECK
     UpdateChecker updateChecker;
 #endif //QV_DISABLE_ONLINE_VERSION_CHECK
+
+    QSet<QString> loadedFontPaths;
 };
 
 #endif // QVAPPLICATION_H
