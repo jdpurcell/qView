@@ -388,7 +388,7 @@
            <x>0</x>
            <y>0</y>
            <width>482</width>
-           <height>397</height>
+           <height>417</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -422,46 +422,55 @@
           <item row="0" column="0">
            <widget class="QLabel" name="label_2">
             <property name="text">
-             <string>Scaling:</string>
+             <string>Smooth scaling:</string>
             </property>
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QCheckBox" name="filteringCheckbox">
+           <widget class="QComboBox" name="smoothScalingComboBox"/>
+          </item>
+          <item row="1" column="1">
+           <widget class="QCheckBox" name="scalingTwoCheckbox">
             <property name="toolTip">
-             <string>Turn this off to see individual pixels</string>
+             <string>Use expensive scaling when zooming above the window size (can be laggier with large images)</string>
             </property>
             <property name="text">
-             <string>&amp;Bilinear filtering</string>
+             <string>Expensive scaling above window size</string>
             </property>
             <property name="checked">
              <bool>true</bool>
             </property>
            </widget>
           </item>
-          <item row="1" column="1">
-           <widget class="QCheckBox" name="scalingCheckbox">
-            <property name="toolTip">
-             <string>Images appear aliased (having jagged edges) without this, but it is faster</string>
+          <item row="2" column="0">
+           <widget class="QCheckBox" name="smoothScalingLimitCheckbox">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
             </property>
             <property name="text">
-             <string>&amp;Image scaling</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
+             <string>Disable above:</string>
             </property>
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QCheckBox" name="scalingTwoCheckbox">
-            <property name="toolTip">
-             <string>Choose whether or not the image continues to be scaled when zooming above the window size (can be laggier with large images)</string>
+           <widget class="QSpinBox" name="smoothScalingLimitSpinBox">
+            <property name="suffix">
+             <string>%</string>
             </property>
-            <property name="text">
-             <string>&amp;Scaling above window size</string>
+            <property name="minimum">
+             <number>100</number>
             </property>
-            <property name="checked">
-             <bool>true</bool>
+            <property name="maximum">
+             <number>6400</number>
+            </property>
+            <property name="singleStep">
+             <number>25</number>
+            </property>
+            <property name="value">
+             <number>400</number>
             </property>
            </widget>
           </item>

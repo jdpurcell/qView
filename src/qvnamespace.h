@@ -58,6 +58,13 @@ namespace Qv
         Random = 2
     };
 
+    enum class SmoothScalingMode
+    {
+        Disabled = 0,
+        Bilinear = 1,
+        Expensive = 2
+    };
+
     enum class SortMode
     {
         Name = 0,

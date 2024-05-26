@@ -58,6 +58,7 @@ protected:
     const Ui::ComboBoxItems<Qv::ColorSpaceConversion> mapColorSpaceConversion();
     const Ui::ComboBoxItems<Qv::PreloadMode> mapPreloadMode();
     const Ui::ComboBoxItems<Qv::SlideshowDirection> mapSlideshowDirection();
+    const Ui::ComboBoxItems<Qv::SmoothScalingMode> mapSmoothScalingMode();
     const Ui::ComboBoxItems<Qv::SortMode> mapSortMode();
     const Ui::ComboBoxItems<Qv::TitleBarText> mapTitleBarText();
     const Ui::ComboBoxItems<Qv::WindowResizeMode> mapWindowResizeMode();
@@ -72,11 +73,13 @@ private slots:
 
     void bgColorCheckboxStateChanged(int state);
 
-    void scalingCheckboxStateChanged(int state);
-
     void titlebarComboBoxCurrentIndexChanged(int index);
 
     void windowResizeComboBoxCurrentIndexChanged(int index);
+
+    void smoothScalingComboBoxCurrentIndexChanged(int index);
+
+    void smoothScalingLimitCheckboxStateChanged(int state);
 
     void fitZoomLimitCheckboxStateChanged(int state);
 

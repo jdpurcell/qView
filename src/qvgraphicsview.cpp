@@ -596,7 +596,8 @@ void QVGraphicsView::zoomAbsolute(const qreal absoluteLevel, const std::optional
         centerImage();
     }
 
-    expensiveScaleTimer->start();
+    handleSmoothScalingChange();
+
     emitZoomLevelChangedTimer->start();
 }
 
@@ -638,18 +639,8 @@ void QVGraphicsView::setNavigationResetsZoom(const bool value)
 
 void QVGraphicsView::applyExpensiveScaling()
 {
-    if (!isScalingEnabled || !getCurrentFileDetails().isPixmapLoaded)
+    if (!isExpensiveScalingRequested())
         return;
-
-    // If we are above maximum scaling size
-    const QSize contentSize = getContentRect().size().toSize();
-    const QSize maxSize = getUsableViewportRect(true).size() * (isScalingTwoEnabled ? 3 : 1) + QSize(1, 1);
-    if (contentSize.width() > maxSize.width() || contentSize.height() > maxSize.height())
-    {
-        // Return to original size
-        removeExpensiveScaling();
-        return;
-    }
 
     // Calculate scaled resolution
     const qreal dpiAdjustment = getDpiAdjustment();
@@ -685,7 +676,7 @@ void QVGraphicsView::animatedFrameChanged(QRect rect)
 {
     Q_UNUSED(rect)
 
-    if (isScalingEnabled)
+    if (isExpensiveScalingRequested())
     {
         applyExpensiveScaling();
     }
@@ -970,6 +961,23 @@ void QVGraphicsView::fitOrConstrainImage()
         scrollHelper->constrain(true);
 }
 
+bool QVGraphicsView::isSmoothScalingRequested() const
+{
+    return smoothScalingMode != Qv::SmoothScalingMode::Disabled &&
+        (!smoothScalingLimit.has_value() || zoomLevel < smoothScalingLimit.value());
+}
+
+bool QVGraphicsView::isExpensiveScalingRequested() const
+{
+    if (!isSmoothScalingRequested() || smoothScalingMode != Qv::SmoothScalingMode::Expensive || !getCurrentFileDetails().isPixmapLoaded)
+        return false;
+
+    // If we are above maximum scaling size
+    const QSize contentSize = getContentRect().size().toSize();
+    const QSize maxSize = getUsableViewportRect(true).size() * (expensiveScalingAboveWindowSize ? 3 : 1) + QSize(1, 1);
+    return contentSize.width() <= maxSize.width() && contentSize.height() <= maxSize.height();
+}
+
 QSizeF QVGraphicsView::getEffectiveOriginalSize() const
 {
     return getTransformWithNoScaling().mapRect(QRectF(QPoint(), getCurrentFileDetails().loadedPixmapSize)).size() * getDpiAdjustment();
@@ -1035,6 +1043,16 @@ void QVGraphicsView::handleDpiAdjustmentChange()
     expensiveScaleTimer->start();
 }
 
+void QVGraphicsView::handleSmoothScalingChange()
+{
+    loadedPixmapItem->setTransformationMode(isSmoothScalingRequested() ? Qt::SmoothTransformation : Qt::FastTransformation);
+
+    if (isExpensiveScalingRequested())
+        expensiveScaleTimer->start();
+    else if (appliedExpensiveScaleZoomLevel != 0.0)
+        removeExpensiveScaling();
+}
+
 void QVGraphicsView::cancelTurboNav()
 {
     if (!turboNavMode.has_value())
@@ -1057,24 +1075,14 @@ void QVGraphicsView::settingsUpdated()
 {
     auto &settingsManager = qvApp->getSettingsManager();
 
-    //filtering
-    if (settingsManager.getBoolean("filteringenabled"))
-        loadedPixmapItem->setTransformationMode(Qt::SmoothTransformation);
-    else
-        loadedPixmapItem->setTransformationMode(Qt::FastTransformation);
+    //smooth scaling
+    smoothScalingMode = settingsManager.getEnum<Qv::SmoothScalingMode>("smoothscalingmode");
 
-    //scaling
-    isScalingEnabled = settingsManager.getBoolean("scalingenabled");
-    if (isScalingEnabled)
-        expensiveScaleTimer->start();
-    else
-        removeExpensiveScaling();
+    //scaling two
+    expensiveScalingAboveWindowSize = settingsManager.getBoolean("scalingtwoenabled");
 
-    //scaling2
-    if (!isScalingEnabled)
-        isScalingTwoEnabled = false;
-    else
-        isScalingTwoEnabled = settingsManager.getBoolean("scalingtwoenabled");
+    //smooth scaling limit
+    smoothScalingLimit = settingsManager.getBoolean("smoothscalinglimitenabled") ? std::make_optional(settingsManager.getInteger("smoothscalinglimitpercent") / 100.0) : std::nullopt;
 
     //calculatedzoommode
     defaultCalculatedZoomMode = settingsManager.getEnum<Qv::CalculatedZoomMode>("calculatedzoommode");
@@ -1127,6 +1135,8 @@ void QVGraphicsView::settingsUpdated()
     hideCursorTimer->setInterval(settingsManager.getDouble("cursorautohidefullscreendelay") * 1000.0);
 
     // End of settings variables
+
+    handleSmoothScalingChange();
 
     handleDpiAdjustmentChange();
 

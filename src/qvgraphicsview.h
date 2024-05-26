@@ -141,6 +141,10 @@ protected:
 
     void executeScrollAction(const Qv::ViewportScrollAction action, const QPoint delta, const QPoint mousePos, const bool hasShiftModifier);
 
+    bool isSmoothScalingRequested() const;
+
+    bool isExpensiveScalingRequested() const;
+
     QRectF getContentRect() const;
 
     QRect getUsableViewportRect(const bool addOverscan = false) const;
@@ -152,6 +156,8 @@ protected:
     qreal getDpiAdjustment() const;
 
     void handleDpiAdjustmentChange();
+
+    void handleSmoothScalingChange();
 
     void cancelTurboNav();
 
@@ -165,8 +171,9 @@ private slots:
 private:
     QGraphicsPixmapItem *loadedPixmapItem;
 
-    bool isScalingEnabled {true};
-    bool isScalingTwoEnabled {true};
+    Qv::SmoothScalingMode smoothScalingMode {Qv::SmoothScalingMode::Disabled};
+    std::optional<qreal> smoothScalingLimit;
+    bool expensiveScalingAboveWindowSize {false};
     std::optional<qreal> fitZoomLimit;
     int fitOverscan {0};
     bool isLoopFoldersEnabled {true};

@@ -16,8 +16,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName("qView-JDP");
     QCoreApplication::setApplicationVersion(QString::number(VERSION));
 
-    if (!QSettings().value("firstlaunch").isValid())
-        SettingsManager::copyFromOfficial();
+    SettingsManager::migrateOldSettings();
 
     if (QSettings().value("options/nonnativetheme").toBool())
         QApplication::setStyle("fusion");
