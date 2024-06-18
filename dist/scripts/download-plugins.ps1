@@ -22,7 +22,8 @@ if ($pluginNames.count -eq 0) {
 }
 
 foreach ($pluginName in $pluginNames) {
-    $artifactName = "$pluginName-$imageName-$qtVersion$($env:arch ? "-$env:arch" : $null).zip"
+    $pluginQtVersion = "6.5.3"
+    $artifactName = "$pluginName-$imageName-$pluginQtVersion$($env:arch ? "-$env:arch" : $null).zip"
     $downloadUrl = "$binaryBaseUrl/$artifactName"
 
     Write-Host "Downloading $downloadUrl"

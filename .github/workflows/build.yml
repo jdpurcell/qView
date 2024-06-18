@@ -19,23 +19,14 @@ jobs:
     strategy:
       matrix:
         include:
-          - runner: 'ubuntu-20.04'
-            qtVersion: '5.15.2'
           - runner: 'macos-14'
-            qtVersion: '6.5.3'
+            qtVersion: '6.7.2'
             qtModules: 'qtimageformats'
-          - runner: 'macos-14'
-            qtVersion: '5.15.2'
-            osSuffix: '_legacy'
           - runner: 'windows-2022'
-            qtVersion: '6.5.3'
+            qtVersion: '6.7.2'
             qtArch: 'win64_msvc2019_64'
             osSuffix: '_64'
             qtModules: 'qtimageformats'
-          - runner: 'windows-2022'
-            qtVersion: '5.15.2'
-            qtArch: 'win32_msvc2019'
-            osSuffix: '_32'
     runs-on: ${{ matrix.runner }}
     steps:
       - name: Set environment variables
