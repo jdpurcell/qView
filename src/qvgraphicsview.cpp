@@ -327,6 +327,8 @@ void QVGraphicsView::zoomAbsolute(const qreal absoluteLevel, const QPoint &pos)
 
     if (isScalingEnabled)
         expensiveScaleTimer->start();
+
+    emit zoomLevelChanged();
 }
 
 void QVGraphicsView::applyExpensiveScaling()

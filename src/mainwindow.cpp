@@ -60,6 +60,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Connect graphicsview signals
     connect(graphicsView, &QVGraphicsView::fileChanged, this, &MainWindow::fileChanged);
+    connect(graphicsView, &QVGraphicsView::zoomLevelChanged, this, &MainWindow::zoomLevelChanged);
     connect(graphicsView, &QVGraphicsView::cancelSlideshow, this, &MainWindow::cancelSlideshow);
 
     // Initialize escape shortcut
@@ -78,6 +79,12 @@ MainWindow::MainWindow(QWidget *parent) :
     // Timer for slideshow
     slideshowTimer = new QTimer(this);
     connect(slideshowTimer, &QTimer::timeout, this, &MainWindow::slideshowAction);
+
+    // Timer for updating titlebar after zoom change
+    zoomTitlebarUpdateTimer = new QTimer(this);
+    zoomTitlebarUpdateTimer->setSingleShot(true);
+    zoomTitlebarUpdateTimer->setInterval(50);
+    connect(zoomTitlebarUpdateTimer, &QTimer::timeout, this, &MainWindow::buildWindowTitle);
 
     // Context menu
     auto &actionManager = qvApp->getActionManager();
@@ -392,6 +399,12 @@ void MainWindow::fileChanged()
     update();
 }
 
+void MainWindow::zoomLevelChanged()
+{
+    if (!zoomTitlebarUpdateTimer->isActive())
+        zoomTitlebarUpdateTimer->start();
+}
+
 void MainWindow::disableActions()
 {
     const auto &actionLibrary = qvApp->getActionManager().getActionLibrary();
@@ -496,14 +509,16 @@ void MainWindow::buildWindowTitle()
         }
         case 2:
         {
-            newString = QString::number(getCurrentFileDetails().loadedIndexInFolder+1);
+            newString = QString::number(graphicsView->getZoomLevel() * 100.0, 'f', 1) + "%";
+            newString += " - " + QString::number(getCurrentFileDetails().loadedIndexInFolder+1);
             newString += "/" + QString::number(getCurrentFileDetails().folderFileInfoList.count());
             newString += " - " + getCurrentFileDetails().fileInfo.fileName();
             break;
         }
         case 3:
         {
-            newString = QString::number(getCurrentFileDetails().loadedIndexInFolder+1);
+            newString = QString::number(graphicsView->getZoomLevel() * 100.0, 'f', 1) + "%";
+            newString += " - " + QString::number(getCurrentFileDetails().loadedIndexInFolder+1);
             newString += "/" + QString::number(getCurrentFileDetails().folderFileInfoList.count());
             newString += " - " + getCurrentFileDetails().fileInfo.fileName();
             if (!getCurrentFileDetails().errorData.hasError)
