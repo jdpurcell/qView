@@ -71,8 +71,8 @@ if ($pluginNames -contains 'kimageformats') {
         if (Test-Path -Path kimageformats/kimageformats/output/avif.dll -PathType Leaf) {
             cp kimageformats/kimageformats/output/avif.dll "$out_frm/"
             cp kimageformats/kimageformats/output/aom.dll "$out_frm/"
-            cp kimageformats/kimageformats/output/jpeg62.dll "$out_frm/"
-            cp kimageformats/kimageformats/output/libyuv.dll "$out_frm/"
+            # cp kimageformats/kimageformats/output/jpeg62.dll "$out_frm/"
+            # cp kimageformats/kimageformats/output/libyuv.dll "$out_frm/"
         }
         # copy heif stuff
         if (Test-Path -Path kimageformats/kimageformats/output/heif.dll -PathType Leaf) {
