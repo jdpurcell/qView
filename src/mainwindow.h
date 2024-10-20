@@ -171,6 +171,8 @@ protected:
 
     void paintEvent(QPaintEvent *event) override;
 
+    void fullscreenChanged();
+
 protected slots:
     void settingsUpdated();
     void shortcutsUpdated();

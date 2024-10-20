@@ -68,7 +68,7 @@ MainWindow::MainWindow(QWidget *parent, const QJsonObject &windowSessionState) :
     // Initialize escape shortcut
     escShortcut = new QShortcut(Qt::Key_Escape, this);
     connect(escShortcut, &QShortcut::activated, this, [this](){
-        if (windowState() == Qt::WindowFullScreen)
+        if (windowState().testFlag(Qt::WindowFullScreen))
             toggleFullScreen();
     });
 
@@ -132,6 +132,9 @@ MainWindow::MainWindow(QWidget *parent, const QJsonObject &windowSessionState) :
     connect(virtualMenu, &QMenu::triggered, this, [this](QAction *triggeredAction){
        ActionManager::actionTriggered(triggeredAction, this);
     });
+
+    // Enable actions related to having a window
+    disableActions();
 
     // Connect functions to application components
     connect(&qvApp->getShortcutManager(), &ShortcutManager::shortcutsUpdated, this, &MainWindow::shortcutsUpdated);
@@ -254,25 +257,9 @@ void MainWindow::changeEvent(QEvent *event)
 {
     if (event->type() == QEvent::WindowStateChange)
     {
-        const auto fullscreenActions = qvApp->getActionManager().getAllClonesOfAction("fullscreen", this);
-        for (const auto &fullscreenAction : fullscreenActions)
-        {
-            if (windowState() == Qt::WindowFullScreen)
-            {
-                fullscreenAction->setText(tr("Exit F&ull Screen"));
-                fullscreenAction->setIcon(QIcon::fromTheme("view-restore"));
-            }
-            else
-            {
-                fullscreenAction->setText(tr("Enter F&ull Screen"));
-                fullscreenAction->setIcon(QIcon::fromTheme("view-fullscreen"));
-            }
-        }
-
-        if (qvApp->getSettingsManager().getBoolean("fullscreendetails"))
-            ui->fullscreenLabel->setVisible(windowState() == Qt::WindowFullScreen);
-
-        updateMenuBarVisible();
+        const auto *changeEvent = static_cast<QWindowStateChangeEvent*>(event);
+        if (windowState().testFlag(Qt::WindowFullScreen) != changeEvent->oldState().testFlag(Qt::WindowFullScreen))
+            fullscreenChanged();
     }
 
     QMainWindow::changeEvent(event);
@@ -334,6 +321,30 @@ void MainWindow::paintEvent(QPaintEvent *event)
     }
 }
 
+void MainWindow::fullscreenChanged()
+{
+    const bool isFullscreen = windowState().testFlag(Qt::WindowFullScreen);
+
+    const auto fullscreenActions = qvApp->getActionManager().getAllClonesOfAction("fullscreen", this);
+    for (const auto &fullscreenAction : fullscreenActions)
+    {
+        fullscreenAction->setText(isFullscreen ? tr("Exit F&ull Screen") : tr("Enter F&ull Screen"));
+        fullscreenAction->setIcon(isFullscreen ? QIcon::fromTheme("view-restore") : QIcon::fromTheme("view-fullscreen"));
+    }
+
+    ui->fullscreenLabel->setVisible(isFullscreen && qvApp->getSettingsManager().getBoolean("fullscreendetails"));
+
+    if (!isFullscreen && storedTitlebarHidden)
+    {
+        setTitlebarHidden(true);
+        storedTitlebarHidden = false;
+    }
+
+    updateMenuBarVisible();
+
+    graphicsView->setCursorVisible(true);
+}
+
 void MainWindow::openFile(const QString &fileName)
 {
     graphicsView->loadFile(fileName);
@@ -364,7 +375,7 @@ void MainWindow::settingsUpdated()
     slideshowTimer->setInterval(static_cast<int>(settingsManager.getDouble("slideshowtimer")*1000));
 
 
-    ui->fullscreenLabel->setVisible(qvApp->getSettingsManager().getBoolean("fullscreendetails") && (windowState() == Qt::WindowFullScreen));
+    ui->fullscreenLabel->setVisible(qvApp->getSettingsManager().getBoolean("fullscreendetails") && windowState().testFlag(Qt::WindowFullScreen));
 
     updateMenuBarVisible();
 
@@ -462,6 +473,10 @@ void MainWindow::disableActions()
                 else if (cloneData.last() == "folderdisable")
                 {
                     clone->setEnabled(!getCurrentFileDetails().folderFileInfoList.isEmpty());
+                }
+                else if (cloneData.last() == "windowdisable")
+                {
+                    clone->setEnabled(true);
                 }
             }
         }
@@ -653,6 +668,12 @@ void MainWindow::setTitlebarHidden(const bool shouldHide)
     customizeWindowFlags(Qt::WindowTitleHint, !shouldHide);
 #endif
 
+    const auto toggleTitlebarActions = qvApp->getActionManager().getAllClonesOfAction("toggletitlebar", this);
+    for (const auto &toggleTitlebarAction : toggleTitlebarActions)
+    {
+        toggleTitlebarAction->setText(shouldHide ? tr("Show Title&bar") : tr("Hide Title&bar"));
+    }
+
     updateWindowFilePath();
     updateMenuBarVisible();
     update();
@@ -672,7 +693,7 @@ void MainWindow::setWindowSize()
     justLaunchedWithImage = false;
 
     //check if window is maximized or fullscreened
-    if (windowState() == Qt::WindowMaximized || windowState() == Qt::WindowFullScreen)
+    if (windowState().testFlag(Qt::WindowMaximized) || windowState().testFlag(Qt::WindowFullScreen))
         return;
 
     const qreal minWindowResizedPercentage = qvApp->getSettingsManager().getInteger("minwindowresizedpercentage")/100.0;
@@ -1322,29 +1343,35 @@ void MainWindow::increaseSpeed()
 
 void MainWindow::toggleFullScreen()
 {
+    // Note: This is only triggered by the menu action, so the logic here should be kept to a minimum. Anything that
+    // needs to run even if the window manager initiated the change should be triggered by QEvent::WindowStateChange.
+
+    // Disable updates during window state change to resolve visual glitches on macOS if the titlebar is hidden
     setUpdatesEnabled(false);
-    if (windowState() & Qt::WindowFullScreen)
+
+    if (windowState().testFlag(Qt::WindowFullScreen))
     {
         setWindowState(storedWindowState);
-        if (storedTitlebarHidden)
-            setTitlebarHidden(true);
     }
     else
     {
         storedWindowState = windowState();
+
+        // Restore the titlebar if it was hidden because the window manager might do something special with the
+        // titlebar (e.g. macOS) in fullscreen mode or get confused by the titlebar being hidden (e.g. Windows).
         storedTitlebarHidden = getTitlebarHidden();
         if (storedTitlebarHidden)
-            setTitlebarHidden(false);
+           setTitlebarHidden(false);
+
         showFullScreen();
     }
-    setUpdatesEnabled(true);
 
-    graphicsView->setCursorVisible(true);
+    setUpdatesEnabled(true);
 }
 
 void MainWindow::toggleTitlebarHidden()
 {
-    if (windowState() & Qt::WindowFullScreen)
+    if (windowState().testFlag(Qt::WindowFullScreen))
         return;
 
     setTitlebarHidden(!getTitlebarHidden());

@@ -281,6 +281,7 @@ QMenu *ActionManager::buildViewMenu(bool addIcon, QWidget *parent)
     addCloneOfAction(viewMenu, "flip");
     addCloneOfAction(viewMenu, "resettransformation");
     viewMenu->addSeparator();
+    addCloneOfAction(viewMenu, "toggletitlebar");
     addCloneOfAction(viewMenu, "fullscreen");
 
     menuCloneLibrary.insert(viewMenu->menuAction()->data().toString(), viewMenu);
@@ -664,6 +665,8 @@ void ActionManager::actionTriggered(QAction *triggeredAction, MainWindow *releva
         relevantWindow->flip();
     } else if (key == "resettransformation") {
         relevantWindow->resetTransformation();
+    } else if (key == "toggletitlebar") {
+        relevantWindow->toggleTitlebarHidden();
     } else if (key == "fullscreen") {
         relevantWindow->toggleFullScreen();
     } else if (key == "firstfile") {
@@ -820,8 +823,13 @@ void ActionManager::initializeActionLibrary()
     resetTransformationAction->setData({"disable"});
     actionLibrary.insert("resettransformation", resetTransformationAction);
 
+    auto *toggleTitlebarAction = new QAction(tr("Hide Title&bar"));
+    toggleTitlebarAction->setData({"windowdisable"});
+    actionLibrary.insert("toggletitlebar", toggleTitlebarAction);
+
     auto *fullScreenAction = new QAction(QIcon::fromTheme("view-fullscreen"), tr("Enter F&ull Screen"));
     fullScreenAction->setMenuRole(QAction::NoRole);
+    fullScreenAction->setData({"windowdisable"});
     actionLibrary.insert("fullscreen", fullScreenAction);
 
     auto *firstFileAction = new QAction(QIcon::fromTheme("go-first"), tr("&First File"));

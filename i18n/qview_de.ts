@@ -199,6 +199,11 @@
         <translation type="unfinished">&amp;Transformation zurücksetzen</translation>
     </message>
     <message>
+        <location filename="../src/actionmanager.cpp" line="826"/>
+        <source>Hide Title&amp;bar</source>
+        <translation type="unfinished">Titelleiste ausblenden</translation>
+    </message>
+    <message>
         <location filename="../src/actionmanager.cpp" line="876"/>
         <source>&amp;Settings</source>
         <extracomment>This is for the options dialog on windows</extracomment>
@@ -463,6 +468,16 @@ Keine Schreibberechtigung oder Datei ist schreibgeschützt.</translation>
         <translation>Fehler beim Öffnen von
 %3
 %2 (Fehler %1)</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="674"/>
+        <source>Show Title&amp;bar</source>
+        <translation type="unfinished">Titelleiste einblenden</translation>
+    </message>
+    <message>
+        <location filename="../src/mainwindow.cpp" line="674"/>
+        <source>Hide Title&amp;bar</source>
+        <translation type="unfinished">Titelleiste ausblenden</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="979"/>
@@ -1865,6 +1880,11 @@ Keine Schreibberechtigung oder Datei ist schreibgeschützt.</translation>
         <location filename="../src/shortcutmanager.cpp" line="96"/>
         <source>Reset Transformation</source>
         <translation type="unfinished">Transformation zurücksetzen</translation>
+    </message>
+    <message>
+        <location filename="../src/shortcutmanager.cpp" line="97"/>
+        <source>Toggle Titlebar Hidden</source>
+        <translation type="unfinished">Titelleiste ausgeblendet umschalten</translation>
     </message>
     <message>
         <location filename="../src/shortcutmanager.cpp" line="116"/>
