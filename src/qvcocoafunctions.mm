@@ -85,6 +85,13 @@ void QVCocoaFunctions::setFullSizeContentView(QWindow *window, const bool should
         adjustedFrame.size.height -= titlebarOverlap;
         [view.window setFrame:adjustedFrame display:NO];
         view.window.styleMask &= ~NSWindowStyleMaskFullSizeContentView;
+#if QT_VERSION == QT_VERSION_CHECK(6, 8, 1)
+        // Workaround for QTBUG-131783
+        [view retain];
+        QTimer::singleShot(0, [view]() {
+            [view release];
+        });
+#endif
     }
     [view.window setFrame:originalFrame display:YES];
 
