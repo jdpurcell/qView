@@ -42,6 +42,12 @@ if ($env:buildArch -eq 'Arm64') {
     windeployqt --no-compiler-runtime $argForceOpenSsl bin/qView.exe
 }
 
+if ($qtVersion -ge [version]'6.8.1') {
+    # Copy font so windows11 style can work on Windows 10
+    New-Item -ItemType Directory -Path "bin\fonts" -Force
+    Copy-Item -Path "dist\win\fonts\Segoe Fluent Icons.ttf" -Destination "bin\fonts"
+}
+
 if ($NightlyVersion -eq '') {
     # Call innomake if we are not building a nightly version (no version passed)
     & "dist/scripts/innomake.ps1"
