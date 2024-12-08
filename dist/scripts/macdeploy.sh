@@ -39,9 +39,9 @@ fi
 echo "Running codesign"
 if [[ "$APPLE_NOTARIZE_REQUESTED" == "true" ]]; then
     APP_IDENTIFIER=$(/usr/libexec/PlistBuddy -c "Print CFBundleIdentifier" "qView.app/Contents/Info.plist")
-    codesign --sign "$CODESIGN_CERT_NAME" --deep --options runtime --timestamp "qView.app"
+    codesign --sign "$CODESIGN_CERT_NAME" --deep --force --options runtime --timestamp "qView.app"
 else
-    codesign --sign "$CODESIGN_CERT_NAME" --deep "qView.app"
+    codesign --sign "$CODESIGN_CERT_NAME" --deep --force "qView.app"
 fi
 
 echo "Creating disk image"

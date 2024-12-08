@@ -38,7 +38,8 @@ if ($env:buildArch -eq 'Arm64') {
     & "$qtHostPath\bin\windeployqt" "--qmake=$env:QT_ROOT_DIR\bin\qmake.bat" --no-compiler-runtime bin\qView.exe
 } else {
     # Run windeployqt which should be in path
-    windeployqt --no-compiler-runtime bin/qView.exe
+    $argForceOpenSsl = $qtVersion -ge [version]'6.8.0' ? '--force-openssl' : $null
+    windeployqt --no-compiler-runtime $argForceOpenSsl bin/qView.exe
 }
 
 if ($NightlyVersion -eq '') {
