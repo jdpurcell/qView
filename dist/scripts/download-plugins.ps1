@@ -7,6 +7,14 @@ $pluginNames = "qtapng", "kimageformats"
 $qtVersion = [version]((qmake --version -split '\n')[1] -split ' ')[3]
 Write-Host "Detected Qt Version $qtVersion"
 
+# For testing until plugins are updated
+$qtArch = $env:qtArch ? "-$env:qtArch" : ''
+if ($qtVersion -gt [version]'6.7.3') {
+    $qtVersion = [version]'6.7.3'
+    $qtArch = $qtArch -replace "msvc2022", "msvc2019"
+    $qtArch = $qtArch -replace "_cross_compiled", ""
+}
+
 # Qt version availability and runner names are assumed.
 if ($IsWindows) {
     $imageName = "windows-2022"
@@ -23,7 +31,6 @@ if ($pluginNames.count -eq 0) {
 }
 
 foreach ($pluginName in $pluginNames) {
-    $qtArch = $env:qtArch ? "-$env:qtArch" : ''
     $artifactName = "$pluginName-$imageName-$qtVersion$qtArch.zip"
     $downloadUrl = "$binaryBaseUrl/$artifactName"
 
