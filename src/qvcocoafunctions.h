@@ -21,6 +21,8 @@ public:
 
     static void closeWindow(QWindow *window);
 
+    static void flushLastInputEvent(QWindow *window);
+
     static void setWindowMenu(QMenu *menu);
 
     static void setAlternate(QMenu *menu, int index);

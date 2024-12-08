@@ -227,6 +227,11 @@ void MainWindow::closeEvent(QCloseEvent *event)
     qvApp->getActionManager().untrackClonedActions(menuBar());
     qvApp->getActionManager().untrackClonedActions(virtualMenu);
 
+#if defined COCOA_LOADED && QT_VERSION == QT_VERSION_CHECK(6, 8, 1)
+    // Workaround for QTBUG-131783
+    QVCocoaFunctions::flushLastInputEvent(windowHandle());
+#endif
+
     QMainWindow::closeEvent(event);
 }
 
