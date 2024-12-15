@@ -9,6 +9,11 @@ on:
         description: 'Is this a release build?'
         required: false
         default: false
+      appleNotarize:
+        type: boolean
+        description: 'Notarize with Apple?'
+        required: false
+        default: false
 jobs:
   build:
     strategy:
@@ -20,27 +25,36 @@ jobs:
             qtVersion: '5.9'
             osSuffix: '_qt5.9'
             skipPlugins: 'true'
-          - runner: 'macos-12'
-            qtVersion: '6.5.3'
+          - runner: 'macos-14'
+            qtVersion: '6.7.3'
             qtModules: 'qtimageformats'
-          - runner: 'macos-12'
+            buildArch: 'Universal'
+          - runner: 'macos-13'
             qtVersion: '5.15.2'
             osSuffix: '_legacy'
-          - runner: 'windows-2019'
-            qtVersion: '6.5.3'
+          - runner: 'windows-2022'
+            qtVersion: '6.7.3'
             qtArch: 'win64_msvc2019_64'
             osSuffix: '_64'
             qtModules: 'qtimageformats'
-          - runner: 'windows-2019'
+          - runner: 'windows-2022'
+            qtVersion: '6.7.3'
+            qtArch: 'win64_msvc2019_arm64'
+            osSuffix: '_arm64'
+            qtModules: 'qtimageformats'
+            buildArch: 'Arm64'
+          - runner: 'windows-2022'
             qtVersion: '5.15.2'
             qtArch: 'win32_msvc2019'
             osSuffix: '_32'
+            buildArch: 'X86'
     runs-on: ${{ matrix.runner }}
     steps:
       - name: Set environment variables
         shell: bash
         run: |
-          echo "arch=${{ matrix.qtArch }}" >> $GITHUB_ENV
+          echo "qtArch=${{ matrix.qtArch }}" >> $GITHUB_ENV
+          echo "buildArch=${{ matrix.buildArch }}" >> $GITHUB_ENV
           if [ "${{ inputs.isRelease }}" != "true" ]; then
             buildNum=$(date '+%Y-%m-%d').$GITHUB_RUN_ATTEMPT
             echo "nightlyDefines=NIGHTLY=$buildNum" >> $GITHUB_ENV
@@ -51,7 +65,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Qt
-        uses: jurplel/install-qt-action@v3
+        uses: jurplel/install-qt-action@v4
         with:
           version: ${{ matrix.qtVersion }}
           arch: ${{ matrix.qtArch }}
@@ -63,6 +77,12 @@ jobs:
         run: dist/scripts/build.ps1
 
       - name: Deploy qView
+        env:
+          APPLE_NOTARIZE_REQUESTED: ${{ inputs.appleNotarize }}
+          APPLE_DEVID_APP_CERT_DATA: ${{ secrets.APPLE_DEVID_APP_CERT_DATA }}
+          APPLE_DEVID_APP_CERT_PASS: ${{ secrets.APPLE_DEVID_APP_CERT_PASS }}
+          APPLE_ID_USER: ${{ secrets.APPLE_ID_USER }}
+          APPLE_ID_PASS: ${{ secrets.APPLE_ID_PASS }}
         shell: pwsh
         run: |
           if ("${{ matrix.skipPlugins }}" -ne "true") {

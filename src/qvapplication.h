@@ -41,7 +41,7 @@ public:
 
     MainWindow *getMainWindow(bool shouldBeEmpty);
 
-    void checkUpdates();
+    void checkUpdates(bool isStartupCheck);
 
     void checkedUpdates();
 
@@ -62,8 +62,6 @@ public:
     void defineFilterLists();
 
     QMenuBar *getMenuBar() const {  return menuBar; }
-
-    const QStringList &getFilterList() const { return filterList; }
 
     const QStringList &getNameFilterList() const { return nameFilterList; }
 
@@ -91,7 +89,6 @@ private:
 
     QMenuBar *menuBar;
 
-    QStringList filterList;
     QStringList nameFilterList;
     QStringList fileExtensionList;
     QStringList mimeTypeNameList;

@@ -4,28 +4,27 @@
 
 $pluginNames = "qtapng", "kimageformats"
 
-$qtVersion = ((qmake --version -split '\n')[1] -split ' ')[3]
+$qtVersion = [version]((qmake --version -split '\n')[1] -split ' ')[3]
 Write-Host "Detected Qt Version $qtVersion"
 
 # Qt version availability and runner names are assumed.
 if ($IsWindows) {
-    $imageName = "windows-2019"
+    $imageName = "windows-2022"
 } elseif ($IsMacOS) {
-    $imageName = "macos-latest"
+    $imageName = $qtVersion -lt [version]'6.5.3' ? "macos-13" : "macos-14"
 } else {
     $imageName = "ubuntu-20.04"
 }
 
 $binaryBaseUrl = "https://github.com/jurplel/kimageformats-binaries/releases/download/cont"
-$pluginQtVersion = If ($qtVersion -like '6.*') { "6.4.3" } Else { $qtVersion }
 
 if ($pluginNames.count -eq 0) {
     Write-Host "the pluginNames array is empty."
 }
 
 foreach ($pluginName in $pluginNames) {
-    $arch = If (-not $env:arch -or $env:arch -eq '') { "" } Else { "-$env:arch" }
-    $artifactName = "$pluginName-$imageName-$pluginQtVersion$arch.zip"
+    $qtArch = $env:qtArch ? "-$env:qtArch" : ''
+    $artifactName = "$pluginName-$imageName-$qtVersion$qtArch.zip"
     $downloadUrl = "$binaryBaseUrl/$artifactName"
 
     Write-Host "Downloading $downloadUrl"
@@ -52,11 +51,11 @@ New-Item -Type Directory -Path "$out_imf" -ErrorAction SilentlyContinue
 # Copy QtApng
 if ($pluginNames -contains 'qtapng') {
     if ($IsWindows) {
-        cp qtapng/QtApng/plugins/imageformats/qapng.dll "$out_imf/"
+        cp qtapng/QtApng/output/qapng.dll "$out_imf/"
     } elseif ($IsMacOS) {
-        cp qtapng/QtApng/plugins/imageformats/libqapng.dylib "$out_imf/"
+        cp qtapng/QtApng/output/libqapng.* "$out_imf/"
     } else {
-        cp qtapng/QtApng/plugins/imageformats/libqapng.so "$out_imf/"
+        cp qtapng/QtApng/output/libqapng.so "$out_imf/"
     }
 }
 
@@ -72,12 +71,15 @@ if ($pluginNames -contains 'kimageformats') {
         if (Test-Path -Path kimageformats/kimageformats/output/avif.dll -PathType Leaf) {
             cp kimageformats/kimageformats/output/avif.dll "$out_frm/"
             cp kimageformats/kimageformats/output/aom.dll "$out_frm/"
+            cp kimageformats/kimageformats/output/jpeg62.dll "$out_frm/"
+            cp kimageformats/kimageformats/output/libyuv.dll "$out_frm/"
         }
         # copy heif stuff
         if (Test-Path -Path kimageformats/kimageformats/output/heif.dll -PathType Leaf) {
             cp kimageformats/kimageformats/output/heif.dll "$out_frm/"
-            cp kimageformats/kimageformats/output/de265.dll "$out_frm/"
+            cp kimageformats/kimageformats/output/libde265.dll "$out_frm/"
             cp kimageformats/kimageformats/output/libx265.dll "$out_frm/"
+            cp kimageformats/kimageformats/output/aom.dll "$out_frm/"
         }
         # copy raw stuff
         if (Test-Path -Path kimageformats/kimageformats/output/raw.dll -PathType Leaf) {
@@ -88,19 +90,22 @@ if ($pluginNames -contains 'kimageformats') {
         # copy jxl stuff
         if (Test-Path -Path kimageformats/kimageformats/output/jxl.dll -PathType Leaf) {
             cp kimageformats/kimageformats/output/jxl.dll "$out_frm/"
+            cp kimageformats/kimageformats/output/jxl_cms.dll "$out_frm/"
             cp kimageformats/kimageformats/output/jxl_threads.dll "$out_frm/"
+            cp kimageformats/kimageformats/output/lcms2.dll "$out_frm/"
             cp kimageformats/kimageformats/output/hwy.dll "$out_frm/"
             cp kimageformats/kimageformats/output/brotlicommon.dll "$out_frm/"
             cp kimageformats/kimageformats/output/brotlidec.dll "$out_frm/"
             cp kimageformats/kimageformats/output/brotlienc.dll "$out_frm/"
         }
-        # copy jxl stuff
-        if (Test-Path -Path kimageformats/kimageformats/output/OpenEXR-3_1.dll -PathType Leaf) {
-            cp kimageformats/kimageformats/output/zlib1.dll "$out_frm/"
-            cp kimageformats/kimageformats/output/OpenEXR-3_1.dll "$out_frm/"
+        # copy openexr stuff
+        if (Test-Path -Path kimageformats/kimageformats/output/OpenEXR-3_2.dll -PathType Leaf) {
+            cp kimageformats/kimageformats/output/deflate.dll "$out_frm/"
+            cp kimageformats/kimageformats/output/OpenEXR-3_2.dll "$out_frm/"
+            cp kimageformats/kimageformats/output/OpenEXRCore-3_2.dll "$out_frm/"
             cp kimageformats/kimageformats/output/Imath-3_1.dll "$out_frm/"
-            cp kimageformats/kimageformats/output/IlmThread-3_1.dll "$out_frm/"
-            cp kimageformats/kimageformats/output/Iex-3_1.dll "$out_frm/"
+            cp kimageformats/kimageformats/output/IlmThread-3_2.dll "$out_frm/"
+            cp kimageformats/kimageformats/output/Iex-3_2.dll "$out_frm/"
         }
     } elseif ($IsMacOS) {
         cp kimageformats/kimageformats/output/*.so "$out_imf/"

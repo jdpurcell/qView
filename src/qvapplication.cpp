@@ -30,8 +30,17 @@ QVApplication::QVApplication(int &argc, char **argv) : QApplication(argc, argv)
     // Check for updates
     // TODO: move this to after first window show event
     if (getSettingsManager().getBoolean("updatenotifications")) {
-        checkUpdates();
+        checkUpdates(true);
     }
+
+    // Block any erroneous icons from showing up on mac and windows
+    // (this is overridden in some cases)
+#if defined Q_OS_MACOS || defined Q_OS_WIN
+    setAttribute(Qt::AA_DontShowIconsInMenus);
+#endif
+    // Adwaita Qt styles should hide icons for a more consistent look
+    if (style()->objectName() == "adwaita-dark" || style()->objectName() == "adwaita")
+        setAttribute(Qt::AA_DontShowIconsInMenus);
 
     // Setup macOS dock menu
     dockMenu = new QMenu();
@@ -60,15 +69,6 @@ QVApplication::QVApplication(int &argc, char **argv) : QApplication(argc, argv)
 #ifdef Q_OS_MACOS
     setQuitOnLastWindowClosed(getSettingsManager().getBoolean("quitonlastwindow"));
 #endif
-
-    // Block any erroneous icons from showing up on mac and windows
-    // (this is overridden in some cases)
-#if defined Q_OS_MACOS || defined Q_OS_WIN
-    setAttribute(Qt::AA_DontShowIconsInMenus);
-#endif
-    // Adwaita Qt styles should hide icons for a more consistent look
-    if (style()->objectName() == "adwaita-dark" || style()->objectName() == "adwaita")
-        setAttribute(Qt::AA_DontShowIconsInMenus);
 
     hideIncompatibleActions();
 }
@@ -197,10 +197,10 @@ MainWindow *QVApplication::getMainWindow(bool shouldBeEmpty)
     return window;
 }
 
-void QVApplication::checkUpdates()
+void QVApplication::checkUpdates(bool isStartupCheck)
 {
 #ifndef QV_DISABLE_ONLINE_VERSION_CHECK
-    updateChecker.check();
+    updateChecker.check(isStartupCheck);
 #endif // QV_DISABLE_ONLINE_VERSION_CHECK
 }
 
@@ -348,8 +348,12 @@ void QVApplication::defineFilterLists()
     const auto &byteArrayFormats = QImageReader::supportedImageFormats();
 
     auto filterString = tr("Supported Images") + " (";
-    filterList.reserve(byteArrayFormats.size()-1);
     fileExtensionList.reserve(byteArrayFormats.size()-1);
+
+    const auto addExtension = [&](const QString &extension) {
+        filterString += "*" + extension + " ";
+        fileExtensionList << extension;
+    };
 
     // Build the filterlist, filterstring, and filterregexplist in one loop
     for (const auto &byteArray : byteArrayFormats)
@@ -359,16 +363,25 @@ void QVApplication::defineFilterLists()
         if (fileExtension == ".pdf")
             continue;
 
-        filterList << "*" + fileExtension;
-        filterString += "*" + fileExtension + " ";
-        fileExtensionList << fileExtension;
+        addExtension(fileExtension);
 
-        // If we support jpg, we actually support the jfif, jfi, and jpe file extensions too almost certainly.
+        // Register additional file extensions that decoders support but don't advertise
         if (fileExtension == ".jpg")
         {
-            filterList << "*.jpe" << "*.jfi" << "*.jfif";
-            filterString += "*.jpe *.jfi *.jfif ";
-            fileExtensionList << ".jpe" << ".jfi" << ".jfif";
+            addExtension(".jpe");
+            addExtension(".jfi");
+#if QT_VERSION < QT_VERSION_CHECK(6, 8, 0)
+            addExtension(".jfif");
+#endif
+        }
+        else if (fileExtension == ".heic")
+        {
+            addExtension(".heics");
+        }
+        else if (fileExtension == ".heif")
+        {
+            addExtension(".heifs");
+            addExtension(".hif");
         }
     }
     filterString.chop(1);
