@@ -5,6 +5,9 @@ if [[ -z "$1" ]]; then
     RELEASE_VER=${RELEASE_VER: -3}
 fi
 
+sudo apt update
+sudo apt install libfuse2
+
 wget -c -nv "https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage"
 wget -c -nv "https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage"
 chmod a+x linuxdeploy-*.AppImage
