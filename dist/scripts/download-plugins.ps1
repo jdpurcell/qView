@@ -16,7 +16,7 @@ if ($IsWindows) {
     $imageName = "ubuntu-20.04"
 }
 
-$binaryBaseUrl = "https://github.com/jurplel/kimageformats-binaries/releases/download/cont"
+$binaryBaseUrl = "https://github.com/jdpurcell/kimageformats-binaries/releases/download/cont"
 
 if ($pluginNames.count -eq 0) {
     Write-Host "the pluginNames array is empty."
@@ -85,14 +85,14 @@ if ($pluginNames -contains 'kimageformats') {
         if (Test-Path -Path kimageformats/kimageformats/output/raw.dll -PathType Leaf) {
             cp kimageformats/kimageformats/output/zlib1.dll "$out_frm/"
             cp kimageformats/kimageformats/output/raw.dll "$out_frm/"
-            cp kimageformats/kimageformats/output/lcms2.dll "$out_frm/"
+            cp kimageformats/kimageformats/output/lcms2-2.dll "$out_frm/"
         }
         # copy jxl stuff
         if (Test-Path -Path kimageformats/kimageformats/output/jxl.dll -PathType Leaf) {
             cp kimageformats/kimageformats/output/jxl.dll "$out_frm/"
             cp kimageformats/kimageformats/output/jxl_cms.dll "$out_frm/"
             cp kimageformats/kimageformats/output/jxl_threads.dll "$out_frm/"
-            cp kimageformats/kimageformats/output/lcms2.dll "$out_frm/"
+            cp kimageformats/kimageformats/output/lcms2-2.dll "$out_frm/"
             cp kimageformats/kimageformats/output/hwy.dll "$out_frm/"
             cp kimageformats/kimageformats/output/brotlicommon.dll "$out_frm/"
             cp kimageformats/kimageformats/output/brotlidec.dll "$out_frm/"
