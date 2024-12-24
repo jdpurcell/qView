@@ -70,6 +70,8 @@ public:
 
     int getFitOverscan() const { return fitOverscan; }
 
+    static int roundToCompleteLogicalPixel(const qreal value, const qreal logicalScale);
+
 signals:
     void cancelSlideshow();
 

@@ -587,9 +587,17 @@ void MainWindow::setWindowSize()
     const QSizeF imageSize = graphicsView->getEffectiveOriginalSize();
     const int fitOverscan = graphicsView->getFitOverscan();
     const QSize fitOverscanSize = QSize(fitOverscan * 2, fitOverscan * 2);
+    const qreal logicalPixelScale = graphicsView->devicePixelRatioF();
     const bool enforceMinSizeBothDimensions = false;
 
-    QSize targetSize = imageSize.toSize() - fitOverscanSize;
+    const auto gvRoundSizeF = [logicalPixelScale](const QSizeF value) {
+        return QSize(
+            QVGraphicsView::roundToCompleteLogicalPixel(value.width(), logicalPixelScale),
+            QVGraphicsView::roundToCompleteLogicalPixel(value.height(), logicalPixelScale)
+        );
+    };
+
+    QSize targetSize = gvRoundSizeF(imageSize) - fitOverscanSize;
 
     const bool limitToMin = targetSize.width() < minWindowSize.width() && targetSize.height() < minWindowSize.height();
     const bool limitToMax = targetSize.width() > maxWindowSize.width() || targetSize.height() > maxWindowSize.height();
@@ -597,7 +605,7 @@ void MainWindow::setWindowSize()
     {
         const QSizeF viewSize = (limitToMin ? minWindowSize : maxWindowSize) + fitOverscanSize;
         const qreal fitRatio = qMin(viewSize.width() / imageSize.width(), viewSize.height() / imageSize.height());
-        targetSize = (imageSize * fitRatio).toSize() - fitOverscanSize;
+        targetSize = gvRoundSizeF(imageSize * fitRatio) - fitOverscanSize;
     }
 
     if (enforceMinSizeBothDimensions)

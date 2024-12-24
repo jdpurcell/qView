@@ -397,14 +397,25 @@ void QVGraphicsView::zoomToFit()
     if (!getCurrentFileDetails().isPixmapLoaded)
         return;
 
-    QSizeF effectiveImageSize = getEffectiveOriginalSize();
-    QSize viewSize = getUsableViewportRect(true).size();
+    const QSizeF effectiveImageSize = getEffectiveOriginalSize();
+    const QSize viewSize = getUsableViewportRect(true).size();
 
     if (viewSize.isEmpty())
         return;
 
-    qreal fitXRatio = viewSize.width() / effectiveImageSize.width();
-    qreal fitYRatio = viewSize.height() / effectiveImageSize.height();
+    const qreal fitXRatio = viewSize.width() / effectiveImageSize.width();
+    const qreal fitYRatio = viewSize.height() / effectiveImageSize.height();
+    const qreal logicalPixelScale = devicePixelRatioF();
+
+    const auto gvRound = [logicalPixelScale](const qreal value) {
+        return roundToCompleteLogicalPixel(value, logicalPixelScale);
+    };
+    const auto gvRoundSizeF = [logicalPixelScale](const QSizeF value) {
+        return QSize(
+            QVGraphicsView::roundToCompleteLogicalPixel(value.width(), logicalPixelScale),
+            QVGraphicsView::roundToCompleteLogicalPixel(value.height(), logicalPixelScale)
+        );
+    };
 
     qreal targetRatio;
 
@@ -413,32 +424,31 @@ void QVGraphicsView::zoomToFit()
 
     switch (cropMode) { // should be enum tbh
     case 1: // only take into account height
-        if (qRound(effectiveImageSize.height()) == viewSize.height())
+        if (gvRound(effectiveImageSize.height()) == viewSize.height())
             targetRatio = 1.0;
         else
             targetRatio = fitYRatio;
         break;
     case 2: // only take into account width
-        if (qRound(effectiveImageSize.width()) == viewSize.width())
+        if (gvRound(effectiveImageSize.width()) == viewSize.width())
             targetRatio = 1.0;
         else
             targetRatio = fitXRatio;
         break;
     default:
-        if ((qRound(effectiveImageSize.height()) == viewSize.height() && qRound(effectiveImageSize.width()) <= viewSize.width()) ||
-            (qRound(effectiveImageSize.width()) == viewSize.width() && qRound(effectiveImageSize.height()) <= viewSize.height()))
+        if ((gvRound(effectiveImageSize.height()) == viewSize.height() && gvRound(effectiveImageSize.width()) <= viewSize.width()) ||
+            (gvRound(effectiveImageSize.width()) == viewSize.width() && gvRound(effectiveImageSize.height()) <= viewSize.height()))
         {
             targetRatio = 1.0;
         }
         else
         {
-            QSize xRatioSize = (effectiveImageSize * fitXRatio * devicePixelRatioF()).toSize();
-            QSize yRatioSize = (effectiveImageSize * fitYRatio * devicePixelRatioF()).toSize();
-            QSize maxSize = (QSizeF(viewSize) * devicePixelRatioF()).toSize();
+            const QSize xRatioSize = gvRoundSizeF(effectiveImageSize * fitXRatio);
+            const QSize yRatioSize = gvRoundSizeF(effectiveImageSize * fitYRatio);
             // If the fit ratios are extremely close, it's possible that both are sufficient to
             // contain the image, but one results in the opposing dimension getting rounded down
             // to just under the view size, so use the larger of the two ratios in that case.
-            if (xRatioSize.boundedTo(maxSize) == xRatioSize && yRatioSize.boundedTo(maxSize) == yRatioSize)
+            if (xRatioSize.boundedTo(viewSize) == xRatioSize && yRatioSize.boundedTo(viewSize) == yRatioSize)
                 targetRatio = qMax(fitXRatio, fitYRatio);
             else
                 targetRatio = qMin(fitXRatio, fitYRatio);
@@ -630,6 +640,13 @@ QTransform QVGraphicsView::getTransformWithNoScaling() const
 qreal QVGraphicsView::getDpiAdjustment() const
 {
     return isOneToOnePixelSizingEnabled ? devicePixelRatioF() : 1.0;
+}
+
+int QVGraphicsView::roundToCompleteLogicalPixel(const qreal value, const qreal logicalScale)
+{
+    const int roundedLogicalPixel = qRound(value);
+    const bool isComplete = qRound(value * logicalScale) >= qRound(roundedLogicalPixel * logicalScale);
+    return roundedLogicalPixel - (isComplete ? 0 : 1);
 }
 
 void QVGraphicsView::handleDpiAdjustmentChange()
