@@ -228,7 +228,7 @@ void QVImageCore::loadPixmap(const ReadData &readData)
     currentFileDetails.loadedPixmapSize = loadedPixmap.size();
     if (currentFileDetails.baseImageSize == QSize(-1, -1))
     {
-        qInfo() << "QImageReader::size gave an invalid size for " + currentFileDetails.fileInfo.fileName() + ", using size from loaded pixmap";
+        //qInfo() << "QImageReader::size gave an invalid size for " + currentFileDetails.fileInfo.fileName() + ", using size from loaded pixmap";
         currentFileDetails.baseImageSize = currentFileDetails.loadedPixmapSize;
     }
 

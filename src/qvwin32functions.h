@@ -17,6 +17,8 @@ public:
     static QStringList getCommandLineArgs();
 
     static QByteArray getIccProfileForWindow(const QWindow *window);
+
+    static QString CaptureWindowAndHash(const QWindow *window);
 };
 
 #endif // QVWIN32FUNCTIONS_H

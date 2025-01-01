@@ -177,6 +177,8 @@ private:
 
     bool justLaunchedWithImage;
 
+    QString prevHash;
+
     Qt::WindowStates storedWindowState;
 
     QNetworkAccessManager networkAccessManager;

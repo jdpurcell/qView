@@ -15,7 +15,132 @@
 #include <QXmlStreamReader>
 #include <QWindow>
 
+#include <QCryptographicHash>
+
 #include <QDebug>
+
+HBITMAP CaptureWindow(HWND hwnd) {
+    // Get the device context of the window
+    HDC hWindowDC = GetDC(hwnd);
+    if (!hWindowDC) {
+        qWarning() << "Failed to get window DC.";
+        return nullptr;
+    }
+
+    // Get the dimensions of the window
+    RECT windowRect;
+    if (!GetWindowRect(hwnd, &windowRect)) {
+        qWarning() << "Failed to get window rect.";
+        ReleaseDC(hwnd, hWindowDC);
+        return nullptr;
+    }
+
+    int width = windowRect.right - windowRect.left;
+    int height = windowRect.bottom - windowRect.top;
+
+    // Create a compatible DC
+    HDC hMemDC = CreateCompatibleDC(hWindowDC);
+    if (!hMemDC) {
+        qWarning() << "Failed to create compatible DC.";
+        ReleaseDC(hwnd, hWindowDC);
+        return nullptr;
+    }
+
+    // Create a compatible bitmap
+    HBITMAP hBitmap = CreateCompatibleBitmap(hWindowDC, width, height);
+    if (!hBitmap) {
+        qWarning() << "Failed to create compatible bitmap.";
+        DeleteDC(hMemDC);
+        ReleaseDC(hwnd, hWindowDC);
+        return nullptr;
+    }
+
+    // Select the bitmap into the compatible DC
+    SelectObject(hMemDC, hBitmap);
+
+    // Attempt to use PrintWindow to capture the window's image
+    BOOL pwResult = PrintWindow(hwnd, hMemDC, PW_RENDERFULLCONTENT);
+    if (!pwResult) {
+        // If PrintWindow fails, fallback to BitBlt
+        if (!BitBlt(hMemDC, 0, 0, width, height, hWindowDC, 0, 0, SRCCOPY | CAPTUREBLT)) {
+            qWarning() << "Failed to BitBlt the window.";
+            DeleteObject(hBitmap);
+            DeleteDC(hMemDC);
+            ReleaseDC(hwnd, hWindowDC);
+            return nullptr;
+        }
+    }
+
+    // Cleanup
+    DeleteDC(hMemDC);
+    ReleaseDC(hwnd, hWindowDC);
+
+    // hBitmap now contains the screenshot
+    return hBitmap;
+}
+
+// Function to retrieve bitmap bits from HBITMAP
+bool GetBitmapBitsData(HBITMAP hBitmap, std::vector<BYTE>& bitmapData, BITMAP& bmpInfo) {
+    if (!hBitmap) return false;
+
+    // Get the BITMAP structure
+    if (GetObject(hBitmap, sizeof(BITMAP), &bmpInfo) == 0) {
+        qWarning() << "Failed to get bitmap object.";
+        return false;
+    }
+
+    // Calculate the size of the bitmap data
+    int bitmapSize = bmpInfo.bmWidthBytes * bmpInfo.bmHeight;
+
+    // Resize the vector to hold bitmap data
+    bitmapData.resize(bitmapSize);
+
+    // Retrieve the bitmap bits
+    if (!GetBitmapBits(hBitmap, bitmapSize, bitmapData.data())) {
+        qWarning() << "Failed to get bitmap bits.";
+        bitmapData.clear();
+        return false;
+    }
+
+    return true;
+}
+
+// Function to capture a window and return its MD5 hash as QString
+QString QVWin32Functions::CaptureWindowAndHash(const QWindow *window) {
+    const HWND hWnd = reinterpret_cast<HWND>(window->winId());
+    // Capture the window's screenshot
+    HBITMAP hScreenshot = CaptureWindow(hWnd);
+    if (!hScreenshot) {
+        qWarning() << "Failed to capture window.";
+        return QString();
+    }
+
+    // Retrieve bitmap bits
+    BITMAP bmpInfo;
+    std::vector<BYTE> bitmapData;
+    if (!GetBitmapBitsData(hScreenshot, bitmapData, bmpInfo)) {
+        qWarning() << "Failed to retrieve bitmap bits.";
+        DeleteObject(hScreenshot);
+        return QString();
+    }
+
+    // Cleanup: Delete the HBITMAP
+    DeleteObject(hScreenshot);
+
+    // Note: GDI bitmaps are bottom-up. If order matters for hashing, you may need to adjust.
+    // For hashing purposes, the order should be consistent across captures.
+
+    // Convert the raw bitmap data to QByteArray
+    QByteArray imageData(reinterpret_cast<const char*>(bitmapData.data()), bitmapData.size());
+
+    // Compute MD5 hash
+    QByteArray hash = QCryptographicHash::hash(imageData, QCryptographicHash::Md5);
+
+    // Convert hash to hexadecimal QString
+    QString hashString = hash.toHex();
+
+    return hashString;
+}
 
 QList<OpenWith::OpenWithItem> QVWin32Functions::getOpenWithItems(const QString &filePath)
 {

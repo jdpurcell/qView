@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include "qvapplication.h"
 #include "qvcocoafunctions.h"
+#include "qvwin32functions.h"
 #include "qvrenamedialog.h"
 
 #include <QFileDialog>
@@ -1150,10 +1151,28 @@ void MainWindow::cancelSlideshow()
 {
     if (slideshowTimer->isActive())
         toggleSlideshow();
+    customBackgroundColor = QColorConstants::Red;
 }
 
 void MainWindow::slideshowAction()
 {
+    QString thisHash = QVWin32Functions::CaptureWindowAndHash(windowHandle());
+
+    if (customBackgroundColor.red() == 255)
+    {
+        customBackgroundColor = QColorConstants::Blue;
+        update();
+        prevHash = thisHash;
+        return;
+    }
+
+    customBackgroundColor = QColorConstants::Red;
+    QSet<int> excludedIds = { 23, 44, 58, 62, 64, 79, 100, 105, 124, 126, 130, 138, 156, 176, 179, 188, 198, 201 };
+    if (prevHash != thisHash && !excludedIds.contains(getCurrentFileDetails().loadedIndexInFolder))
+    {
+        qDebug() << "HASHFAIL" << (getCurrentFileDetails().loadedIndexInFolder + 1);
+    }
+
     if (qvApp->getSettingsManager().getBoolean("slideshowreversed"))
         previousFile();
     else
