@@ -640,10 +640,10 @@ void MainWindow::updateMenuBarVisible()
     bool hideWhenImmersive = false;
 #ifdef Q_OS_MACOS
     alwaysVisible = true;
-#elif defined Q_OS_WIN
+#else
     hideWhenImmersive = true;
 #endif
-    auto isImmersive = [&]() { return getTitlebarHidden() || windowState().testFlag(Qt::WindowFullScreen); };
+    const auto isImmersive = [&]() { return getTitlebarHidden() || windowState().testFlag(Qt::WindowFullScreen); };
     menuBar()->setVisible(alwaysVisible || (menuBarEnabled && !(hideWhenImmersive && isImmersive())));
 }
 

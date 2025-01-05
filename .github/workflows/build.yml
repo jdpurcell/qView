@@ -15,8 +15,9 @@ jobs:
     strategy:
       matrix:
         include:
-          - runner: 'ubuntu-20.04'
-            qtVersion: '5.15.2'
+          - runner: 'ubuntu-22.04'
+            qtVersion: '6.8.1'
+            qtModules: 'qtimageformats'
             buildArch: 'X64'
           - runner: 'macos-14'
             qtVersion: '6.8.1'
