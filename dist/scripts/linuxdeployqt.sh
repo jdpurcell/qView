@@ -17,7 +17,7 @@ make install INSTALL_ROOT=bin/appdir
 cd bin
 rm qview
 
-export DEPLOY_PLATFORM_THEMES="1"
+export EXTRA_PLATFORM_PLUGINS="libqwayland-egl.so;libqwayland-generic.so"
 ../linuxdeploy-x86_64.AppImage \
     --plugin qt \
     --appdir appdir \
