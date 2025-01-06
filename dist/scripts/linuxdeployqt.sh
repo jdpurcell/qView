@@ -17,6 +17,7 @@ make install INSTALL_ROOT=bin/appdir
 cd bin
 rm qview
 
+export DEPLOY_PLATFORM_THEMES="1"
 ../linuxdeploy-x86_64.AppImage \
     --plugin qt \
     --appdir appdir \
