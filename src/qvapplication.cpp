@@ -46,6 +46,7 @@ QVApplication::QVApplication(int &argc, char **argv) : QApplication(argc, argv)
     {
         setAttribute(Qt::AA_DontShowIconsInMenus);
     }
+    QMessageBox::information(nullptr, "Debug", QIcon::themeName() + " " + QIcon::themeSearchPaths().join(";") + " " + (QIcon::fromTheme("window-keep-above").isNull() ? "null" : "good") + " " + (QIcon::fromTheme("edit-paste").isNull() ? "null" : "good"));
 #endif
 
     // Setup macOS dock menu
