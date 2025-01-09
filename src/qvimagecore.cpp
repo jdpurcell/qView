@@ -112,20 +112,27 @@ QVImageCore::ReadData QVImageCore::readFile(const QString &fileName, const QColo
 
     imageReader.setFileName(fileName);
 
+    QStringList dbg;
     QImage readImage;
     if (imageReader.format() == "svg" || imageReader.format() == "svgz")
     {
+        dbg << "a";
         // Render vectors into a high resolution
         QIcon icon;
         icon.addFile(fileName);
+        dbg << QString::number(largestDimension);
         readImage = icon.pixmap(largestDimension).toImage();
         readImage.setDevicePixelRatio(1.0);
+        dbg << (readImage.isNull() ? "null" : "good");
         // If this fails, try reading the normal way so that a proper error message is given
         if (readImage.isNull())
             readImage = imageReader.read();
+        else
+            dbg << QString::number(readImage.size().width());
     }
     else
     {
+        dbg << "b";
         readImage = imageReader.read();
     }
 
@@ -159,13 +166,13 @@ QVImageCore::ReadData QVImageCore::readFile(const QString &fileName, const QColo
         {}
     };
 
-    if (readPixmap.isNull())
-    {
+    //if (readPixmap.isNull())
+    //{
         readData.errorData = {
-            imageReader.error(),
-            imageReader.errorString()
+            1,
+            dbg.join(";")
         };
-    }
+    //}
 
     return readData;
 }
