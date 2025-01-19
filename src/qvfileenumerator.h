@@ -11,24 +11,19 @@ public:
     struct CompatibleFile
     {
         QString absoluteFilePath;
-        QString fileName;
-
-        // Only populated if needed for sorting
-        qint64 lastModified;
-        qint64 lastCreated;
-        qint64 size;
-        QString mimeType;
+        qint64 numericSortKey;
+        QString stringSortKey;
     };
 
     explicit QVFileEnumerator(QObject *parent = nullptr);
 
-    QList<CompatibleFile> getCompatibleFiles(const QString &dirPath);
+    QList<CompatibleFile> getCompatibleFiles(const QString &dirPath) const;
     bool getIsLoopFoldersEnabled() const { return isLoopFoldersEnabled; }
     void loadSettings();
 
 protected:
-    void sortCompatibleFiles(QList<CompatibleFile> &fileList);
-    unsigned getRandomSortSeed(const QString &dirPath, const int fileCount);
+    void sortCompatibleFiles(QList<CompatibleFile> &fileList) const;
+    qint64 getRandomSortKey(const QString &filePath, const int fileCount) const;
 
 private:
     const quint32 baseRandomSortSeed {static_cast<quint32>(std::chrono::system_clock::now().time_since_epoch().count())};

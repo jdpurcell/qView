@@ -1,6 +1,5 @@
 #include "qvfileenumerator.h"
 #include "qvapplication.h"
-#include <random>
 
 QVFileEnumerator::QVFileEnumerator(QObject *parent)
     : QObject{parent}
@@ -8,23 +7,22 @@ QVFileEnumerator::QVFileEnumerator(QObject *parent)
     loadSettings();
 }
 
-QList<QVFileEnumerator::CompatibleFile> QVFileEnumerator::getCompatibleFiles(const QString &dirPath)
+QList<QVFileEnumerator::CompatibleFile> QVFileEnumerator::getCompatibleFiles(const QString &dirPath) const
 {
     QList<CompatibleFile> fileList;
 
-    QMimeDatabase mimeDb;
+    const QMimeDatabase mimeDb;
     const auto &extensions = qvApp->getFileExtensionSet();
     const auto &disabledExtensions = qvApp->getDisabledFileExtensions();
     const auto &mimeTypes = qvApp->getMimeTypeNameSet();
-
-    QMimeDatabase::MatchMode mimeMatchMode = allowMimeContentDetection ? QMimeDatabase::MatchDefault : QMimeDatabase::MatchExtension;
+    const QMimeDatabase::MatchMode mimeMatchMode = allowMimeContentDetection ? QMimeDatabase::MatchDefault : QMimeDatabase::MatchExtension;
 
     QDir::Filters filters = QDir::Files;
     if (!skipHiddenFiles)
         filters |= QDir::Hidden;
 
-    const QFileInfoList currentFolder = QDir(dirPath).entryInfoList(filters, QDir::Unsorted);
-    for (const QFileInfo &fileInfo : currentFolder)
+    const QFileInfoList candidateFiles = QDir(dirPath).entryInfoList(filters, QDir::Unsorted);
+    for (const QFileInfo &fileInfo : candidateFiles)
     {
         const QString absoluteFilePath = fileInfo.absoluteFilePath();
         const QString fileName = fileInfo.fileName();
@@ -46,14 +44,41 @@ QList<QVFileEnumerator::CompatibleFile> QVFileEnumerator::getCompatibleFiles(con
 
         if (matched)
         {
+            qint64 numericSortKey = 0;
+            QString stringSortKey;
+            switch (sortMode)
+            {
+            case Qv::SortMode::DateModified:
+                numericSortKey = fileInfo.lastModified().toMSecsSinceEpoch();
+                break;
+            case Qv::SortMode::DateCreated:
+                numericSortKey = fileInfo.birthTime().toMSecsSinceEpoch();
+                break;
+            case Qv::SortMode::Size:
+                numericSortKey = fileInfo.size();
+                break;
+            case Qv::SortMode::Type:
+                stringSortKey = mimeType;
+                break;
+            case Qv::SortMode::Name:
+                stringSortKey = fileName;
+                break;
+            default:
+                break;
+            };
             fileList.append({
                 absoluteFilePath,
-                fileName,
-                sortMode == Qv::SortMode::DateModified ? fileInfo.lastModified().toMSecsSinceEpoch() : 0,
-                sortMode == Qv::SortMode::DateCreated ? fileInfo.birthTime().toMSecsSinceEpoch() : 0,
-                sortMode == Qv::SortMode::Size ? fileInfo.size() : 0,
-                sortMode == Qv::SortMode::Type ? mimeType : QString()
+                numericSortKey,
+                stringSortKey
             });
+        }
+    }
+
+    if (sortMode == Qv::SortMode::Random)
+    {
+        for (auto &file : fileList)
+        {
+            file.numericSortKey = getRandomSortKey(file.absoluteFilePath, fileList.size());
         }
     }
 
@@ -62,89 +87,35 @@ QList<QVFileEnumerator::CompatibleFile> QVFileEnumerator::getCompatibleFiles(con
     return fileList;
 }
 
-void QVFileEnumerator::sortCompatibleFiles(QList<CompatibleFile> &fileList)
+void QVFileEnumerator::sortCompatibleFiles(QList<CompatibleFile> &fileList) const
 {
-    if (sortMode == Qv::SortMode::Name)
-    {
-        QCollator collator;
-        collator.setNumericMode(true);
-        std::sort(fileList.begin(),
-                  fileList.end(),
-                  [&collator, this](const CompatibleFile &file1, const CompatibleFile &file2)
-        {
-            if (sortDescending)
-                return collator.compare(file1.fileName, file2.fileName) > 0;
-            else
-                return collator.compare(file1.fileName, file2.fileName) < 0;
-        });
-    }
-    else if (sortMode == Qv::SortMode::DateModified)
-    {
-        std::sort(fileList.begin(),
-                  fileList.end(),
-                  [this](const CompatibleFile &file1, const CompatibleFile &file2)
-        {
-            if (sortDescending)
-                return file1.lastModified < file2.lastModified;
-            else
-                return file1.lastModified > file2.lastModified;
-        });
-    }
-    else if (sortMode == Qv::SortMode::DateCreated)
-    {
-        std::sort(fileList.begin(),
-                  fileList.end(),
-                  [this](const CompatibleFile &file1, const CompatibleFile &file2)
-        {
-            if (sortDescending)
-                return file1.lastCreated < file2.lastCreated;
-            else
-                return file1.lastCreated > file2.lastCreated;
-        });
-
-    }
-    else if (sortMode == Qv::SortMode::Size)
-    {
-        std::sort(fileList.begin(),
-                  fileList.end(),
-                  [this](const CompatibleFile &file1, const CompatibleFile &file2)
-        {
-            if (sortDescending)
-                return file1.size < file2.size;
-            else
-                return file1.size > file2.size;
-        });
-    }
-    else if (sortMode == Qv::SortMode::Type)
-    {
-        QCollator collator;
-        std::sort(fileList.begin(),
-                  fileList.end(),
-                  [&collator, this](const CompatibleFile &file1, const CompatibleFile &file2)
-        {
-            if (sortDescending)
-                return collator.compare(file1.mimeType, file2.mimeType) > 0;
-            else
-                return collator.compare(file1.mimeType, file2.mimeType) < 0;
-        });
-    }
-    else if (sortMode == Qv::SortMode::Random)
-    {
-        unsigned randomSortSeed = getRandomSortSeed(QFileInfo(fileList.value(0).absoluteFilePath).path(), fileList.count());
-        std::shuffle(fileList.begin(), fileList.end(), std::default_random_engine(randomSortSeed));
-    }
+    QCollator collator;
+    collator.setNumericMode(true);
+    std::sort(
+        fileList.begin(),
+        fileList.end(),
+        [&](const CompatibleFile &file1, const CompatibleFile &file2) {
+            int result =
+                file1.numericSortKey < file2.numericSortKey ? -1 :
+                file1.numericSortKey > file2.numericSortKey ? 1 :
+                collator.compare(file1.stringSortKey, file2.stringSortKey);
+            if (result == 0)
+                result = collator.compare(file1.absoluteFilePath, file2.absoluteFilePath);
+            return sortDescending ? (result > 0) : (result < 0);
+        }
+    );
 }
 
-unsigned QVFileEnumerator::getRandomSortSeed(const QString &dirPath, const int fileCount)
+qint64 QVFileEnumerator::getRandomSortKey(const QString &filePath, const int fileCount) const
 {
-    QString seed = QString::number(baseRandomSortSeed, 16) + dirPath + QString::number(fileCount, 16);
-    QByteArray hash = QCryptographicHash::hash(seed.toUtf8(), QCryptographicHash::Md5);
-    return hash.toHex().left(8).toUInt(nullptr, 16);
+    const QString seed = QString::number(baseRandomSortSeed, 16) + filePath + QString::number(fileCount, 16);
+    const QByteArray hash = QCryptographicHash::hash(seed.toUtf8(), QCryptographicHash::Md5);
+    return static_cast<qint64>(hash.toHex().left(16).toULongLong(nullptr, 16));
 }
 
 void QVFileEnumerator::loadSettings()
 {
-    auto &settingsManager = qvApp->getSettingsManager();
+    const auto &settingsManager = qvApp->getSettingsManager();
 
     //loop folders
     isLoopFoldersEnabled = settingsManager.getBoolean("loopfoldersenabled");
