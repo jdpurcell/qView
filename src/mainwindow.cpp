@@ -247,11 +247,6 @@ void MainWindow::closeEvent(QCloseEvent *event)
     QVCocoaFunctions::setFullSizeContentView(this, false);
 #endif
 
-#if defined COCOA_LOADED && QT_VERSION == QT_VERSION_CHECK(6, 8, 1)
-    // Workaround for QTBUG-131783
-    QVCocoaFunctions::flushLastInputEvent(windowHandle());
-#endif
-
     if (qvApp->isSessionStateSaveRequested())
         qvApp->addClosedWindowSessionState(getSessionState(), getLastActivatedTimestamp());
 

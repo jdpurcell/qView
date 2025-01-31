@@ -175,12 +175,6 @@ void QVCocoaFunctions::closeWindow(QWindow *window)
     [view.window close];
 }
 
-void QVCocoaFunctions::flushLastInputEvent(QWindow *window)
-{
-    auto *view = reinterpret_cast<NSView*>(window->winId());
-    [view touchesCancelledWithEvent:nil];
-}
-
 void QVCocoaFunctions::setWindowMenu(QMenu *menu)
 {
     NSMenu *nativeMenu = menu->toNSMenu();
