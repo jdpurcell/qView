@@ -75,9 +75,15 @@ public:
 
     ActionManager &getActionManager() { return actionManager; }
 
+    bool getIsApplicationQuitting() const;
+
     static qreal getPerceivedBrightness(const QColor &color);
 
+protected slots:
+    void onAboutToQuit();
+
 private:
+    static std::atomic<bool> isApplicationQuitting;
 
     QList<MainWindow*> lastActiveWindows;
 

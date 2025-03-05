@@ -8,6 +8,8 @@
 #include <QTimer>
 #include <QFileDialog>
 
+std::atomic<bool> QVApplication::isApplicationQuitting = false;
+
 QVApplication::QVApplication(int &argc, char **argv) : QApplication(argc, argv)
 {
     setDesktopFileName("com.interversehq.qView.desktop");
@@ -18,6 +20,8 @@ QVApplication::QVApplication(int &argc, char **argv) : QApplication(argc, argv)
 #ifndef QV_DISABLE_ONLINE_VERSION_CHECK
     connect(&updateChecker, &UpdateChecker::checkedUpdates, this, &QVApplication::checkedUpdates);
 #endif //QV_DISABLE_ONLINE_VERSION_CHECK
+
+    connect(this, &QCoreApplication::aboutToQuit, this, &QVApplication::onAboutToQuit);
 
     // Add fallback fromTheme icon search on linux with qt >5.11
 #if defined Q_OS_UNIX && !defined Q_OS_MACOS && QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
@@ -404,7 +408,22 @@ void QVApplication::defineFilterLists()
     nameFilterList << tr("All Files") + " (*)";
 }
 
+bool QVApplication::getIsApplicationQuitting() const
+{
+    return isApplicationQuitting;
+}
+
 qreal QVApplication::getPerceivedBrightness(const QColor &color)
 {
     return (color.red() * 0.299 + color.green() * 0.587 + color.blue() * 0.114) / 255.0;
+}
+
+void QVApplication::onAboutToQuit()
+{
+    isApplicationQuitting = true;
+
+    // Delay destroying application until thread pool threads have finished. If preloader
+    // threads are still running, they require an application instance to construct a
+    // QPixmap (even a null one) without crashing.
+    QThreadPool::globalInstance()->waitForDone();
 }
