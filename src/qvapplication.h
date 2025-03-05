@@ -83,7 +83,7 @@ protected slots:
     void onAboutToQuit();
 
 private:
-    static std::atomic<bool> isApplicationQuitting;
+    std::atomic<bool> isApplicationQuitting {false};
 
     QList<MainWindow*> lastActiveWindows;
 

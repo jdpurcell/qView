@@ -8,8 +8,6 @@
 #include <QTimer>
 #include <QFileDialog>
 
-std::atomic<bool> QVApplication::isApplicationQuitting {false};
-
 QVApplication::QVApplication(int &argc, char **argv) : QApplication(argc, argv)
 {
     setDesktopFileName("com.interversehq.qView.desktop");
