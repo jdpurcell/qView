@@ -4,6 +4,13 @@ param (
     $Prefix = "/usr"
 )
 
+if ($IsWindows -and $env:buildArch -eq 'Arm64' -and (Test-Path -Path "$env:QT_ROOT_DIR\bin\host-qmake.bat" -PathType Leaf)) {
+    Rename-Item -Path "$env:QT_ROOT_DIR\bin\qmake.exe" -NewName "target-qmake.exe"
+    Rename-Item -Path "$env:QT_ROOT_DIR\bin\host-qmake.bat" -NewName "qmake.bat"
+    Rename-Item -Path "$env:QT_ROOT_DIR\bin\qtpaths.exe" -NewName "target-qtpaths.exe"
+    Rename-Item -Path "$env:QT_ROOT_DIR\bin\host-qtpaths.bat" -NewName "qtpaths.bat"
+}
+
 $qtVersion = [version](qmake -query QT_VERSION)
 Write-Host "Detected Qt version $qtVersion"
 
