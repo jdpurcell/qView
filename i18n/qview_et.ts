@@ -41,162 +41,162 @@
     <message>
         <location filename="../src/actionmanager.cpp" line="312"/>
         <source>Open &amp;Recent</source>
-        <translation type="unfinished"></translation>
+        <translation>Ava &amp;hiljutisi faile</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="322"/>
         <location filename="../src/actionmanager.cpp" line="478"/>
         <source>Empty</source>
-        <translation type="unfinished"></translation>
+        <translation>Tühi</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="470"/>
         <source>Open With</source>
-        <translation type="unfinished"></translation>
+        <translation>Ava rakendusega</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="660"/>
         <source>&amp;Quit</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Välju</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="664"/>
         <source>Exit</source>
         <extracomment>The quit action is called &quot;Exit&quot; on windows</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Välju</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="667"/>
         <source>New Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Uus aken</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="670"/>
         <source>&amp;Open...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Ava...</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="673"/>
         <source>Open &amp;URL...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ava &amp;võrguaadress...</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="676"/>
         <source>Re&amp;load File</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Laadi fail uuesti</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="680"/>
         <source>Close Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Sulge aken</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="684"/>
         <source>Close All</source>
         <extracomment>Close all windows, that is</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Sulge kõik</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="687"/>
         <source>Open Containing &amp;Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Ava sisalduv &amp;kaust</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="690"/>
         <source>Show in E&amp;xplorer</source>
         <extracomment>Open containing folder on windows</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Näita E&amp;xploreris</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="693"/>
         <source>Show in &amp;Finder</source>
         <extracomment>Open containing folder on macOS</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Näita &amp;Finderis</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="698"/>
         <source>Show File &amp;Info</source>
-        <translation type="unfinished"></translation>
+        <translation>Näita fail&amp;iteavet</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="702"/>
         <source>&amp;Move to Trash</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Viska prügikasti</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="704"/>
         <source>&amp;Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Kustuta</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="709"/>
         <source>Delete Permanently</source>
-        <translation type="unfinished"></translation>
+        <translation>Kustuta jäädavalt</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="713"/>
         <source>&amp;Restore from Trash</source>
-        <translation type="unfinished"></translation>
+        <translation>Taasta p&amp;rügikastist</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="715"/>
         <source>&amp;Undo Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Võta k&amp;ustutamine tagasi</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="720"/>
         <source>&amp;Copy</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Kopeeri</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="724"/>
         <source>&amp;Paste</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Aseta</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="727"/>
         <source>R&amp;ename...</source>
-        <translation type="unfinished"></translation>
+        <translation>Muuda nim&amp;e...</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="731"/>
         <source>Zoom &amp;In</source>
-        <translation type="unfinished"></translation>
+        <translation>Suumi s&amp;isse</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="735"/>
         <source>Zoom &amp;Out</source>
-        <translation type="unfinished"></translation>
+        <translation>Suumi &amp;välja</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="739"/>
         <source>Reset &amp;Zoom</source>
-        <translation type="unfinished"></translation>
+        <translation>Lähtesta &amp;suum</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="743"/>
         <source>Ori&amp;ginal Size</source>
-        <translation type="unfinished"></translation>
+        <translation>Al&amp;gne suurus</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="747"/>
         <source>Rotate &amp;Right</source>
-        <translation type="unfinished"></translation>
+        <translation>Pööra &amp;paremale</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="751"/>
         <source>Rotate &amp;Left</source>
-        <translation type="unfinished"></translation>
+        <translation>Pööra vasaku&amp;le</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="755"/>
         <source>&amp;Mirror</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Peegelda</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="759"/>
         <source>&amp;Flip</source>
-        <translation type="unfinished"></translation>
+        <translation>Pööra ü&amp;mber</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="763"/>
@@ -321,12 +321,12 @@
     <message>
         <location filename="../src/mainwindow.cpp" line="242"/>
         <source>Exit F&amp;ull Screen</source>
-        <translation type="unfinished"></translation>
+        <translation>Välju &amp;täisekraanivaatest</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="247"/>
         <source>Enter F&amp;ull Screen</source>
-        <translation type="unfinished"></translation>
+        <translation>Ava &amp;täisekraanivaade</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="658"/>
@@ -337,43 +337,43 @@
         <location filename="../src/mainwindow.cpp" line="922"/>
         <location filename="../src/mainwindow.cpp" line="930"/>
         <source>Error</source>
-        <translation type="unfinished"></translation>
+        <translation>Viga</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="658"/>
         <source>Error: URL is invalid</source>
-        <translation type="unfinished"></translation>
+        <translation>Viga: võrguaadress on vigane</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="664"/>
         <source>Downloading image...</source>
-        <translation type="unfinished"></translation>
+        <translation>Laadin pilti alla...</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="664"/>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Katkesta</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="668"/>
         <location filename="../src/mainwindow.cpp" line="724"/>
         <source>Open URL...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ava võrguaadress...</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="685"/>
         <source>Error </source>
-        <translation type="unfinished"></translation>
+        <translation>Viga </translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="708"/>
         <source>Error: Invalid image</source>
-        <translation type="unfinished"></translation>
+        <translation>Viga: vigane pilt</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="725"/>
         <source>URL of a supported image file:</source>
-        <translation type="unfinished"></translation>
+        <translation>Toetatud pildifaili võrguaadress:</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="785"/>
@@ -504,17 +504,17 @@ No write permission or file is read-only.</source>
     <message>
         <location filename="../src/qvaboutdialog.ui" line="20"/>
         <source>About qView</source>
-        <translation type="unfinished"></translation>
+        <translation>Rakenduse teave: qView</translation>
     </message>
     <message>
         <location filename="../src/qvaboutdialog.cpp" line="44"/>
         <source>version %1</source>
-        <translation type="unfinished"></translation>
+        <translation>versioon %1</translation>
     </message>
     <message>
         <location filename="../src/qvaboutdialog.cpp" line="47"/>
         <source>Nightly %1</source>
-        <translation type="unfinished"></translation>
+        <translation>Arenduse kompileerimisjärk %1</translation>
     </message>
     <message>
         <location filename="../src/qvaboutdialog.cpp" line="62"/>
@@ -524,23 +524,23 @@ No write permission or file is read-only.</source>
     <message>
         <location filename="../src/qvaboutdialog.cpp" line="93"/>
         <source>Checking for updates...</source>
-        <translation type="unfinished"></translation>
+        <translation>Kontrollin uuenduse olemasolu...</translation>
     </message>
     <message>
         <location filename="../src/qvaboutdialog.cpp" line="97"/>
         <source>%1 update available</source>
         <extracomment>%1 is a version number e.g. &quot;4.0 update available&quot;</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>%1 - uuendus on saadaval</translation>
     </message>
     <message>
         <location filename="../src/qvaboutdialog.cpp" line="101"/>
         <source>No updates available</source>
-        <translation type="unfinished"></translation>
+        <translation>Uuendusi pole saadaval</translation>
     </message>
     <message>
         <location filename="../src/qvaboutdialog.cpp" line="105"/>
         <source>Error checking for updates</source>
-        <translation type="unfinished"></translation>
+        <translation>Viga uuenduste kontrollimisel</translation>
     </message>
 </context>
 <context>
@@ -548,17 +548,17 @@ No write permission or file is read-only.</source>
     <message>
         <location filename="../src/qvapplication.cpp" line="349"/>
         <source>Supported Images</source>
-        <translation type="unfinished"></translation>
+        <translation>Toetatud pilditüübid</translation>
     </message>
     <message>
         <location filename="../src/qvapplication.cpp" line="404"/>
         <source>All Files</source>
-        <translation type="unfinished"></translation>
+        <translation>Kõik failid</translation>
     </message>
     <message>
         <location filename="../src/qvapplication.cpp" line="115"/>
         <source>Open...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ava...</translation>
     </message>
 </context>
 <context>
@@ -574,12 +574,12 @@ No write permission or file is read-only.</source>
     <message>
         <location filename="../src/qvinfodialog.ui" line="20"/>
         <source>File Info</source>
-        <translation type="unfinished"></translation>
+        <translation>Failiteave</translation>
     </message>
     <message>
         <location filename="../src/qvinfodialog.ui" line="26"/>
         <source>Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Nimi:</translation>
     </message>
     <message>
         <location filename="../src/qvinfodialog.ui" line="36"/>
@@ -591,57 +591,57 @@ No write permission or file is read-only.</source>
         <location filename="../src/qvinfodialog.ui" line="183"/>
         <location filename="../src/qvinfodialog.ui" line="203"/>
         <source>error</source>
-        <translation type="unfinished"></translation>
+        <translation>viga</translation>
     </message>
     <message>
         <location filename="../src/qvinfodialog.ui" line="52"/>
         <source>Type:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tüüp:</translation>
     </message>
     <message>
         <location filename="../src/qvinfodialog.ui" line="75"/>
         <source>Location:</source>
-        <translation type="unfinished"></translation>
+        <translation>Asukoht:</translation>
     </message>
     <message>
         <location filename="../src/qvinfodialog.ui" line="101"/>
         <source>Size:</source>
-        <translation type="unfinished"></translation>
+        <translation>Suurus:</translation>
     </message>
     <message>
         <location filename="../src/qvinfodialog.ui" line="130"/>
         <source>Modified:</source>
-        <translation type="unfinished"></translation>
+        <translation>Muudetud:</translation>
     </message>
     <message>
         <location filename="../src/qvinfodialog.ui" line="153"/>
         <source>Dimensions:</source>
-        <translation type="unfinished"></translation>
+        <translation>Mõõdud:</translation>
     </message>
     <message>
         <location filename="../src/qvinfodialog.ui" line="173"/>
         <source>Aspect Ratio:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kuvasuhe:</translation>
     </message>
     <message>
         <location filename="../src/qvinfodialog.ui" line="193"/>
         <source>Frames:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kaadreid:</translation>
     </message>
     <message>
         <location filename="../src/qvinfodialog.ui" line="213"/>
         <source>Refresh</source>
-        <translation type="unfinished"></translation>
+        <translation>Värskenda andmeid</translation>
     </message>
     <message>
         <location filename="../src/qvinfodialog.cpp" line="62"/>
         <source>%1 (%2 bytes)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (%2 baiti)</translation>
     </message>
     <message>
         <location filename="../src/qvinfodialog.cpp" line="64"/>
         <source>%1 x %2 (%3 MP)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 x %2 (%3 MPix)</translation>
     </message>
 </context>
 <context>
