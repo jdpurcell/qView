@@ -135,6 +135,7 @@ QVImageCore::ReadData QVImageCore::readFile(const QString &fileName, const QColo
 
     imageReader.setFileName(fileName);
 
+    bool isMultiFrameImage = false;
     QImage readImage;
     if (imageReader.format() == "svg" || imageReader.format() == "svgz")
     {
@@ -148,7 +149,23 @@ QVImageCore::ReadData QVImageCore::readFile(const QString &fileName, const QColo
     }
     else
     {
+        isMultiFrameImage = !imageReader.supportsOption(QImageIOHandler::Animation) && imageReader.imageCount() > 1;
         readImage = imageReader.read();
+    }
+
+    // Handle cases like icons containing multiple resolutions
+    if (isMultiFrameImage)
+    {
+        auto bestSize = readImage.sizeInBytes();
+        while (imageReader.jumpToNextImage())
+        {
+            QImage candidateImage = imageReader.read();
+            if (!candidateImage.isNull() && candidateImage.sizeInBytes() > bestSize)
+            {
+                bestSize = candidateImage.sizeInBytes();
+                readImage = candidateImage;
+            }
+        }
     }
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
@@ -184,7 +201,8 @@ QVImageCore::ReadData QVImageCore::readFile(const QString &fileName, const QColo
         readImage,
         fileInfo.absoluteFilePath(),
         fileInfo.size(),
-        imageReader.size(),
+        isMultiFrameImage ? QSize() : imageReader.size(),
+        isMultiFrameImage,
         targetColorSpace,
         {}
     };
@@ -234,11 +252,8 @@ void QVImageCore::loadPixmap(const ReadData &readData)
     currentFileDetails.isPixmapLoaded = true;
     currentFileDetails.baseImageSize = readData.imageSize;
     currentFileDetails.loadedPixmapSize = loadedPixmap.size();
-    if (currentFileDetails.baseImageSize == QSize(-1, -1))
-    {
-        qInfo() << "QImageReader::size gave an invalid size for " + currentFileDetails.fileInfo.fileName() + ", using size from loaded pixmap";
+    if (!currentFileDetails.baseImageSize.isValid())
         currentFileDetails.baseImageSize = currentFileDetails.loadedPixmapSize;
-    }
 
     addToCache(std::move(readData));
 
@@ -254,7 +269,7 @@ void QVImageCore::loadPixmap(const ReadData &readData)
         loadedMovie.setFileName(currentFileDetails.fileInfo.absoluteFilePath());
     }
 
-    if (loadedMovie.isValid() && loadedMovie.frameCount() != 1)
+    if (!readData.isMultiFrameImage && loadedMovie.isValid() && loadedMovie.frameCount() != 1)
         loadedMovie.start();
 
     currentFileDetails.isMovieLoaded = loadedMovie.state() == QMovie::Running;

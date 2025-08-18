@@ -63,6 +63,7 @@ public:
         QString absoluteFilePath;
         qint64 fileSize;
         QSize imageSize;
+        bool isMultiFrameImage;
         QColorSpace targetColorSpace;
         ErrorData errorData;
     };
