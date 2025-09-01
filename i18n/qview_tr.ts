@@ -83,7 +83,7 @@
     <message>
         <location filename="../src/actionmanager.cpp" line="676"/>
         <source>Re&amp;load File</source>
-        <translation type="unfinished"></translation>
+        <translation>Dosyayı Yeniden Yükle</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="680"/>
@@ -131,17 +131,17 @@
     <message>
         <location filename="../src/actionmanager.cpp" line="709"/>
         <source>Delete Permanently</source>
-        <translation type="unfinished"></translation>
+        <translation>Kalıcı Olarak Sil</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="713"/>
         <source>&amp;Restore from Trash</source>
-        <translation>&amp;Çöp Kutusundan Geri Yükle</translation>
+        <translation>Çöp Kutusundan Geri Yükle</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="715"/>
         <source>&amp;Undo Delete</source>
-        <translation>&amp;Silme İşlemini Geri Al</translation>
+        <translation>Silme İşlemini Geri Al</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="720"/>
@@ -151,7 +151,7 @@
     <message>
         <location filename="../src/actionmanager.cpp" line="724"/>
         <source>&amp;Paste</source>
-        <translation>&amp;Yapıştır</translation>
+        <translation>Yapıştır</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="727"/>
