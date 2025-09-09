@@ -111,7 +111,7 @@
         <location filename="../src/actionmanager.cpp" line="693"/>
         <source>Show in &amp;Finder</source>
         <extracomment>Open containing folder on macOS</extracomment>
-        <translation>在捜索中查看(&amp;F)</translation>
+        <translation>在访达中查看(&amp;F)</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="698"/>
