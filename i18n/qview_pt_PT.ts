@@ -83,7 +83,7 @@
     <message>
         <location filename="../src/actionmanager.cpp" line="676"/>
         <source>Re&amp;load File</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Recarregar ficheiro</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="680"/>
@@ -131,7 +131,7 @@
     <message>
         <location filename="../src/actionmanager.cpp" line="709"/>
         <source>Delete Permanently</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminar permanentemente</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="713"/>
@@ -262,7 +262,7 @@
         <location filename="../src/actionmanager.cpp" line="812"/>
         <source>&amp;Settings</source>
         <extracomment>This is for the options dialog on windows</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Definiçõe&amp;s</translation>
     </message>
     <message>
         <source>Option&amp;s</source>
@@ -283,7 +283,7 @@
     <message>
         <location filename="../src/actionmanager.cpp" line="818"/>
         <source>Setting&amp;s...</source>
-        <translation type="unfinished"></translation>
+        <translation>Definiçõe&amp;s...</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="823"/>
@@ -399,7 +399,7 @@ Não tem permissão de escrita ou o ficheiro é apenas de leitura.</translation>
     <message>
         <location filename="../src/mainwindow.cpp" line="792"/>
         <source>Are you sure you want to delete %1 permanently? This can&apos;t be undone.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tem a certeza de que deseja eliminar %1 permanentemente? Não pode reverter a eliminação.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="799"/>
@@ -416,7 +416,9 @@ Não tem permissão de escrita ou o ficheiro é apenas de leitura.</translation>
         <source>Error occurred opening
 %3
 %2 (Error %1)</source>
-        <translation type="unfinished"></translation>
+        <translation>Ocorreu um erro ao abrir
+%3
+%2 (Erro %1)</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="803"/>
@@ -994,22 +996,22 @@ Não tem permissão de escrita ou o ficheiro é apenas de leitura.</translation>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="457"/>
         <source>Color space conversion:</source>
-        <translation type="unfinished"></translation>
+        <translation>Conversão de cores:</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="476"/>
         <source>Auto-detect</source>
-        <translation type="unfinished"></translation>
+        <translation>Deteção automática</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="481"/>
         <source>sRGB</source>
-        <translation type="unfinished"></translation>
+        <translation>sRGB</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="486"/>
         <source>Display P3</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar P3</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="495"/>
@@ -1065,17 +1067,17 @@ Não tem permissão de escrita ou o ficheiro é apenas de leitura.</translation>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="17"/>
         <source>Settings</source>
-        <translation type="unfinished">Definições</translation>
+        <translation>Definições</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="524"/>
         <source>Date Modified</source>
-        <translation type="unfinished"></translation>
+        <translation>Data de alteração</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="529"/>
         <source>Date Created</source>
-        <translation type="unfinished"></translation>
+        <translation>Data de criação</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="604"/>
@@ -1156,23 +1158,23 @@ Não tem permissão de escrita ou o ficheiro é apenas de leitura.</translation>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="703"/>
         <source>Detect supported files in folder even if extension isn&apos;t recognized (may be slow with larger/network folders)</source>
-        <translation type="unfinished"></translation>
+        <translation>Detetar ficheiros suportados na pasta mesmo que a sua extensão não seja conhecida (lento em pastas de rede/com muitos ficheiros)</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="706"/>
         <source>Allow &amp;MIME content detection</source>
-        <translation type="unfinished"></translation>
+        <translation>Permitir deteção de conteúdo &amp;MIME</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="727"/>
         <source>Skip hidden files when browsing to the next/previous file</source>
-        <translation type="unfinished"></translation>
+        <translation>Ignorar ficheiros ocultos ao ir para o ficheiro anterior/seguinte</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="730"/>
         <source>Skip hidden files</source>
         <extracomment>Don&apos;t view files with &apos;hidden&apos; attribute</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Ignorar ficheiros ocultos</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="741"/>
@@ -1316,7 +1318,7 @@ Não tem permissão de escrita ou o ficheiro é apenas de leitura.</translation>
     <message>
         <location filename="../src/shortcutmanager.cpp" line="47"/>
         <source>Reload File</source>
-        <translation type="unfinished"></translation>
+        <translation>Recarregar ficheiro</translation>
     </message>
     <message>
         <location filename="../src/shortcutmanager.cpp" line="48"/>
@@ -1376,7 +1378,7 @@ Não tem permissão de escrita ou o ficheiro é apenas de leitura.</translation>
     <message>
         <location filename="../src/shortcutmanager.cpp" line="75"/>
         <source>Delete Permanently</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminar permanentemente</translation>
     </message>
     <message>
         <location filename="../src/shortcutmanager.cpp" line="80"/>
@@ -1481,7 +1483,7 @@ Não tem permissão de escrita ou o ficheiro é apenas de leitura.</translation>
     <message>
         <location filename="../src/shortcutmanager.cpp" line="115"/>
         <source>Settings</source>
-        <translation type="unfinished">Definições</translation>
+        <translation>Definições</translation>
     </message>
     <message>
         <source>Options</source>
