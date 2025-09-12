@@ -201,119 +201,119 @@
     <message>
         <location filename="../src/actionmanager.cpp" line="763"/>
         <source>Enter F&amp;ull Screen</source>
-        <translation type="unfinished"></translation>
+        <translation>Ava &amp;täisekraan</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="767"/>
         <source>&amp;First File</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Esimene fail</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="771"/>
         <source>Previous Fi&amp;le</source>
-        <translation type="unfinished"></translation>
+        <translation>Eelmine fai&amp;l</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="775"/>
         <source>&amp;Next File</source>
-        <translation type="unfinished"></translation>
+        <translation>Järgmi&amp;ne fail</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="779"/>
         <source>Las&amp;t File</source>
-        <translation type="unfinished"></translation>
+        <translation>Vii&amp;mane fail</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="783"/>
         <source>Save Frame &amp;As...</source>
-        <translation type="unfinished"></translation>
+        <translation>Salvesta k&amp;aader kui...</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="787"/>
         <source>Pa&amp;use</source>
-        <translation type="unfinished"></translation>
+        <translation>Pea&amp;ta</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="791"/>
         <source>&amp;Next Frame</source>
-        <translation type="unfinished"></translation>
+        <translation>Järgmi&amp;ne kaader</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="795"/>
         <source>&amp;Decrease Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Vähen&amp;da esituskiirust</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="799"/>
         <source>&amp;Reset Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Lähtes&amp;ta esituse kiirus</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="803"/>
         <source>&amp;Increase Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Suurenda es&amp;ituskiirust</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="807"/>
         <source>Start S&amp;lideshow</source>
-        <translation type="unfinished"></translation>
+        <translation>Alusta s&amp;laidiesitlust</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="812"/>
         <source>&amp;Settings</source>
         <extracomment>This is for the options dialog on windows</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Seadistused</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="816"/>
         <source>Preference&amp;s...</source>
         <extracomment>This is for the options dialog on older mac versions</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Eelistu&amp;sed...</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="818"/>
         <source>Setting&amp;s...</source>
-        <translation type="unfinished"></translation>
+        <translation>Seadistu&amp;sed...</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="823"/>
         <source>&amp;About</source>
-        <translation type="unfinished"></translation>
+        <translation>R&amp;akenduse teave</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="826"/>
         <source>&amp;About qView</source>
         <extracomment>This is for the about dialog on mac</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Te&amp;ave qView kohta</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="830"/>
         <source>&amp;Welcome</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Tere tulemast</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="834"/>
         <source>Clear &amp;Menu</source>
         <extracomment>This is for clearing the recents menu</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Tühjenda &amp;menüü</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="838"/>
         <source>Other Application...</source>
         <extracomment>Open with other program for unix non-mac</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Muu rakendus...</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="841"/>
         <source>Choose another app</source>
         <extracomment>Open with other program for windows</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Vali muu rakendus</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="844"/>
         <source>Other...</source>
         <extracomment>Open with other program for macos</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Muu...</translation>
     </message>
 </context>
 <context>
@@ -379,93 +379,98 @@
         <location filename="../src/mainwindow.cpp" line="785"/>
         <source>Can&apos;t delete %1:
 No write permission or file is read-only.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 faili kustutamine ei õnnestu:
+Sul pole kirjutusõiguse või fail on vaid lugemisõigustes.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="792"/>
         <source>Are you sure you want to delete %1 permanently? This can&apos;t be undone.</source>
-        <translation type="unfinished"></translation>
+        <translation>Kas oled kindel, et soovid %1 faili jäädavalt kustutada? Seda tegevust ei saa tagasi pöörata.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="799"/>
         <source>Are you sure you want to move %1 to the Trash?</source>
-        <translation type="unfinished"></translation>
+        <translation>Kas oled kindel, et soovid %1 faili prügikasti visata?</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="797"/>
         <source>Are you sure you want to move %1 to the Recycle Bin?</source>
-        <translation type="unfinished"></translation>
+        <translation>Kas oled kindel, et soovid %1 faili prügikasti visata?</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="803"/>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Kustuta</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="806"/>
         <source>Do not ask again</source>
-        <translation type="unfinished"></translation>
+        <translation>Ära küsi enam uuesti</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="865"/>
         <source>Can&apos;t delete %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 faili kustutamine ei õnnestu.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="855"/>
         <location filename="../src/mainwindow.cpp" line="935"/>
         <source>Not Supported</source>
-        <translation type="unfinished"></translation>
+        <translation>Pole toetatud</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="310"/>
         <source>Error occurred opening
 %3
 %2 (Error %1)</source>
-        <translation type="unfinished"></translation>
+        <translation>%3
+Avamisel tekkis viga
+%2 (Viga %1)</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="855"/>
         <location filename="../src/mainwindow.cpp" line="935"/>
         <source>This program was compiled with an old version of Qt and this feature is not available.
 If you see this message, please report a bug!</source>
-        <translation type="unfinished"></translation>
+        <translation>See programm on kompileeritud Qt varasema versiooniga ning antud funktsionaalsus pole saadaval.
+Kui näed seda teadet, siis palun anna meile veast teada!</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="922"/>
         <source>Can&apos;t undo deletion of %1:
 No write permission or file is read-only.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 faili kustutamist ei saa tagasi võtta:
+Puuduvad kirjutamise õigused või fail on vaid lugemisõigustega.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="930"/>
         <source>Failed undoing deletion of %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 faili kustutamise tagasivõtmine ei õnnestunud.</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="1068"/>
         <source>Save Frame As...</source>
-        <translation type="unfinished"></translation>
+        <translation>Salvesta kaader kui...</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="1097"/>
         <source>Res&amp;ume</source>
-        <translation type="unfinished"></translation>
+        <translation>Jä&amp;tka</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="1106"/>
         <source>Pause</source>
-        <translation type="unfinished"></translation>
+        <translation>Peata esitus</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="1129"/>
         <source>Start S&amp;lideshow</source>
-        <translation type="unfinished"></translation>
+        <translation>Alusta s&amp;laidiesitlust</translation>
     </message>
     <message>
         <location filename="../src/mainwindow.cpp" line="1138"/>
         <source>Stop S&amp;lideshow</source>
-        <translation type="unfinished"></translation>
+        <translation>Lõpeta s&amp;laidiesitlus</translation>
     </message>
 </context>
 <context>
@@ -473,17 +478,17 @@ No write permission or file is read-only.</source>
     <message>
         <location filename="../src/openwith.cpp" line="163"/>
         <source>All Applications (*.app)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kõik rakendused (*.app)</translation>
     </message>
     <message>
         <location filename="../src/openwith.cpp" line="175"/>
         <source>Programs (*.exe *.pif *.com *.bat *.cmd)</source>
-        <translation type="unfinished"></translation>
+        <translation>Programmid (*.exe *.pif *.com *.bat *.cmd)</translation>
     </message>
     <message>
         <location filename="../src/openwith.cpp" line="175"/>
         <source>All Files (*)</source>
-        <translation type="unfinished"></translation>
+        <translation>Kõik failid (*)</translation>
     </message>
 </context>
 <context>
@@ -491,12 +496,12 @@ No write permission or file is read-only.</source>
     <message>
         <location filename="../src/main.cpp" line="18"/>
         <source>file</source>
-        <translation type="unfinished"></translation>
+        <translation>fail</translation>
     </message>
     <message>
         <location filename="../src/main.cpp" line="18"/>
         <source>The file to open.</source>
-        <translation type="unfinished"></translation>
+        <translation>Avatav fail.</translation>
     </message>
 </context>
 <context>
@@ -566,7 +571,7 @@ No write permission or file is read-only.</source>
     <message>
         <location filename="../src/qvcocoafunctions.mm" line="217"/>
         <source> (default)</source>
-        <translation type="unfinished"></translation>
+        <translation> (vaikimisi)</translation>
     </message>
 </context>
 <context>
@@ -649,67 +654,67 @@ No write permission or file is read-only.</source>
     <message>
         <location filename="../src/qvopenwithdialog.ui" line="14"/>
         <source>Choose Application</source>
-        <translation type="unfinished"></translation>
+        <translation>Vali rakendus</translation>
     </message>
     <message>
         <location filename="../src/openwith.h" line="67"/>
         <source>Development</source>
-        <translation type="unfinished"></translation>
+        <translation>Arendus</translation>
     </message>
     <message>
         <location filename="../src/openwith.h" line="68"/>
         <source>Education</source>
-        <translation type="unfinished"></translation>
+        <translation>Haridus</translation>
     </message>
     <message>
         <location filename="../src/openwith.h" line="69"/>
         <source>Games</source>
-        <translation type="unfinished"></translation>
+        <translation>Mängud</translation>
     </message>
     <message>
         <location filename="../src/openwith.h" line="70"/>
         <source>Graphics</source>
-        <translation type="unfinished"></translation>
+        <translation>Graafika</translation>
     </message>
     <message>
         <location filename="../src/openwith.h" line="71"/>
         <source>Internet</source>
-        <translation type="unfinished"></translation>
+        <translation>Internet</translation>
     </message>
     <message>
         <location filename="../src/openwith.h" line="72"/>
         <source>Multimedia</source>
-        <translation type="unfinished"></translation>
+        <translation>Multimeedia</translation>
     </message>
     <message>
         <location filename="../src/openwith.h" line="73"/>
         <source>Office</source>
-        <translation type="unfinished"></translation>
+        <translation>Kontorirakendused</translation>
     </message>
     <message>
         <location filename="../src/openwith.h" line="74"/>
         <source>Science</source>
-        <translation type="unfinished"></translation>
+        <translation>Teadus</translation>
     </message>
     <message>
         <location filename="../src/openwith.h" line="75"/>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Seadistused</translation>
     </message>
     <message>
         <location filename="../src/openwith.h" line="76"/>
         <source>System</source>
-        <translation type="unfinished"></translation>
+        <translation>Süsteem</translation>
     </message>
     <message>
         <location filename="../src/openwith.h" line="77"/>
         <source>Utilities</source>
-        <translation type="unfinished"></translation>
+        <translation>Tarvikud</translation>
     </message>
     <message>
         <location filename="../src/openwith.h" line="78"/>
         <source>Other</source>
-        <translation type="unfinished"></translation>
+        <translation>Muud</translation>
     </message>
 </context>
 <context>
@@ -717,42 +722,42 @@ No write permission or file is read-only.</source>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="33"/>
         <source>Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Aken</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="39"/>
         <source>Back&amp;ground color:</source>
-        <translation type="unfinished"></translation>
+        <translation>Taust&amp;avärv:</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="56"/>
         <source>Changes the amount of information displayed in the titlebar</source>
-        <translation type="unfinished"></translation>
+        <translation>Muudab tiitliribal kuvatavat teavet</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="59"/>
         <source>Titlebar text:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tiitliriba tekst:</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="66"/>
         <source>&amp;Basic</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Väga napp</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="73"/>
         <source>&amp;Minimal</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Napp</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="83"/>
         <source>&amp;Practical</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Praktiline</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="90"/>
         <source>&amp;Verbose</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Inforikas</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="110"/>
@@ -1235,12 +1240,12 @@ No write permission or file is read-only.</source>
     <message>
         <location filename="../src/qvwelcomedialog.cpp" line="42"/>
         <source>Thank you for downloading qView.&lt;br&gt;Here&apos;s a few tips to get you started:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tänud, et kasutad rakendust qView.&lt;br&gt;Siin on sulle alustamiseks paar juhist:</translation>
     </message>
     <message>
         <location filename="../src/qvwelcomedialog.cpp" line="49"/>
         <source>&lt;ul&gt;&lt;li&gt;Right click to access the main menu&lt;/li&gt;&lt;li&gt;Drag the image to reposition it&lt;/li&gt;&lt;li&gt;Scroll to zoom in and out&lt;/li&gt;&lt;li&gt;Use arrow keys to switch files&lt;/li&gt;&lt;/ul&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;ul&gt;&lt;li&gt;Parema klõpsuga saad ligipääsu põhimenüüle&lt;/li&gt;&lt;li&gt;Pildi asukoha muutmiseks lohista teda&lt;/li&gt;&lt;li&gt;Sisse või välja suumimiseks kasuta kerimist&lt;/li&gt;&lt;li&gt;Failide vahetamiseks kasuta nooleklahve&lt;/li&gt;&lt;/ul&gt;</translation>
     </message>
 </context>
 <context>
@@ -1248,87 +1253,87 @@ No write permission or file is read-only.</source>
     <message>
         <location filename="../src/shortcutmanager.cpp" line="45"/>
         <source>Open</source>
-        <translation type="unfinished"></translation>
+        <translation>Ava</translation>
     </message>
     <message>
         <location filename="../src/shortcutmanager.cpp" line="46"/>
         <source>Open URL</source>
-        <translation type="unfinished"></translation>
+        <translation>Ava võrguaadress</translation>
     </message>
     <message>
         <location filename="../src/shortcutmanager.cpp" line="47"/>
         <source>Reload File</source>
-        <translation type="unfinished"></translation>
+        <translation>Laadi fail uuesti</translation>
     </message>
     <message>
         <location filename="../src/shortcutmanager.cpp" line="48"/>
         <source>Open Containing Folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Ava sisalduv kaust</translation>
     </message>
     <message>
         <location filename="../src/shortcutmanager.cpp" line="51"/>
         <source>Show in Explorer</source>
-        <translation type="unfinished"></translation>
+        <translation>Näita Exploreris</translation>
     </message>
     <message>
         <location filename="../src/shortcutmanager.cpp" line="53"/>
         <source>Show in Finder</source>
-        <translation type="unfinished"></translation>
+        <translation>Näita Finderis</translation>
     </message>
     <message>
         <location filename="../src/shortcutmanager.cpp" line="55"/>
         <source>Show File Info</source>
-        <translation type="unfinished"></translation>
+        <translation>Näita failiteavet</translation>
     </message>
     <message>
         <location filename="../src/shortcutmanager.cpp" line="56"/>
         <source>Restore from Trash</source>
-        <translation type="unfinished"></translation>
+        <translation>Taasta prügikastist</translation>
     </message>
     <message>
         <location filename="../src/shortcutmanager.cpp" line="58"/>
         <source>Undo Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Võta kustutamine tagasi</translation>
     </message>
     <message>
         <location filename="../src/shortcutmanager.cpp" line="60"/>
         <source>Copy</source>
-        <translation type="unfinished"></translation>
+        <translation>Kopeeri</translation>
     </message>
     <message>
         <location filename="../src/shortcutmanager.cpp" line="61"/>
         <source>Paste</source>
-        <translation type="unfinished"></translation>
+        <translation>Aseta</translation>
     </message>
     <message>
         <location filename="../src/shortcutmanager.cpp" line="62"/>
         <source>Rename</source>
-        <translation type="unfinished"></translation>
+        <translation>Muuda nime</translation>
     </message>
     <message>
         <location filename="../src/shortcutmanager.cpp" line="69"/>
         <source>Move to Trash</source>
-        <translation type="unfinished"></translation>
+        <translation>Viska prügikasti</translation>
     </message>
     <message>
         <location filename="../src/shortcutmanager.cpp" line="73"/>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Kustuta</translation>
     </message>
     <message>
         <location filename="../src/shortcutmanager.cpp" line="75"/>
         <source>Delete Permanently</source>
-        <translation type="unfinished"></translation>
+        <translation>Kustuta jäädavalt</translation>
     </message>
     <message>
         <location filename="../src/shortcutmanager.cpp" line="80"/>
         <source>First File</source>
-        <translation type="unfinished"></translation>
+        <translation>Esimene fail</translation>
     </message>
     <message>
         <location filename="../src/shortcutmanager.cpp" line="81"/>
         <source>Previous File</source>
-        <translation type="unfinished"></translation>
+        <translation>Eelmine fail</translation>
     </message>
     <message>
         <location filename="../src/shortcutmanager.cpp" line="82"/>
@@ -1388,72 +1393,72 @@ No write permission or file is read-only.</source>
     <message>
         <location filename="../src/shortcutmanager.cpp" line="108"/>
         <source>Save Frame As</source>
-        <translation type="unfinished"></translation>
+        <translation>Salvesta kaader kui</translation>
     </message>
     <message>
         <location filename="../src/shortcutmanager.cpp" line="109"/>
         <source>Pause</source>
-        <translation type="unfinished"></translation>
+        <translation>Peata esitus</translation>
     </message>
     <message>
         <location filename="../src/shortcutmanager.cpp" line="110"/>
         <source>Next Frame</source>
-        <translation type="unfinished"></translation>
+        <translation>Järgmine kaader</translation>
     </message>
     <message>
         <location filename="../src/shortcutmanager.cpp" line="111"/>
         <source>Decrease Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Vähenda esituskiirust</translation>
     </message>
     <message>
         <location filename="../src/shortcutmanager.cpp" line="112"/>
         <source>Reset Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Lähtesta esituse kiirus</translation>
     </message>
     <message>
         <location filename="../src/shortcutmanager.cpp" line="113"/>
         <source>Increase Speed</source>
-        <translation type="unfinished"></translation>
+        <translation>Suurenda esituskiirust</translation>
     </message>
     <message>
         <location filename="../src/shortcutmanager.cpp" line="114"/>
         <source>Toggle Slideshow</source>
-        <translation type="unfinished"></translation>
+        <translation>Lülita slaidiesitus sisse/välja</translation>
     </message>
     <message>
         <location filename="../src/shortcutmanager.cpp" line="115"/>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Seadistused</translation>
     </message>
     <message>
         <location filename="../src/shortcutmanager.cpp" line="117"/>
         <source>Preferences</source>
-        <translation type="unfinished"></translation>
+        <translation>Eelistused</translation>
     </message>
     <message>
         <location filename="../src/shortcutmanager.cpp" line="121"/>
         <source>New Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Uus aken</translation>
     </message>
     <message>
         <location filename="../src/shortcutmanager.cpp" line="122"/>
         <source>Close Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Sulge aken</translation>
     </message>
     <message>
         <location filename="../src/shortcutmanager.cpp" line="123"/>
         <source>Close All</source>
-        <translation type="unfinished"></translation>
+        <translation>Sulge kõik</translation>
     </message>
     <message>
         <location filename="../src/shortcutmanager.cpp" line="125"/>
         <source>Quit</source>
-        <translation type="unfinished"></translation>
+        <translation>Välju</translation>
     </message>
     <message>
         <location filename="../src/shortcutmanager.cpp" line="130"/>
         <source>Exit</source>
-        <translation type="unfinished"></translation>
+        <translation>Välju</translation>
     </message>
 </context>
 <context>
@@ -1461,33 +1466,34 @@ No write permission or file is read-only.</source>
     <message>
         <location filename="../src/updatechecker.cpp" line="94"/>
         <source>Download</source>
-        <translation type="unfinished"></translation>
+        <translation>Laadi alla</translation>
     </message>
     <message>
         <location filename="../src/updatechecker.cpp" line="97"/>
         <source>qView Update Available</source>
-        <translation type="unfinished"></translation>
+        <translation>Saadaval on qView uuendus</translation>
     </message>
     <message>
         <location filename="../src/updatechecker.cpp" line="98"/>
         <source>qView %1 is available to download.</source>
-        <translation type="unfinished"></translation>
+        <translation>Saadaval on qView %1.</translation>
     </message>
     <message>
         <location filename="../src/updatechecker.cpp" line="102"/>
         <source>&amp;Disable Update Checking</source>
-        <translation type="unfinished"></translation>
+        <translation>Lülita uuen&amp;duste kontrollimine välja</translation>
     </message>
     <message>
         <location filename="../src/updatechecker.cpp" line="112"/>
         <source>qView Update Checking Disabled</source>
-        <translation type="unfinished"></translation>
+        <translation>qView uuen&amp;duste kontrollimine on väljalülitatud</translation>
     </message>
     <message>
         <location filename="../src/updatechecker.cpp" line="112"/>
         <source>Update notifications on startup have been disabled.
 You can reenable them in the options dialog.</source>
-        <translation type="unfinished"></translation>
+        <translation>Uuenduste olemasolu kontrollimine käivitamisel on lülitatud välja.
+Seadistuste vaatest saad selle jälle sisse lülitada.</translation>
     </message>
 </context>
 </TS>
