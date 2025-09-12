@@ -6,79 +6,79 @@
     <message>
         <location filename="../src/actionmanager.cpp" line="30"/>
         <source>Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Cửa sổ</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="172"/>
         <source>&amp;File</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Tập tin</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="201"/>
         <source>&amp;Edit</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Chỉnh sửa</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="223"/>
         <source>&amp;Go</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Đi</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="252"/>
         <source>&amp;View</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Xem</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="276"/>
         <source>&amp;Tools</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Công cụ</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="298"/>
         <source>&amp;Help</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Giúp đỡ</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="312"/>
         <source>Open &amp;Recent</source>
-        <translation type="unfinished"></translation>
+        <translation>Mở &amp;Gần đây</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="322"/>
         <location filename="../src/actionmanager.cpp" line="478"/>
         <source>Empty</source>
-        <translation type="unfinished"></translation>
+        <translation>Trống</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="470"/>
         <source>Open With</source>
-        <translation type="unfinished"></translation>
+        <translation>Mở bằng</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="660"/>
         <source>&amp;Quit</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Thoát</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="664"/>
         <source>Exit</source>
         <extracomment>The quit action is called &quot;Exit&quot; on windows</extracomment>
-        <translation type="unfinished"></translation>
+        <translation>Nút thoát được gọi là &quot;Exit&quot; trên windows</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="667"/>
         <source>New Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Cửa sổ mới</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="670"/>
         <source>&amp;Open...</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Mở...</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="673"/>
         <source>Open &amp;URL...</source>
-        <translation type="unfinished"></translation>
+        <translation>Mở &amp;URL...</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="676"/>
@@ -88,13 +88,13 @@
     <message>
         <location filename="../src/actionmanager.cpp" line="680"/>
         <source>Close Window</source>
-        <translation type="unfinished"></translation>
+        <translation>Đóng cửa sổ</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="684"/>
         <source>Close All</source>
         <extracomment>Close all windows, that is</extracomment>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Đóng tất cả cửa sổ, bao gồm</translation>
     </message>
     <message>
         <location filename="../src/actionmanager.cpp" line="687"/>
