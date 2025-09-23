@@ -524,7 +524,7 @@ Puuduvad kirjutamise õigused või fail on vaid lugemisõigustega.</translation>
     <message>
         <location filename="../src/qvaboutdialog.cpp" line="62"/>
         <source>Built with Qt %1 (%2)&lt;br&gt;Source code available under GPLv3 on &lt;a style=&quot;color: #03A9F4; text-decoration:none;&quot; href=&quot;https://github.com/jurplel/qView&quot;&gt;GitHub&lt;/a&gt;&lt;br&gt;Icon glyph created by Guilhem from the Noun Project&lt;br&gt;Copyright © %3 jurplel and qView contributors</source>
-        <translation type="unfinished"></translation>
+        <translation>Kompileerimisel oli kasutusel Qt %1 (%2)&lt;br&gt;Lähtekood on saadaval GPLv3 alusel &lt;a style=&quot;color: #03A9F4; text-decoration:none;&quot; href=&quot;https://github.com/jurplel/qView&quot;&gt;GitHubis&lt;/a&gt;&lt;br&gt;Ikoonis kasutatud glüüfi on teinud Guilhem Noun Projectist&lt;br&gt;Autoriõigused © %3 jurplel and qView kaasautorid</translation>
     </message>
     <message>
         <location filename="../src/qvaboutdialog.cpp" line="93"/>
@@ -763,54 +763,54 @@ Puuduvad kirjutamise õigused või fail on vaid lugemisõigustega.</translation>
         <location filename="../src/qvoptionsdialog.ui" line="110"/>
         <location filename="../src/qvoptionsdialog.ui" line="120"/>
         <source>Control when the window should resize to fit the image&apos;s actual size</source>
-        <translation type="unfinished"></translation>
+        <translation>Juhi seda, kuidas akna suurus peaks sobituma pildi tegeliku suurusega</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="113"/>
         <source>Window matches image size:</source>
-        <translation type="unfinished"></translation>
+        <translation>Aken sobitub pildi suurusega:</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="127"/>
         <source>Never</source>
-        <translation type="unfinished"></translation>
+        <translation>Ei iialgi</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="132"/>
         <source>When launching</source>
-        <translation type="unfinished"></translation>
+        <translation>Käivitumisel</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="137"/>
         <source>When opening images</source>
-        <translation type="unfinished"></translation>
+        <translation>Piltide avamisel</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="145"/>
         <source>Minimum size:</source>
-        <translation type="unfinished"></translation>
+        <translation>Miinimumsuurus:</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="152"/>
         <source>Control the minimum size that the window should reach when matching the image&apos;s actual size</source>
-        <translation type="unfinished"></translation>
+        <translation>Halda akna miinimumsuurust pildi tegeliku suurusega sobitumisel</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="155"/>
         <location filename="../src/qvoptionsdialog.ui" line="187"/>
         <source>% of screen size</source>
-        <translation type="unfinished"></translation>
+        <translation>% ekraanimõõdust</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="174"/>
         <location filename="../src/qvoptionsdialog.ui" line="184"/>
         <source>Control the maximum size that the window should reach when matching the image&apos;s actual size</source>
-        <translation type="unfinished"></translation>
+        <translation>Halda akna maksimumsuurust pildi tegeliku suurusega sobitumisel</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="177"/>
         <source>Maximum size:</source>
-        <translation type="unfinished"></translation>
+        <translation>Maksimumsuurus:</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="219"/>
@@ -825,27 +825,27 @@ Puuduvad kirjutamise õigused või fail on vaid lugemisõigustega.</translation>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="232"/>
         <source>Show menubar</source>
-        <translation type="unfinished"></translation>
+        <translation>Näita menüüriba</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="239"/>
         <source>Choose whether or not to display the titlebar text while in fullscreen</source>
-        <translation type="unfinished"></translation>
+        <translation>Vali, kas soovid täisekraanivaates näha pealkirjariba teksti</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="242"/>
         <source>Show titlebar text in fullscreen</source>
-        <translation type="unfinished"></translation>
+        <translation>Näita pealkirjariba teksti täisekraanivaates</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="249"/>
         <source>&amp;Quit on last window closed</source>
-        <translation type="unfinished"></translation>
+        <translation>&amp;Välju viimase akna sulgemisel</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="257"/>
         <source>Image</source>
-        <translation type="unfinished"></translation>
+        <translation>Pilt</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="263"/>
@@ -977,37 +977,37 @@ Puuduvad kirjutamise õigused või fail on vaid lugemisõigustega.</translation>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="511"/>
         <source>Sort files by:</source>
-        <translation type="unfinished"></translation>
+        <translation>Järjesta faile:</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="519"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>Nime alusel</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="534"/>
         <source>Size</source>
-        <translation type="unfinished"></translation>
+        <translation>Suuruse alusel</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="539"/>
         <source>Type</source>
-        <translation type="unfinished"></translation>
+        <translation>Tüübi alusel</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="544"/>
         <source>Random</source>
-        <translation type="unfinished"></translation>
+        <translation>Juhuslikult</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="552"/>
         <source>A&amp;scending</source>
-        <translation type="unfinished"></translation>
+        <translation>Ka&amp;svavalt</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="562"/>
         <source>D&amp;escending</source>
-        <translation type="unfinished"></translation>
+        <translation>Kahan&amp;evalt</translation>
     </message>
     <message>
         <location filename="../src/qvoptionsdialog.ui" line="582"/>
