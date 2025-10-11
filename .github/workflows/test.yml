@@ -43,8 +43,5 @@ jobs:
       - name: Install clang-tidy
         run: sudo apt-get update && sudo apt-get install -y clang-tidy
 
-      - name: Configure CMake
-        run: cmake -B build -DENABLE_CLANG_TIDY=ON -DCMAKE_COMPILE_WARNING_AS_ERROR=ON
-
       - name: Run clang-tidy
-        run: cmake --build build --parallel
+        run: ./build.sh --tidy
