@@ -1,0 +1,66 @@
+name: Checks
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  unit-tests:
+    name: Run Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.8'
+          cache: true
+          modules: 'qtimageformats'
+
+      - name: Configure CMake
+        run: cmake -B build -DBUILD_TESTS=ON
+
+      - name: Build
+        run: cmake --build build --parallel
+
+      - name: Run tests
+        run: xvfb-run --auto-servernum --server-args="-screen 0 1280x1024x24" ctest --test-dir build
+
+  clang-tidy:
+    name: Run clang-tidy
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.8'
+          cache: true
+          modules: 'qtimageformats'
+
+      - name: Install clang-tidy
+        run: sudo apt-get update && sudo apt-get install -y clang-tidy
+
+      - name: Run clang-tidy
+        run: ./build.sh --tidy
+
+    format:
+      name: Run clang-format
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4
+
+        - name: Install Qt
+          uses: jurplel/install-qt-action@v4
+          with:
+            version: '6.8'
+            cache: true
+            modules: 'qtimageformats'
+
+        - name: Install clang-format
+          run: sudo apt-get update && sudo apt-get install -y clang-format
+
+        - name: Run clang-format
+          run: ./build.sh --format-check

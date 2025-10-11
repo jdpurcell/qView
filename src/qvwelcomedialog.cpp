@@ -6,9 +6,7 @@
 #include <QFontDatabase>
 #include <QSettings>
 
-QVWelcomeDialog::QVWelcomeDialog(QWidget *parent) :
-    QDialog(parent),
-    ui(new Ui::QVWelcomeDialog)
+QVWelcomeDialog::QVWelcomeDialog(QWidget *parent) : QDialog(parent), ui(new Ui::QVWelcomeDialog)
 {
     ui->setupUi(this);
 
@@ -27,7 +25,7 @@ QVWelcomeDialog::QVWelcomeDialog(QWidget *parent) :
     QFontDatabase::addApplicationFont(":/fonts/Lato-Regular.ttf");
 
     int modifier = 0;
-    //set main title font
+    // set main title font
 #ifdef Q_OS_MACOS
     const QFont font1 = QFont("Lato", 72, QFont::Light);
     modifier = 4;
@@ -36,17 +34,20 @@ QVWelcomeDialog::QVWelcomeDialog(QWidget *parent) :
 #endif
     ui->logoLabel->setFont(font1);
 
-    //set subtitle font & text
+    // set subtitle font & text
     QFont font2 = QFont("Lato", 14 + modifier);
     font2.setStyleName("Regular");
-    const QString subtitleText = tr("Thank you for downloading qView.<br>Here's a few tips to get you started:");
+    const QString subtitleText =
+            tr("Thank you for downloading qView.<br>Here's a few tips to get you started:");
     ui->subtitleLabel->setFont(font2);
     ui->subtitleLabel->setText(subtitleText);
 
-    //set info font & text
+    // set info font & text
     QFont font3 = QFont("Lato", 12 + modifier);
     font3.setStyleName("Regular");
-    const QString updateText = tr("<ul><li>Right click to access the main menu</li><li>Drag the image to reposition it</li><li>Scroll to zoom in and out</li><li>Use arrow keys to switch files</li></ul>");
+    const QString updateText = tr("<ul><li>Right click to access the main menu</li><li>Drag the "
+                                  "image to reposition it</li><li>Scroll to zoom in and "
+                                  "out</li><li>Use arrow keys to switch files</li></ul>");
     ui->infoLabel->setFont(font3);
     ui->infoLabel->setText(updateText);
 
@@ -56,14 +57,14 @@ QVWelcomeDialog::QVWelcomeDialog(QWidget *parent) :
 #ifdef QV_DISABLE_ONLINE_VERSION_CHECK
     ui->updateCheckBox->hide();
 #else
-    ui->updateCheckBox->setChecked(qvApp->getSettingsManager().getBoolean("updatenotifications"));
-    connect(ui->updateCheckBox, &QCheckBox::stateChanged, qvApp, [](int state){
+    ui->updateCheckBox->setChecked(qvApp->getSettingsManager().getBool("updatenotifications"));
+    connect(ui->updateCheckBox, &QCheckBox::stateChanged, qvApp, [](int state) {
         QSettings settings;
         settings.beginGroup("options");
         settings.setValue("updatenotifications", state > 0);
         qvApp->getSettingsManager().loadSettings();
     });
-#endif //QV_DISABLE_ONLINE_VERSION_CHECK
+#endif // QV_DISABLE_ONLINE_VERSION_CHECK
 }
 
 QVWelcomeDialog::~QVWelcomeDialog()

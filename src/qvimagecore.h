@@ -12,7 +12,7 @@
 #include <QElapsedTimer>
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-#include <QColorSpace>
+#  include <QColorSpace>
 #else
 typedef QString QColorSpace;
 #endif
@@ -57,6 +57,20 @@ public:
         void updateLoadedIndexInFolder();
     };
 
+    struct DirInfo
+    {
+        QString dirPath;
+        qsizetype fileCount;
+        int sortMode;
+        bool sortDescending;
+
+        bool operator!=(const DirInfo &other) const
+        {
+            return dirPath != other.dirPath || fileCount != other.fileCount
+                    || sortMode != other.sortMode || sortDescending != other.sortDescending;
+        }
+    };
+
     struct ReadData
     {
         QImage image;
@@ -78,7 +92,8 @@ public:
     void requestCaching();
     void requestCachingFile(const QString &filePath, const QColorSpace &targetColorSpace);
     void addToCache(const ReadData &&readImageAndFileInfo);
-    static QString getPixmapCacheKey(const QString &absoluteFilePath, const qint64 &fileSize, const QColorSpace &targetColorSpace);
+    static QString getPixmapCacheKey(const QString &absoluteFilePath, const qint64 &fileSize,
+                                     const QColorSpace &targetColorSpace);
     QColorSpace getTargetColorSpace() const;
     QColorSpace detectDisplayColorSpace() const;
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0) && QT_VERSION < QT_VERSION_CHECK(6, 7, 2)
@@ -98,11 +113,11 @@ public:
     QPixmap scaleExpensively(const int desiredWidth, const int desiredHeight);
     QPixmap scaleExpensively(const QSizeF desiredSize);
 
-    //returned const reference is read-only
-    const QPixmap& getLoadedPixmap() const {return loadedPixmap; }
-    const QMovie& getLoadedMovie() const {return loadedMovie; }
-    const FileDetails& getCurrentFileDetails() const {return currentFileDetails; }
-    int getCurrentRotation() const {return currentRotation; }
+    // returned const reference is read-only
+    const QPixmap &getLoadedPixmap() const { return loadedPixmap; }
+    const QMovie &getLoadedMovie() const { return loadedMovie; }
+    const FileDetails &getCurrentFileDetails() const { return currentFileDetails; }
+    int getCurrentRotation() const { return currentRotation; }
 
 signals:
     void animatedFrameChanged(QRect rect);
@@ -124,17 +139,11 @@ private:
 
     QFutureWatcher<ReadData> loadFutureWatcher;
 
-    bool isLoopFoldersEnabled;
-    int preloadingMode;
-    int sortMode;
-    bool sortDescending;
-    bool allowMimeContentDetection;
     int colorSpaceConversion;
 
     static QCache<QString, ReadData> imageCache;
 
-    QPair<QString, int> lastDirInfo;
-    unsigned randomSortSeed;
+    DirInfo lastDirInfo;
 
     QStringList lastFilesPreloaded;
     QStringList preloadFilesInProgress;

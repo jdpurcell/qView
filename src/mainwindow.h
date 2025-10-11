@@ -35,7 +35,13 @@ public:
 
     void refreshProperties();
 
-    void buildWindowTitle();
+    void updateWindowTitle();
+
+    void updateWindowFilePath();
+
+    bool getTitlebarHidden() const;
+
+    void setTitlebarHidden(const bool hide);
 
     void setWindowSize();
 
@@ -111,9 +117,14 @@ public:
 
     void toggleFullScreen();
 
+    void toggleTitlebarHidden();
+
     int getTitlebarOverlap() const;
 
-    const QVImageCore::FileDetails& getCurrentFileDetails() const { return graphicsView->getCurrentFileDetails(); }
+    const QVImageCore::FileDetails &getCurrentFileDetails() const
+    {
+        return graphicsView->getCurrentFileDetails();
+    }
 
 public slots:
     void openFile(const QString &fileName);
@@ -145,6 +156,8 @@ protected:
 
     void paintEvent(QPaintEvent *event) override;
 
+    void fullscreenChanged();
+
 protected slots:
     void settingsUpdated();
     void shortcutsUpdated();
@@ -167,6 +180,7 @@ private:
     bool justLaunchedWithImage;
 
     Qt::WindowStates storedWindowState;
+    bool storedTitlebarHidden;
 
     QNetworkAccessManager networkAccessManager;
 

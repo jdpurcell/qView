@@ -16,25 +16,13 @@ class QVGraphicsView : public QGraphicsView
 public:
     QVGraphicsView(QWidget *parent = nullptr);
 
-    enum class ScaleMode
-    {
-       resetScale,
-       zoom
-    };
+    enum class ScaleMode { resetScale, zoom };
     Q_ENUM(ScaleMode)
 
-    enum class GoToFileMode
-    {
-       constant,
-       first,
-       previous,
-       next,
-       last
-    };
+    enum class GoToFileMode { constant, first, previous, next, last };
     Q_ENUM(GoToFileMode)
 
-
-    QMimeData* getMimeData() const;
+    QMimeData *getMimeData() const;
     void loadMimeData(const QMimeData *mimeData);
     void loadFile(const QString &fileName);
 
@@ -62,9 +50,12 @@ public:
     void setSpeed(const int &desiredSpeed);
     void rotateImage(int rotation);
 
-    const QVImageCore::FileDetails& getCurrentFileDetails() const { return imageCore.getCurrentFileDetails(); }
-    const QPixmap& getLoadedPixmap() const { return imageCore.getLoadedPixmap(); }
-    const QMovie& getLoadedMovie() const { return imageCore.getLoadedMovie(); }
+    const QVImageCore::FileDetails &getCurrentFileDetails() const
+    {
+        return imageCore.getCurrentFileDetails();
+    }
+    const QPixmap &getLoadedPixmap() const { return imageCore.getLoadedPixmap(); }
+    const QMovie &getLoadedMovie() const { return imageCore.getLoadedMovie(); }
 
 signals:
     void cancelSlideshow();
@@ -92,7 +83,11 @@ protected:
     void enterEvent(QEnterEvent *event) override;
 #endif
 
+    void mousePressEvent(QMouseEvent *event) override;
+
     void mouseReleaseEvent(QMouseEvent *event) override;
+
+    void mouseMoveEvent(QMouseEvent *event) override;
 
     bool event(QEvent *event) override;
 
@@ -105,7 +100,6 @@ protected:
 
     void centerOn(const QGraphicsItem *item);
 
-
 private slots:
     void animatedFrameChanged(QRect rect);
 
@@ -116,20 +110,7 @@ private slots:
 private:
     void updateFilteringMode();
 
-
     QGraphicsPixmapItem *loadedPixmapItem;
-
-    bool isFilteringEnabled;
-    bool isScalingEnabled;
-    bool isScalingTwoEnabled;
-    bool isPastActualSizeEnabled;
-    int scrollZooms;
-    bool isFractionalZoomEnabled;
-
-    bool isLoopFoldersEnabled;
-    bool isCursorZoomEnabled;
-    int cropMode;
-    qreal scaleFactor;
 
     constexpr static int MARGIN = -2;
     constexpr static qreal MAX_EXPENSIVE_SCALING_SIZE = 3;
@@ -148,9 +129,13 @@ private:
     QTransform zoomBasis;
     qreal zoomBasisScaleFactor;
 
-    QVImageCore imageCore { this };
+    QVImageCore imageCore{ this };
 
     QTimer *expensiveScaleTimerNew;
     QPointF centerPoint;
+
+    Qt::MouseButton mousePressButton;
+    Qt::KeyboardModifiers mousePressModifiers;
+    QPoint mousePressPosition;
 };
 #endif // QVGRAPHICSVIEW_H
