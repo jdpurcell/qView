@@ -15,6 +15,14 @@ fi
 for arg in "$@"
 do
     case $arg in
+        --format)
+        clang-format -i **/*.cpp **/*.h **/*.mm
+        exit 0
+        ;;
+        --format-check)
+        clang-format -i **/*.cpp **/*.h **/*.mm --dry-run -Werror
+        exit 0
+        ;;
         --tidy)
         CMAKE_ARGS="$CMAKE_ARGS -DCMAKE_CXX_CLANG_TIDY=clang-tidy"
         shift # Remove --tidy from processing
