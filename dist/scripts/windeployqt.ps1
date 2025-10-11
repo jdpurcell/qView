@@ -13,7 +13,7 @@ if ($env:buildArch -ne 'Arm64') {
         $openSslSubfolder = "openssl-1.1\"
         $openSslFilenameVersion = "1_1"
     } else {
-        $openSslDownloadUrl = "https://download.firedaemon.com/FireDaemon-OpenSSL/openssl-3.4.1.zip"
+        $openSslDownloadUrl = "https://download.firedaemon.com/FireDaemon-OpenSSL/openssl-3.5.4.zip"
         $openSslSubfolder = ""
         $openSslFilenameVersion = "3"
     }
