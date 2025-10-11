@@ -86,11 +86,12 @@ jobs:
         shell: pwsh
         run: |
           if ("${{ matrix.skipPlugins }}" -ne "true") {
-            Invoke-Expression "& 'dist/scripts/download-plugins.ps1'"
+            & dist/scripts/download-plugins.ps1
           }
           if ($IsWindows) {
-            Invoke-Expression "& 'dist/scripts/windeployqt.ps1' ${{ env.buildNumString }}"
+            & dist/scripts/windeployqt.ps1 ${{ env.buildNumString }}
           } elseif ($IsMacOS) {
+            & dist/scripts/macinstallcert.ps1
             bash dist/scripts/macdeploy.sh ${{ env.buildNumString }}
           } else {
             bash dist/scripts/linuxdeployqt.sh ${{ env.buildNumString }}
