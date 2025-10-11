@@ -519,8 +519,8 @@ void QVImageCore::addToCache(const ReadData &&readData)
     qint64 pixmapMemoryBytes = static_cast<qint64>(readData.image.width()) * readData.image.height()
             * readData.image.depth() / 8;
 
-    QVImageCore::imageCache.insert(cacheKey, new ReadData(std::move(readData)),
-                                   qMax(pixmapMemoryBytes / 1024, 1LL));
+    qint64 pixmapMemoryKiB = qMax(pixmapMemoryBytes / 1024, 1LL);
+    QVImageCore::imageCache.insert(cacheKey, new ReadData(std::move(readData)), pixmapMemoryKiB);
 }
 
 QString QVImageCore::getPixmapCacheKey(const QString &absoluteFilePath, const qint64 &fileSize,
@@ -723,17 +723,18 @@ void QVImageCore::settingsUpdated()
     auto &settingsManager = qvApp->getSettingsManager();
 
     // preloading mode
+    // Cost is in KiB
     switch (qvGetSettingInt(PreloadingMode)) {
     case 0: {
         QVImageCore::imageCache.setMaxCost(0);
         break;
     }
     case 1: {
-        QVImageCore::imageCache.setMaxCost(204800);
+        QVImageCore::imageCache.setMaxCost(256000);
         break;
     }
     case 2: {
-        QVImageCore::imageCache.setMaxCost(819200);
+        QVImageCore::imageCache.setMaxCost(2048000);
         break;
     }
     default:
