@@ -8,22 +8,19 @@
 
 #import <Cocoa/Cocoa.h>
 
-
 static void fixNativeMenuEccentricities(QMenu *menu, NSMenu *nativeMenu)
 {
     // Stop menu items with no actions being disabled automatically
     [nativeMenu setAutoenablesItems:false];
     int i = 0;
-    for (NSMenuItem *item in nativeMenu.itemArray)
-    {
+    for (NSMenuItem *item in nativeMenu.itemArray) {
         // Set menu items as disabled again (setAutoenablesItems resets them all to enabled)
         [item setEnabled:menu->actions().value(i)->isEnabled()];
         // Update each item so the submenus actually show up
         [nativeMenu.delegate menu:nativeMenu updateItem:item atIndex:0 shouldCancel:false];
         // Hide shortcuts from menu as is typical for context menus
         [item setKeyEquivalent:@""];
-        if (item.hasSubmenu)
-        {
+        if (item.hasSubmenu) {
             // Stop items with submenus from being clickable
             [item setAction:nil];
 
@@ -36,26 +33,48 @@ static void fixNativeMenuEccentricities(QMenu *menu, NSMenu *nativeMenu)
 
 void QVCocoaFunctions::showMenu(QMenu *menu, const QPoint &point, QWindow *window)
 {
-    auto *view = reinterpret_cast<NSView*>(window->winId());
+    auto *view = reinterpret_cast<NSView *>(window->winId());
 
     NSMenu *nativeMenu = menu->toNSMenu();
     fixNativeMenuEccentricities(menu, nativeMenu);
 
-    NSPoint transposedPoint = QPoint(point.x(), static_cast<int>(view.frame.size.height)-point.y()).toCGPoint();
+    NSPoint transposedPoint =
+            QPoint(point.x(), static_cast<int>(view.frame.size.height) - point.y()).toCGPoint();
     NSGraphicsContext *graphicsContext = [NSGraphicsContext currentContext];
 
     // Synthesize event to open menu
-    NSEvent *event = [NSEvent mouseEventWithType:NSEventTypeRightMouseDown location:transposedPoint modifierFlags:0
-            timestamp:0 windowNumber:view.window.windowNumber context:graphicsContext eventNumber:0 clickCount:0 pressure:1];
+    NSEvent *event = [NSEvent mouseEventWithType:NSEventTypeRightMouseDown
+                                        location:transposedPoint
+                                   modifierFlags:0
+                                       timestamp:0
+                                    windowNumber:view.window.windowNumber
+                                         context:graphicsContext
+                                     eventNumber:0
+                                      clickCount:0
+                                        pressure:1];
     [NSMenu popUpContextMenu:nativeMenu withEvent:event forView:view];
 
     // Send left and right up events to replace ones that aren't sent automatically
-    NSEvent *eventRightUp = [NSEvent mouseEventWithType:NSEventTypeRightMouseUp location:transposedPoint modifierFlags:0
-            timestamp:0 windowNumber:view.window.windowNumber context:graphicsContext eventNumber:0 clickCount:0 pressure:1];
+    NSEvent *eventRightUp = [NSEvent mouseEventWithType:NSEventTypeRightMouseUp
+                                               location:transposedPoint
+                                          modifierFlags:0
+                                              timestamp:0
+                                           windowNumber:view.window.windowNumber
+                                                context:graphicsContext
+                                            eventNumber:0
+                                             clickCount:0
+                                               pressure:1];
     [view rightMouseUp:eventRightUp];
 
-    NSEvent *eventLeftUp = [NSEvent mouseEventWithType:NSEventTypeLeftMouseUp location:transposedPoint modifierFlags:0
-            timestamp:0 windowNumber:view.window.windowNumber context:graphicsContext eventNumber:0 clickCount:0 pressure:1];
+    NSEvent *eventLeftUp = [NSEvent mouseEventWithType:NSEventTypeLeftMouseUp
+                                              location:transposedPoint
+                                         modifierFlags:0
+                                             timestamp:0
+                                          windowNumber:view.window.windowNumber
+                                               context:graphicsContext
+                                           eventNumber:0
+                                            clickCount:0
+                                              pressure:1];
     [view mouseUp:eventLeftUp];
 }
 
@@ -67,7 +86,7 @@ void QVCocoaFunctions::setUserDefaults()
 // This function should only be enabled once because it sets observers
 void QVCocoaFunctions::setFullSizeContentView(QWindow *window, const bool enable)
 {
-    auto *view = reinterpret_cast<NSView*>(window->winId());
+    auto *view = reinterpret_cast<NSView *>(window->winId());
 
     // Make sure the requested state isn't already in effect
     if (enable == (view.window.styleMask & NSWindowStyleMaskFullSizeContentView))
@@ -76,15 +95,12 @@ void QVCocoaFunctions::setFullSizeContentView(QWindow *window, const bool enable
     // Changing the style mask causes the window to resize, so snapshot the original size
     NSRect originalFrame = view.window.frame;
 
-    if (enable)
-    {
+    if (enable) {
         // Proceed only if this Qt and macOS version combination is already using layer-backed view
         if (!view.wantsLayer)
             return;
         view.window.styleMask |= NSWindowStyleMaskFullSizeContentView;
-    }
-    else
-    {
+    } else {
         view.window.styleMask &= ~NSWindowStyleMaskFullSizeContentView;
     }
 
@@ -93,17 +109,24 @@ void QVCocoaFunctions::setFullSizeContentView(QWindow *window, const bool enable
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 2, 0)
     // workaround for QTBUG-69975
-    if (enable)
-    {
-        [[NSNotificationCenter defaultCenter] addObserverForName:NSWindowDidExitFullScreenNotification object:view.window queue:nil usingBlock:^(NSNotification *notification){
-            auto *window = reinterpret_cast<NSWindow*>(notification.object);
-            window.styleMask |= NSWindowStyleMaskFullSizeContentView;
-        }];
+    if (enable) {
+        [[NSNotificationCenter defaultCenter]
+                addObserverForName:NSWindowDidExitFullScreenNotification
+                            object:view.window
+                             queue:nil
+                        usingBlock:^(NSNotification *notification) {
+                            auto *window = reinterpret_cast<NSWindow *>(notification.object);
+                            window.styleMask |= NSWindowStyleMaskFullSizeContentView;
+                        }];
 
-        [[NSNotificationCenter defaultCenter] addObserverForName:NSWindowDidEnterFullScreenNotification object:view.window queue:nil usingBlock:^(NSNotification *notification){
-            auto *window = reinterpret_cast<NSWindow*>(notification.object);
-            window.styleMask |= NSWindowStyleMaskFullSizeContentView;
-        }];
+        [[NSNotificationCenter defaultCenter]
+                addObserverForName:NSWindowDidEnterFullScreenNotification
+                            object:view.window
+                             queue:nil
+                        usingBlock:^(NSNotification *notification) {
+                            auto *window = reinterpret_cast<NSWindow *>(notification.object);
+                            window.styleMask |= NSWindowStyleMaskFullSizeContentView;
+                        }];
     }
 #endif
 }
@@ -113,14 +136,14 @@ bool QVCocoaFunctions::getTitlebarHidden(const QWidget *window)
 #if QT_VERSION >= QT_VERSION_CHECK(6, 9, 0)
     return window->windowFlags().testFlags(Qt::NoTitleBarBackgroundHint);
 #else
-    auto *view = reinterpret_cast<NSView*>(window->winId());
+    auto *view = reinterpret_cast<NSView *>(window->winId());
     return view.window.titleVisibility == NSWindowTitleHidden;
 #endif
 }
 
 void QVCocoaFunctions::setTitlebarHidden(QWidget *window, const bool hide)
 {
-    auto *view = reinterpret_cast<NSView*>(window->winId());
+    auto *view = reinterpret_cast<NSView *>(window->winId());
 #if QT_VERSION >= QT_VERSION_CHECK(6, 9, 0)
     Qt::WindowFlags newFlags = window->windowFlags().setFlag(Qt::NoTitleBarBackgroundHint, hide);
     window->overrideWindowFlags(newFlags);
@@ -133,16 +156,13 @@ void QVCocoaFunctions::setTitlebarHidden(QWidget *window, const bool hide)
 
 void QVCocoaFunctions::setVibrancy(bool alwaysDark, QWindow *window)
 {
-    auto *view = reinterpret_cast<NSView*>(window->winId());
+    auto *view = reinterpret_cast<NSView *>(window->winId());
 
-    if (alwaysDark)
-    {
+    if (alwaysDark) {
 
-        [view.window setAppearance: [NSAppearance appearanceNamed:NSAppearanceNameVibrantDark]];
-    }
-    else
-    {
-        [view.window setAppearance: nil];
+        [view.window setAppearance:[NSAppearance appearanceNamed:NSAppearanceNameVibrantDark]];
+    } else {
+        [view.window setAppearance:nil];
     }
 }
 
@@ -151,7 +171,7 @@ int QVCocoaFunctions::getObscuredHeight(QWindow *window)
     if (!window)
         return 0;
 
-    auto *view = reinterpret_cast<NSView*>(window->winId());
+    auto *view = reinterpret_cast<NSView *>(window->winId());
 
     if (view.window.titlebarAppearsTransparent)
         return 0;
@@ -164,14 +184,16 @@ int QVCocoaFunctions::getObscuredHeight(QWindow *window)
 
 void QVCocoaFunctions::closeWindow(QWindow *window)
 {
-    auto *view = reinterpret_cast<NSView*>(window->winId());
+    auto *view = reinterpret_cast<NSView *>(window->winId());
     [view.window close];
 }
 
 void QVCocoaFunctions::setWindowMenu(QMenu *menu)
 {
     NSMenu *nativeMenu = menu->toNSMenu();
-    [nativeMenu addItemWithTitle:@"Minimize" action:@selector(performMiniaturize:) keyEquivalent:@"m"];
+    [nativeMenu addItemWithTitle:@"Minimize"
+                          action:@selector(performMiniaturize:)
+                   keyEquivalent:@"m"];
 
     [nativeMenu addItemWithTitle:@"Zoom" action:@selector(performZoom:) keyEquivalent:@""];
     [[NSApplication sharedApplication] setWindowsMenu:nativeMenu];
@@ -187,8 +209,7 @@ void QVCocoaFunctions::setDockRecents(const QStringList &recentPathsList)
 {
     NSDocumentController *documentController = [NSDocumentController sharedDocumentController];
     [documentController clearRecentDocuments:documentController];
-    for (int i = recentPathsList.size()-1; i >= 0; i--)
-    {
+    for (int i = recentPathsList.size() - 1; i >= 0; i--) {
         const auto &path = recentPathsList[i];
         auto url = QUrl::fromLocalFile(path);
         [documentController noteNewRecentDocumentURL:url.toNSURL()];
@@ -202,40 +223,45 @@ QList<OpenWith::OpenWithItem> QVCocoaFunctions::getOpenWithItems(const QString &
 
     NSString *utiType = nil;
     NSError *error = nil;
-    BOOL success = [fileUrl.toNSURL() getResourceValue:&utiType forKey:NSURLTypeIdentifierKey error:&error];
+    BOOL success = [fileUrl.toNSURL() getResourceValue:&utiType
+                                                forKey:NSURLTypeIdentifierKey
+                                                 error:&error];
 
-    if (!success)
-    {
+    if (!success) {
         NSLog(@"getResourceValue:forKey:error: returned error == %@", error);
         return QList<OpenWith::OpenWithItem>();
     }
 
-
-    NSArray *supportedApplications = [(NSArray *)LSCopyAllRoleHandlersForContentType((CFStringRef)utiType, kLSRolesAll) autorelease];
-    NSString *defaultApplication = [(NSString *)LSCopyDefaultRoleHandlerForContentType((CFStringRef)utiType, kLSRolesAll) autorelease];
+    NSArray *supportedApplications =
+            [(NSArray *)LSCopyAllRoleHandlersForContentType((CFStringRef)utiType, kLSRolesAll)
+                    autorelease];
+    NSString *defaultApplication =
+            [(NSString *)LSCopyDefaultRoleHandlerForContentType((CFStringRef)utiType, kLSRolesAll)
+                    autorelease];
 
     QList<OpenWith::OpenWithItem> listOfOpenWithItems;
-    for (NSString *appId in supportedApplications)
-    {
-        if ([appId isEqualToString:@"com.qview.qView"] || [appId isEqualToString:@"com.interversehq.qView"])
+    for (NSString *appId in supportedApplications) {
+        if ([appId isEqualToString:@"com.qview.qView"] ||
+            [appId isEqualToString:@"com.interversehq.qView"])
             continue;
 
         OpenWith::OpenWithItem openWithItem;
         openWithItem.exec = "open";
-        openWithItem.args.append({"-b", QString::fromNSString(appId)});
+        openWithItem.args.append({ "-b", QString::fromNSString(appId) });
 
-        NSString *absolutePath = [[NSWorkspace sharedWorkspace] absolutePathForAppBundleWithIdentifier:appId];
+        NSString *absolutePath =
+                [[NSWorkspace sharedWorkspace] absolutePathForAppBundleWithIdentifier:appId];
 
         NSString *appName = [[NSFileManager defaultManager] displayNameAtPath:absolutePath];
         openWithItem.name = QString::fromNSString(appName);
 
         QFileIconProvider fiProvider;
         QIcon icon = fiProvider.icon(QFileInfo(QString::fromNSString(absolutePath)));
-        openWithItem.icon = ActionManager::getCacheableIcon("application:" + QString::fromNSString(appId), icon);
+        openWithItem.icon = ActionManager::getCacheableIcon(
+                "application:" + QString::fromNSString(appId), icon);
 
         // If the program is the default program, save it to add to the beginning after sorting
-        if ([appId isEqualToString:defaultApplication])
-        {
+        if ([appId isEqualToString:defaultApplication]) {
             openWithItem.isDefault = true;
             openWithItem.name += QT_TR_NOOP(" (default)");
         }
@@ -253,9 +279,10 @@ QString QVCocoaFunctions::deleteFile(const QString &filePath)
 
     NSURL *resultUrl = nil;
     NSError *error = nil;
-    BOOL success = [[NSFileManager defaultManager] trashItemAtURL:fileUrl.toNSURL() resultingItemURL:&resultUrl error:&error];
-    if (!success)
-    {
+    BOOL success = [[NSFileManager defaultManager] trashItemAtURL:fileUrl.toNSURL()
+                                                 resultingItemURL:&resultUrl
+                                                            error:&error];
+    if (!success) {
         NSLog(@"trashItemAtUrl:resultingItemUrl:error: returned error == %@", error);
         return "";
     }
@@ -265,13 +292,11 @@ QString QVCocoaFunctions::deleteFile(const QString &filePath)
 
 QByteArray QVCocoaFunctions::getIccProfileForWindow(const QWindow *window)
 {
-    NSView *view = reinterpret_cast<NSView*>(window->winId());
+    NSView *view = reinterpret_cast<NSView *>(window->winId());
     NSColorSpace *nsColorSpace = view.window.colorSpace;
-    if (nsColorSpace)
-    {
+    if (nsColorSpace) {
         NSData *iccProfileData = nsColorSpace.ICCProfileData;
-        if (iccProfileData)
-        {
+        if (iccProfileData) {
             return QByteArray::fromNSData(iccProfileData);
         }
     }
