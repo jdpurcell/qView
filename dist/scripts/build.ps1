@@ -6,6 +6,9 @@ param
     $Prefix = "/usr"
 )
 
+$qtVersion = [version](qmake -query QT_VERSION)
+Write-Host "Detected Qt version $qtVersion"
+
 if ($IsWindows) {
     dist/scripts/vcvars.ps1
 } elseif ($IsMacOS) {
