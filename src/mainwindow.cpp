@@ -441,7 +441,7 @@ void MainWindow::disableActions()
         }
     }
 
-    const auto &openWithMenus = qvApp->getActionManager().getAllClonesOfMenu("openwith");
+    const auto &openWithMenus = qvApp->getActionManager().getAllClonesOfMenu("openwith", this);
     for (const auto &menu : openWithMenus)
     {
         menu->setEnabled(getCurrentFileDetails().isPixmapLoaded);
