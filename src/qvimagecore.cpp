@@ -24,8 +24,6 @@ QVImageCore::QVImageCore(QObject *parent) : QObject(parent)
     QImageReader::setAllocationLimit(8192);
 #endif
 
-    randomSortSeed = 0;
-
     currentRotation = 0;
 
 
@@ -373,91 +371,103 @@ void QVImageCore::updateFolderInfo(QString dirPath)
 
     currentFileDetails.folderFileInfoList = getCompatibleFiles(dirPath);
 
-    QPair<QString, int> dirInfo = {dirPath,
-                                         currentFileDetails.folderFileInfoList.count()};
+    DirInfo dirInfo = {dirPath, currentFileDetails.folderFileInfoList.count(),
+                       qvGetSettingInt(SortMode),
+                       qvGetSettingBool(SortDescending)};
     // If the current folder changed since the last image, assign a new seed for random sorting
-    if (lastDirInfo != dirInfo)
-    {
-        randomSortSeed = std::chrono::system_clock::now().time_since_epoch().count();
-    }
+    const bool shouldSort = lastDirInfo != dirInfo;
     lastDirInfo = dirInfo;
 
-    bool sortDescending = qvGetSettingBool(SortDescending);
+    const auto sortFn =
+          [&]() {
+            // Sorting
+            switch (dirInfo.sortMode) {
+            case 0: {
+              // Natural sorting
+              QCollator collator;
+              collator.setNumericMode(true);
+              std::sort(currentFileDetails.folderFileInfoList.begin(),
+                        currentFileDetails.folderFileInfoList.end(),
+                        [&](const CompatibleFile &file1,
+                                             const CompatibleFile &file2) {
+                          if (dirInfo.sortDescending)
+                            return collator.compare(file1.fileName,
+                                                    file2.fileName) > 0;
+                          else
+                            return collator.compare(file1.fileName,
+                                                    file2.fileName) < 0;
+                        });
+              break;
+            }
+            case 1:
+              // Date modified
+              std::sort(currentFileDetails.folderFileInfoList.begin(),
+                        currentFileDetails.folderFileInfoList.end(),
+                        [&](const CompatibleFile &file1,
+                                  const CompatibleFile &file2) {
+                          if (dirInfo.sortDescending)
+                            return file1.lastModified < file2.lastModified;
+                          else
+                            return file1.lastModified > file2.lastModified;
+                        });
+              break;
+            case 2:
+              // Date created
+              std::sort(currentFileDetails.folderFileInfoList.begin(),
+                        currentFileDetails.folderFileInfoList.end(),
+                        [&](const CompatibleFile &file1,
+                                  const CompatibleFile &file2) {
+                          if (dirInfo.sortDescending)
+                            return file1.lastCreated < file2.lastCreated;
+                          else
+                            return file1.lastCreated > file2.lastCreated;
+                        });
+              break;
+            case 3:
+              // Size
+              std::sort(currentFileDetails.folderFileInfoList.begin(),
+                        currentFileDetails.folderFileInfoList.end(),
+                        [&](const CompatibleFile &file1,
+                                  const CompatibleFile &file2) {
+                          if (dirInfo.sortDescending)
+                            return file1.size < file2.size;
+                          else
+                            return file1.size > file2.size;
+                        });
+              break;
+            case 4: {
+              // Type
+              QCollator collator;
+              std::sort(currentFileDetails.folderFileInfoList.begin(),
+                        currentFileDetails.folderFileInfoList.end(),
+                        [&](const CompatibleFile &file1,
+                                             const CompatibleFile &file2) {
+                          if (dirInfo.sortDescending)
+                            return collator.compare(file1.mimeType,
+                                                    file2.mimeType) > 0;
+                          else
+                            return collator.compare(file1.mimeType,
+                                                    file2.mimeType) < 0;
+                        });
+              break;
+            }
+            case 5:
+              // Random
+              std::shuffle(currentFileDetails.folderFileInfoList.begin(),
+                           currentFileDetails.folderFileInfoList.end(),
+                           std::default_random_engine(std::chrono::system_clock::now().time_since_epoch().count()));
+              break;
+            default:
+              Q_ASSERT(false);
+              break;
+            }
+          };
 
-    // Sorting
-    switch (qvGetSettingInt(SortMode)) {
-        case 0: {
-            // Natural sorting
-            QCollator collator;
-            collator.setNumericMode(true);
-            std::sort(currentFileDetails.folderFileInfoList.begin(),
-                    currentFileDetails.folderFileInfoList.end(),
-                    [&collator, sortDescending](const CompatibleFile &file1, const CompatibleFile &file2)
-            {
-                if (sortDescending)
-                    return collator.compare(file1.fileName, file2.fileName) > 0;
-                else
-                    return collator.compare(file1.fileName, file2.fileName) < 0;
-            });
-            break;
-        }
-        case 1:
-            // Date modified
-            std::sort(currentFileDetails.folderFileInfoList.begin(),
-                    currentFileDetails.folderFileInfoList.end(),
-                    [sortDescending](const CompatibleFile &file1, const CompatibleFile &file2)
-            {
-                if (sortDescending)
-                    return file1.lastModified < file2.lastModified;
-                else
-                    return file1.lastModified > file2.lastModified;
-            });
-            break;
-        case 2:
-            // Date created
-            std::sort(currentFileDetails.folderFileInfoList.begin(),
-                    currentFileDetails.folderFileInfoList.end(),
-                    [sortDescending](const CompatibleFile &file1, const CompatibleFile &file2)
-            {
-                if (sortDescending)
-                    return file1.lastCreated < file2.lastCreated;
-                else
-                    return file1.lastCreated > file2.lastCreated;
-            });
-            break;
-        case 3:
-            // Size
-            std::sort(currentFileDetails.folderFileInfoList.begin(),
-                    currentFileDetails.folderFileInfoList.end(),
-                    [sortDescending](const CompatibleFile &file1, const CompatibleFile &file2)
-            {
-                if (sortDescending)
-                    return file1.size < file2.size;
-                else
-                    return file1.size > file2.size;
-            });
-            break;
-        case 4: {
-            // Type
-            QCollator collator;
-            std::sort(currentFileDetails.folderFileInfoList.begin(),
-                    currentFileDetails.folderFileInfoList.end(),
-                    [&collator, sortDescending](const CompatibleFile &file1, const CompatibleFile &file2)
-            {
-                if (sortDescending)
-                    return collator.compare(file1.mimeType, file2.mimeType) > 0;
-                else
-                    return collator.compare(file1.mimeType, file2.mimeType) < 0;
-            });
-            break;
-        }
-        case 5:
-            // Random
-            std::shuffle(currentFileDetails.folderFileInfoList.begin(), currentFileDetails.folderFileInfoList.end(), std::default_random_engine(randomSortSeed));
-            break;
-        default:
-            Q_ASSERT(false);
-            break;
+    if (shouldSort) {
+        qDebug() << "Sorting folder";
+        sortFn();
+    } else {
+        qDebug() << "Not sorting folder";
     }
 
     // Set current file index variable

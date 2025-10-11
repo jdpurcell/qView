@@ -57,6 +57,20 @@ public:
         void updateLoadedIndexInFolder();
     };
 
+    struct DirInfo
+    {
+        QString dirPath;
+        qsizetype fileCount;
+        int sortMode;
+        bool sortDescending;
+
+        bool operator!=(const DirInfo &other) const {
+          return dirPath != other.dirPath || fileCount != other.fileCount ||
+                 sortMode != other.sortMode ||
+                 sortDescending != other.sortDescending;
+        }
+    };
+
     struct ReadData
     {
         QImage image;
@@ -128,8 +142,7 @@ private:
 
     static QCache<QString, ReadData> imageCache;
 
-    QPair<QString, int> lastDirInfo;
-    unsigned randomSortSeed;
+    DirInfo lastDirInfo;
 
     QStringList lastFilesPreloaded;
     QStringList preloadFilesInProgress;
