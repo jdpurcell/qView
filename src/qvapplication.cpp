@@ -13,11 +13,12 @@ QVApplication::QVApplication(int &argc, char **argv) : QApplication(argc, argv)
     setDesktopFileName("com.interversehq.qView.desktop");
 
     // Connections
-    connect(&actionManager, &ActionManager::recentsMenuUpdated, this, &QVApplication::recentsMenuUpdated);
+    connect(&actionManager, &ActionManager::recentsMenuUpdated, this,
+            &QVApplication::recentsMenuUpdated);
 
 #ifndef QV_DISABLE_ONLINE_VERSION_CHECK
     connect(&updateChecker, &UpdateChecker::checkedUpdates, this, &QVApplication::checkedUpdates);
-#endif //QV_DISABLE_ONLINE_VERSION_CHECK
+#endif // QV_DISABLE_ONLINE_VERSION_CHECK
 
     // Add fallback fromTheme icon search on linux with qt >5.11
 #if defined Q_OS_UNIX && !defined Q_OS_MACOS && QT_VERSION >= QT_VERSION_CHECK(5, 11, 0)
@@ -43,9 +44,8 @@ QVApplication::QVApplication(int &argc, char **argv) : QApplication(argc, argv)
 
     // Setup macOS dock menu
     dockMenu = new QMenu();
-    connect(dockMenu, &QMenu::triggered, this, [](QAction *triggeredAction) {
-       ActionManager::actionTriggered(triggeredAction);
-    });
+    connect(dockMenu, &QMenu::triggered, this,
+            [](QAction *triggeredAction) { ActionManager::actionTriggered(triggeredAction); });
 
     actionManager.loadRecentsList();
 
@@ -57,9 +57,8 @@ QVApplication::QVApplication(int &argc, char **argv) : QApplication(argc, argv)
 
     // Build menu bar
     menuBar = actionManager.buildMenuBar();
-    connect(menuBar, &QMenuBar::triggered, this, [](QAction *triggeredAction) {
-        ActionManager::actionTriggered(triggeredAction);
-    });
+    connect(menuBar, &QMenuBar::triggered, this,
+            [](QAction *triggeredAction) { ActionManager::actionTriggered(triggeredAction); });
 
     // Set mac-specific application settings
 #ifdef COCOA_LOADED
@@ -80,14 +79,11 @@ QVApplication::~QVApplication()
 
 bool QVApplication::event(QEvent *event)
 {
-    if (event->type() == QEvent::FileOpen)
-    {
+    if (event->type() == QEvent::FileOpen) {
         auto *openEvent = static_cast<QFileOpenEvent *>(event);
         openFile(getMainWindow(true), openEvent->file());
-    }
-    else if (event->type() == QEvent::ApplicationStateChange)
-    {
-        auto *stateEvent = static_cast<QApplicationStateChangeEvent*>(event);
+    } else if (event->type() == QEvent::ApplicationStateChange) {
+        auto *stateEvent = static_cast<QApplicationStateChangeEvent *>(event);
         if (stateEvent->applicationState() == Qt::ApplicationActive)
             settingsManager.loadSettings();
     }
@@ -119,24 +115,23 @@ void QVApplication::pickFile(MainWindow *parent)
     if (parent)
         fileDialog->setWindowModality(Qt::WindowModal);
 
-    connect(fileDialog, &QFileDialog::filesSelected, fileDialog, [parent](const QStringList &selected) {
-        bool isFirstLoop = true;
-        for (const auto &file : selected)
-        {
-            if (isFirstLoop && parent)
-                parent->openFile(file);
-            else
-                QVApplication::openFile(file);
+    connect(fileDialog, &QFileDialog::filesSelected, fileDialog,
+            [parent](const QStringList &selected) {
+                bool isFirstLoop = true;
+                for (const auto &file : selected) {
+                    if (isFirstLoop && parent)
+                        parent->openFile(file);
+                    else
+                        QVApplication::openFile(file);
 
-            isFirstLoop = false;
-        }
+                    isFirstLoop = false;
+                }
 
-        // Set lastFileDialogDir
-        QSettings settings;
-        settings.beginGroup("recents");
-        settings.setValue("lastFileDialogDir", QFileInfo(selected.constFirst()).path());
-
-    });
+                // Set lastFileDialogDir
+                QSettings settings;
+                settings.beginGroup("recents");
+                settings.setValue("lastFileDialogDir", QFileInfo(selected.constFirst()).path());
+            });
     fileDialog->show();
 }
 
@@ -152,40 +147,29 @@ MainWindow *QVApplication::newWindow()
 MainWindow *QVApplication::getMainWindow(bool shouldBeEmpty)
 {
     // Attempt to use from list of last active windows
-    for (const auto &window : qAsConst(lastActiveWindows))
-    {
+    for (const auto &window : qAsConst(lastActiveWindows)) {
         if (!window)
             continue;
 
-        if (shouldBeEmpty)
-        {
+        if (shouldBeEmpty) {
             // File info is set if an image load is requested, but not loaded
-            if (!window->getCurrentFileDetails().isLoadRequested)
-            {
+            if (!window->getCurrentFileDetails().isLoadRequested) {
                 return window;
             }
-        }
-        else
-        {
+        } else {
             return window;
         }
     }
 
     // If none of those are valid, scan the list for any existing MainWindow
     const auto topLevelWidgets = QApplication::topLevelWidgets();
-    for (const auto &widget : topLevelWidgets)
-    {
-        if (auto *window = qobject_cast<MainWindow*>(widget))
-        {
-            if (shouldBeEmpty)
-            {
-                if (!window->getCurrentFileDetails().isLoadRequested)
-                {
+    for (const auto &widget : topLevelWidgets) {
+        if (auto *window = qobject_cast<MainWindow *>(widget)) {
+            if (shouldBeEmpty) {
+                if (!window->getCurrentFileDetails().isLoadRequested) {
                     return window;
                 }
-            }
-            else
-            {
+            } else {
                 return window;
             }
         }
@@ -206,13 +190,10 @@ void QVApplication::checkUpdates(bool isStartupCheck)
 void QVApplication::checkedUpdates()
 {
 #ifndef QV_DISABLE_ONLINE_VERSION_CHECK
-    if (aboutDialog)
-    {
+    if (aboutDialog) {
         aboutDialog->setLatestVersionNum(updateChecker.getLatestVersionNum());
-    }
-    else if (updateChecker.getLatestVersionNum() > VERSION &&
-             getSettingsManager().getBool("updatenotifications"))
-    {
+    } else if (updateChecker.getLatestVersionNum() > VERSION
+               && getSettingsManager().getBool("updatenotifications")) {
         updateChecker.openDialog();
     }
 #endif // QV_DISABLE_ONLINE_VERSION_CHECK
@@ -222,8 +203,7 @@ void QVApplication::recentsMenuUpdated()
 {
 #ifdef COCOA_LOADED
     QStringList recentsPathList;
-    for(const auto &recent : actionManager.getRecentsList())
-    {
+    for (const auto &recent : actionManager.getRecentsList()) {
         recentsPathList << recent.filePath;
     }
     QVCocoaFunctions::setDockRecents(recentsPathList);
@@ -259,9 +239,7 @@ void QVApplication::openOptionsDialog(QWidget *parent)
     parent = nullptr;
 #endif
 
-
-    if (optionsDialog)
-    {
+    if (optionsDialog) {
         optionsDialog->raise();
         optionsDialog->activateWindow();
         return;
@@ -278,8 +256,7 @@ void QVApplication::openWelcomeDialog(QWidget *parent)
     parent = nullptr;
 #endif
 
-    if (welcomeDialog)
-    {
+    if (welcomeDialog) {
         welcomeDialog->raise();
         welcomeDialog->activateWindow();
         return;
@@ -296,8 +273,7 @@ void QVApplication::openAboutDialog(QWidget *parent)
     parent = nullptr;
 #endif
 
-    if (aboutDialog)
-    {
+    if (aboutDialog) {
         aboutDialog->raise();
         aboutDialog->activateWindow();
         return;
@@ -307,38 +283,36 @@ void QVApplication::openAboutDialog(QWidget *parent)
     aboutDialog = new QVAboutDialog(updateChecker.getLatestVersionNum(), parent);
 #else
     aboutDialog = new QVAboutDialog(-1, parent);
-#endif //QV_DISABLE_ONLINE_VERSION_CHECK
+#endif // QV_DISABLE_ONLINE_VERSION_CHECK
     aboutDialog->show();
 }
 
 void QVApplication::hideIncompatibleActions()
-{    
+{
     // Deletion actions
 #if (QT_VERSION < QT_VERSION_CHECK(5, 15, 0))
-    auto hideDeleteActions = [this]{
+    auto hideDeleteActions = [this] {
         getActionManager().hideAllInstancesOfAction("delete");
         getActionManager().hideAllInstancesOfAction("undo");
 
-        getShortcutManager().setShortcutsHidden({"delete", "undo"});
+        getShortcutManager().setShortcutsHidden({ "delete", "undo" });
     };
-#if defined Q_OS_UNIX && !defined Q_OS_MACOS
+#  if defined Q_OS_UNIX && !defined Q_OS_MACOS
     QProcess *testGio = new QProcess(this);
     testGio->start("gio", QStringList());
-    connect(testGio, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), [hideDeleteActions, testGio, this](){
-        if (testGio->error() == QProcess::FailedToStart)
-        {
-            qInfo() << "No backup gio trash backend found";
-            hideDeleteActions();
-        }
-        else
-        {
-            qInfo() << "Using backup gio trash backend";
-        }
-    });
-#elif defined Q_OS_WIN || (defined Q_OS_MACOS && !COCOA_LOADED)
+    connect(testGio, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+            [hideDeleteActions, testGio, this]() {
+                if (testGio->error() == QProcess::FailedToStart) {
+                    qInfo() << "No backup gio trash backend found";
+                    hideDeleteActions();
+                } else {
+                    qInfo() << "Using backup gio trash backend";
+                }
+            });
+#  elif defined Q_OS_WIN || (defined Q_OS_MACOS && !COCOA_LOADED)
     qInfo() << "Qt version too old for trash feature";
     hideDeleteActions();
-#endif
+#  endif
 #endif
 }
 
@@ -347,7 +321,7 @@ void QVApplication::defineFilterLists()
     const auto &byteArrayFormats = QImageReader::supportedImageFormats();
 
     auto filterString = tr("Supported Images") + " (";
-    fileExtensionList.reserve(byteArrayFormats.size()-1);
+    fileExtensionList.reserve(byteArrayFormats.size() - 1);
 
     const auto addExtension = [&](const QString &extension) {
         filterString += "*" + extension + " ";
@@ -355,8 +329,7 @@ void QVApplication::defineFilterLists()
     };
 
     // Build the filterlist, filterstring, and filterregexplist in one loop
-    for (const auto &byteArray : byteArrayFormats)
-    {
+    for (const auto &byteArray : byteArrayFormats) {
         const auto fileExtension = "." + QString::fromUtf8(byteArray);
         // Qt 5.15 seems to have added pdf support for QImageReader but it is super broken in qView
         if (fileExtension == ".pdf")
@@ -365,20 +338,15 @@ void QVApplication::defineFilterLists()
         addExtension(fileExtension);
 
         // Register additional file extensions that decoders support but don't advertise
-        if (fileExtension == ".jpg")
-        {
+        if (fileExtension == ".jpg") {
             addExtension(".jpe");
             addExtension(".jfi");
 #if QT_VERSION < QT_VERSION_CHECK(6, 8, 0)
             addExtension(".jfif");
 #endif
-        }
-        else if (fileExtension == ".heic")
-        {
+        } else if (fileExtension == ".heic") {
             addExtension(".heics");
-        }
-        else if (fileExtension == ".heif")
-        {
+        } else if (fileExtension == ".heif") {
             addExtension(".heifs");
             addExtension(".hif");
         }
@@ -388,9 +356,8 @@ void QVApplication::defineFilterLists()
 
     // Build mime type list
     const auto &byteArrayMimeTypes = QImageReader::supportedMimeTypes();
-    mimeTypeNameList.reserve(byteArrayMimeTypes.size()-1);
-    for (const auto &byteArray : byteArrayMimeTypes)
-    {
+    mimeTypeNameList.reserve(byteArrayMimeTypes.size() - 1);
+    for (const auto &byteArray : byteArrayMimeTypes) {
         // Qt 5.15 seems to have added pdf support for QImageReader but it is super broken in qView
         const QString mime = QString::fromUtf8(byteArray);
         if (mime == "application/pdf")

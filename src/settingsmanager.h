@@ -4,7 +4,8 @@
 #include <QVariant>
 #include <QVector>
 
-struct SettingData {
+struct SettingData
+{
     QVariant defaultValue;
     QVariant value;
 };
@@ -13,8 +14,7 @@ class SettingsManager : public QObject
 {
     Q_OBJECT
 public:
-    enum class Setting
-    {
+    enum class Setting {
         // Window settings
         BgColorEnabled = 0,
         BgColor,
@@ -54,7 +54,8 @@ public:
     };
     Q_ENUM(Setting)
 
-    struct SettingData {
+    struct SettingData
+    {
         QVariant defaultValue;
         QVariant value;
     };
@@ -93,7 +94,6 @@ private:
     void initializeSettingDataCache();
     QVector<SettingData> settingDataCache;
     static const QString &getSettingKey(Setting setting);
-
 };
 
 #endif // SETTINGSMANAGER_H

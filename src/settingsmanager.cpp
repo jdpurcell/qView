@@ -10,50 +10,51 @@
 #include <QDebug>
 
 // Setting definition structure for initialization
-struct SettingDefinition {
+struct SettingDefinition
+{
     SettingsManager::Setting setting;
     QVariant defaultValue;
-    const char* key;
+    const char *key;
 };
 
 // Master list of all settings with their data and keys
 static const SettingDefinition settingDefinitions[] = {
     // Window settings
-    {SettingsManager::Setting::BgColorEnabled, true, "bgcolorenabled"},
-    {SettingsManager::Setting::BgColor, "#212121", "bgcolor"},
-    {SettingsManager::Setting::TitleBarMode, 1, "titlebarmode"},
-    {SettingsManager::Setting::WindowResizeMode, 1, "windowresizemode"},
-    {SettingsManager::Setting::MinWindowResizedPercentage, 20, "minwindowresizedpercentage"},
-    {SettingsManager::Setting::MaxWindowResizedPercentage, 70, "maxwindowresizedpercentage"},
-    {SettingsManager::Setting::TitleBarAlwaysDark, true, "titlebaralwaysdark"},
-    {SettingsManager::Setting::QuitOnLastWindow, false, "quitonlastwindow"},
-    {SettingsManager::Setting::MenuBarEnabled, false, "menubarenabled"},
-    {SettingsManager::Setting::FullScreenDetails, false, "fullscreendetails"},
+    { SettingsManager::Setting::BgColorEnabled, true, "bgcolorenabled" },
+    { SettingsManager::Setting::BgColor, "#212121", "bgcolor" },
+    { SettingsManager::Setting::TitleBarMode, 1, "titlebarmode" },
+    { SettingsManager::Setting::WindowResizeMode, 1, "windowresizemode" },
+    { SettingsManager::Setting::MinWindowResizedPercentage, 20, "minwindowresizedpercentage" },
+    { SettingsManager::Setting::MaxWindowResizedPercentage, 70, "maxwindowresizedpercentage" },
+    { SettingsManager::Setting::TitleBarAlwaysDark, true, "titlebaralwaysdark" },
+    { SettingsManager::Setting::QuitOnLastWindow, false, "quitonlastwindow" },
+    { SettingsManager::Setting::MenuBarEnabled, false, "menubarenabled" },
+    { SettingsManager::Setting::FullScreenDetails, false, "fullscreendetails" },
     // Image settings
-    {SettingsManager::Setting::FilteringEnabled, true, "filteringenabled"},
-    {SettingsManager::Setting::ScalingEnabled, true, "scalingenabled"},
-    {SettingsManager::Setting::ScalingTwoEnabled, true, "scalingtwoenabled"},
-    {SettingsManager::Setting::ScaleFactor, 25, "scalefactor"},
-    {SettingsManager::Setting::ScrollZoom, 1, "scrollzoom"},
-    {SettingsManager::Setting::FractionalZoom, false, "fractionalzoom"},
-    {SettingsManager::Setting::CursorZoom, true, "cursorzoom"},
-    {SettingsManager::Setting::CropMode, 0, "cropmode"},
-    {SettingsManager::Setting::PastActualSizeEnabled, true, "pastactualsizeenabled"},
-    {SettingsManager::Setting::ColorSpaceConversion, 1, "colorspaceconversion"},
+    { SettingsManager::Setting::FilteringEnabled, true, "filteringenabled" },
+    { SettingsManager::Setting::ScalingEnabled, true, "scalingenabled" },
+    { SettingsManager::Setting::ScalingTwoEnabled, true, "scalingtwoenabled" },
+    { SettingsManager::Setting::ScaleFactor, 25, "scalefactor" },
+    { SettingsManager::Setting::ScrollZoom, 1, "scrollzoom" },
+    { SettingsManager::Setting::FractionalZoom, false, "fractionalzoom" },
+    { SettingsManager::Setting::CursorZoom, true, "cursorzoom" },
+    { SettingsManager::Setting::CropMode, 0, "cropmode" },
+    { SettingsManager::Setting::PastActualSizeEnabled, true, "pastactualsizeenabled" },
+    { SettingsManager::Setting::ColorSpaceConversion, 1, "colorspaceconversion" },
     // Miscellaneous settings
-    {SettingsManager::Setting::Language, "system", "language"},
-    {SettingsManager::Setting::SortMode, 0, "sortmode"},
-    {SettingsManager::Setting::SortDescending, false, "sortdescending"},
-    {SettingsManager::Setting::PreloadingMode, 1, "preloadingmode"},
-    {SettingsManager::Setting::LoopFoldersEnabled, true, "loopfoldersenabled"},
-    {SettingsManager::Setting::SlideshowReversed, false, "slideshowreversed"},
-    {SettingsManager::Setting::SlideshowTimer, 5, "slideshowtimer"},
-    {SettingsManager::Setting::AfterDelete, 2, "afterdelete"},
-    {SettingsManager::Setting::AskDelete, true, "askdelete"},
-    {SettingsManager::Setting::AllowMimeContentDetection, false, "allowmimecontentdetection"},
-    {SettingsManager::Setting::SaveRecents, true, "saverecents"},
-    {SettingsManager::Setting::UpdateNotifications, false, "updatenotifications"},
-    {SettingsManager::Setting::SkipHidden, true, "skiphidden"}
+    { SettingsManager::Setting::Language, "system", "language" },
+    { SettingsManager::Setting::SortMode, 0, "sortmode" },
+    { SettingsManager::Setting::SortDescending, false, "sortdescending" },
+    { SettingsManager::Setting::PreloadingMode, 1, "preloadingmode" },
+    { SettingsManager::Setting::LoopFoldersEnabled, true, "loopfoldersenabled" },
+    { SettingsManager::Setting::SlideshowReversed, false, "slideshowreversed" },
+    { SettingsManager::Setting::SlideshowTimer, 5, "slideshowtimer" },
+    { SettingsManager::Setting::AfterDelete, 2, "afterdelete" },
+    { SettingsManager::Setting::AskDelete, true, "askdelete" },
+    { SettingsManager::Setting::AllowMimeContentDetection, false, "allowmimecontentdetection" },
+    { SettingsManager::Setting::SaveRecents, true, "saverecents" },
+    { SettingsManager::Setting::UpdateNotifications, false, "updatenotifications" },
+    { SettingsManager::Setting::SkipHidden, true, "skiphidden" }
 };
 
 // settingKeys is a file-static variable, it doesn't need to be a member
@@ -73,15 +74,13 @@ QString SettingsManager::getSystemLanguage() const
     const auto centries = entries;
 
     const auto languages = QLocale::system().uiLanguages();
-    for (auto language : languages)
-    {
+    for (auto language : languages) {
         language.replace('-', '_');
         const auto countryless = language.left(2);
 
-        for (auto entry : centries)
-        {
+        for (auto entry : centries) {
             entry.remove(0, 6);
-            entry.remove(entry.length()-3, 3);
+            entry.remove(entry.length() - 3, 3);
 
             if (entry == language)
                 return language;
@@ -104,8 +103,7 @@ bool SettingsManager::loadTranslation() const
 
     QTranslator *translator = new QTranslator();
     bool success = translator->load("qview_" + lang + ".qm", QLatin1String(":/i18n"));
-    if (success)
-    {
+    if (success) {
         qInfo() << "Loaded translation" << lang;
         QCoreApplication::installTranslator(translator);
     }
@@ -143,12 +141,12 @@ void SettingsManager::loadSettings()
 const QVariant SettingsManager::getSetting(const QString &key, bool defaults) const
 {
     // Find the setting enum that matches this key
-    for (const auto& def : settingDefinitions) {
+    for (const auto &def : settingDefinitions) {
         if (QString(def.key) == key) {
             return getSetting(def.setting, defaults);
         }
     }
-    
+
     qWarning() << "Error: Invalid settings key: " + key;
     return QVariant();
 }
@@ -188,7 +186,7 @@ const QString SettingsManager::getString(const QString &key, bool defaults) cons
 bool SettingsManager::isDefault(const QString &key) const
 {
     // Find the setting enum that matches this key
-    for (const auto& def : settingDefinitions) {
+    for (const auto &def : settingDefinitions) {
         if (QString(def.key) == key) {
             return isDefault(def.setting);
         }
@@ -260,7 +258,8 @@ bool SettingsManager::isDefault(Setting setting) const
     return data.value.isNull() || data.value == data.defaultValue;
 }
 
-void SettingsManager::initializeSettingDataCache() {
+void SettingsManager::initializeSettingDataCache()
+{
     QMetaEnum metaEnum = QMetaEnum::fromType<SettingsManager::Setting>();
     int enumCount = metaEnum.keyCount();
 
@@ -268,9 +267,9 @@ void SettingsManager::initializeSettingDataCache() {
     settingKeys.resize(enumCount);
 
     // Fill vectors based on definitions
-    for (const auto& def : settingDefinitions) {
+    for (const auto &def : settingDefinitions) {
         int index = static_cast<int>(def.setting);
-        settingDataCache[index] = {def.defaultValue, {}};
+        settingDataCache[index] = { def.defaultValue, {} };
         settingKeys[index] = def.key;
     }
 }

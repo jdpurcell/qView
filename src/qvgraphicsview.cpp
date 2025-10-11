@@ -38,28 +38,29 @@ QVGraphicsView::QVGraphicsView(QWidget *parent) : QGraphicsView(parent)
     lastScrollRoundingError = QPointF();
     mousePressButton = Qt::MouseButton::NoButton;
     mousePressModifiers = Qt::KeyboardModifier::NoModifier;
-  
+
     zoomBasisScaleFactor = 1.0;
 
-    connect(&imageCore, &QVImageCore::animatedFrameChanged, this, &QVGraphicsView::animatedFrameChanged);
+    connect(&imageCore, &QVImageCore::animatedFrameChanged, this,
+            &QVGraphicsView::animatedFrameChanged);
     connect(&imageCore, &QVImageCore::fileChanged, this, &QVGraphicsView::postLoad);
-    connect(&imageCore, &QVImageCore::updateLoadedPixmapItem, this, &QVGraphicsView::updateLoadedPixmapItem);
+    connect(&imageCore, &QVImageCore::updateLoadedPixmapItem, this,
+            &QVGraphicsView::updateLoadedPixmapItem);
 
     // Should replace the other timer eventually
     expensiveScaleTimerNew = new QTimer(this);
     expensiveScaleTimerNew->setSingleShot(true);
     expensiveScaleTimerNew->setInterval(50);
-    connect(expensiveScaleTimerNew, &QTimer::timeout, this, [this]{scaleExpensively();});
-
+    connect(expensiveScaleTimerNew, &QTimer::timeout, this, [this] { scaleExpensively(); });
 
     loadedPixmapItem = new QGraphicsPixmapItem();
     scene->addItem(loadedPixmapItem);
 
     // Connect to settings signal
-    connect(&qvApp->getSettingsManager(), &SettingsManager::settingsUpdated, this, &QVGraphicsView::settingsUpdated);
+    connect(&qvApp->getSettingsManager(), &SettingsManager::settingsUpdated, this,
+            &QVGraphicsView::settingsUpdated);
     settingsUpdated();
 }
-
 
 // Events
 
@@ -81,8 +82,7 @@ void QVGraphicsView::dropEvent(QDropEvent *event)
 void QVGraphicsView::dragEnterEvent(QDragEnterEvent *event)
 {
     QGraphicsView::dragEnterEvent(event);
-    if (event->mimeData()->hasUrls())
-    {
+    if (event->mimeData()->hasUrls()) {
         event->acceptProposedAction();
     }
 }
@@ -118,10 +118,10 @@ void QVGraphicsView::mousePressEvent(QMouseEvent *event)
         viewport()->setCursor(Qt::ClosedHandCursor);
     };
 
-    if (event->button() == Qt::LeftButton && event->modifiers().testFlag(Qt::ControlModifier))
-    {
+    if (event->button() == Qt::LeftButton && event->modifiers().testFlag(Qt::ControlModifier)) {
         const auto windowState = window()->windowState();
-        if (!windowState.testFlag(Qt::WindowFullScreen) && !windowState.testFlag(Qt::WindowMaximized))
+        if (!windowState.testFlag(Qt::WindowFullScreen)
+            && !windowState.testFlag(Qt::WindowMaximized))
             initializeDrag();
         return;
     }
@@ -131,20 +131,18 @@ void QVGraphicsView::mousePressEvent(QMouseEvent *event)
 
 void QVGraphicsView::mouseReleaseEvent(QMouseEvent *event)
 {
-    if (mousePressButton != Qt::NoButton)
-    {
+    if (mousePressButton != Qt::NoButton) {
         mousePressButton = Qt::NoButton;
         mousePressModifiers = Qt::NoModifier;
     }
-  
+
     QGraphicsView::mouseReleaseEvent(event);
     viewport()->setCursor(Qt::ArrowCursor);
 }
 
 void QVGraphicsView::mouseMoveEvent(QMouseEvent *event)
 {
-    if (mousePressButton == Qt::LeftButton && mousePressModifiers.testFlag(Qt::ControlModifier))
-    {
+    if (mousePressButton == Qt::LeftButton && mousePressModifiers.testFlag(Qt::ControlModifier)) {
         const QPoint delta = event->pos() - mousePressPosition;
         window()->move(window()->pos() + delta);
         return;
@@ -155,12 +153,10 @@ void QVGraphicsView::mouseMoveEvent(QMouseEvent *event)
 
 bool QVGraphicsView::event(QEvent *event)
 {
-    //this is for touchpad pinch gestures
-    if (event->type() == QEvent::Gesture)
-    {
-        auto *gestureEvent = static_cast<QGestureEvent*>(event);
-        if (QGesture *pinch = gestureEvent->gesture(Qt::PinchGesture))
-        {
+    // this is for touchpad pinch gestures
+    if (event->type() == QEvent::Gesture) {
+        auto *gestureEvent = static_cast<QGestureEvent *>(event);
+        if (QGesture *pinch = gestureEvent->gesture(Qt::PinchGesture)) {
             auto *pinchGesture = static_cast<QPinchGesture *>(pinch);
             QPinchGesture::ChangeFlags changeFlags = pinchGesture->changeFlags();
 
@@ -170,23 +166,22 @@ bool QVGraphicsView::event(QEvent *event)
             }
 
             // Fun rotation stuff maybe later
-//            if (changeFlags & QPinchGesture::RotationAngleChanged) {
-//                qreal rotationDelta = pinchGesture->rotationAngle() - pinchGesture->lastRotationAngle();
-//                rotate(rotationDelta);
-//                centerOn(loadedPixmapItem);
-//            }
+            //            if (changeFlags & QPinchGesture::RotationAngleChanged) {
+            //                qreal rotationDelta = pinchGesture->rotationAngle() -
+            //                pinchGesture->lastRotationAngle(); rotate(rotationDelta);
+            //                centerOn(loadedPixmapItem);
+            //            }
             return true;
         }
-    }
-    else if (event->type() == QEvent::NativeGesture) {
-        auto *nativeEvent = static_cast<QNativeGestureEvent*>(event);
+    } else if (event->type() == QEvent::NativeGesture) {
+        auto *nativeEvent = static_cast<QNativeGestureEvent *>(event);
         if (nativeEvent->gestureType() == Qt::ZoomNativeGesture) {
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
-    const QPoint eventPos = nativeEvent->position().toPoint();
+            const QPoint eventPos = nativeEvent->position().toPoint();
 #else
-    const QPoint eventPos = nativeEvent->pos();
+            const QPoint eventPos = nativeEvent->pos();
 #endif
-            zoom(nativeEvent->value()+1, eventPos);
+            zoom(nativeEvent->value() + 1, eventPos);
             return true;
         }
     }
@@ -204,26 +199,24 @@ void QVGraphicsView::wheelEvent(QWheelEvent *event)
 
     const bool modifierPressed = event->modifiers().testFlag(Qt::ControlModifier);
     bool dontZoom = qvGetSettingInt(ScrollZoom) == 2;
-    if (modifierPressed)
-    {
+    if (modifierPressed) {
         dontZoom = !dontZoom;
     }
 
-bool touchDeviceDetected = false;
+    bool touchDeviceDetected = false;
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     // Auto-detect touchpad
-    touchDeviceDetected = event->device()->type() == QInputDevice::DeviceType::TouchPad || event->device()->type() == QInputDevice::DeviceType::TouchScreen;
+    touchDeviceDetected = event->device()->type() == QInputDevice::DeviceType::TouchPad
+            || event->device()->type() == QInputDevice::DeviceType::TouchScreen;
     // Real touchpads are likely to exhibit these characteristics in empirical testing
     touchDeviceDetected = touchDeviceDetected && event->phase() != Qt::NoScrollPhase;
-    if (touchDeviceDetected && qvGetSettingInt(ScrollZoom) == 1)
-    {
+    if (touchDeviceDetected && qvGetSettingInt(ScrollZoom) == 1) {
         // If this is a touch device, override setting
         dontZoom = !modifierPressed;
     }
 #endif
 
-    if (dontZoom)
-    {
+    if (dontZoom) {
         const qreal scrollDivisor = 2.0; // To make scrolling less sensitive
         qreal scrollX = event->angleDelta().x() * (isRightToLeft() ? 1 : -1) / scrollDivisor;
         qreal scrollY = event->angleDelta().y() * -1 / scrollDivisor;
@@ -270,7 +263,8 @@ QMimeData *QVGraphicsView::getMimeData() const
     if (!getCurrentFileDetails().isPixmapLoaded)
         return mimeData;
 
-    mimeData->setUrls({QUrl::fromLocalFile(imageCore.getCurrentFileDetails().fileInfo.absoluteFilePath())});
+    mimeData->setUrls(
+            { QUrl::fromLocalFile(imageCore.getCurrentFileDetails().fileInfo.absoluteFilePath()) });
     mimeData->setImageData(imageCore.getLoadedPixmap().toImage());
     return mimeData;
 }
@@ -286,10 +280,8 @@ void QVGraphicsView::loadMimeData(const QMimeData *mimeData)
     const QList<QUrl> urlList = mimeData->urls();
 
     bool first = true;
-    for (const auto &url : urlList)
-    {
-        if (first)
-        {
+    for (const auto &url : urlList) {
+        if (first) {
             loadFile(url.toString());
             emit cancelSlideshow();
             first = false;
@@ -332,18 +324,16 @@ void QVGraphicsView::zoomOut(const QPoint &pos)
 
 void QVGraphicsView::zoom(qreal scaleFactor, const QPoint &pos)
 {
-    //don't zoom too far out, dude
+    // don't zoom too far out, dude
     currentScale *= scaleFactor;
-    if (currentScale >= 500 || currentScale <= 0.01)
-    {
+    if (currentScale >= 500 || currentScale <= 0.01) {
         currentScale *= qPow(scaleFactor, -1);
         return;
     }
 
     updateFilteringMode();
 
-    if (pos != lastZoomEventPos)
-    {
+    if (pos != lastZoomEventPos) {
         lastZoomEventPos = pos;
         lastZoomRoundingError = QPointF();
     }
@@ -353,22 +343,21 @@ void QVGraphicsView::zoom(qreal scaleFactor, const QPoint &pos)
     setTransform(QTransform(zoomBasis).scale(zoomBasisScaleFactor, zoomBasisScaleFactor));
     absoluteTransform.scale(scaleFactor, scaleFactor);
 
-    // If we are zooming in, we have a point to zoom towards, the mouse is on top of the viewport, and cursor zooming is enabled
-    if (currentScale > 1.00001 && pos != QPoint(-1, -1) && underMouse() && qvGetSettingBool(CursorZoom))
-    {
+    // If we are zooming in, we have a point to zoom towards, the mouse is on top of the viewport,
+    // and cursor zooming is enabled
+    if (currentScale > 1.00001 && pos != QPoint(-1, -1) && underMouse()
+        && qvGetSettingBool(CursorZoom)) {
         const QPointF p1mouse = mapFromScene(scenePos);
         const QPointF move = p1mouse - pos;
-        horizontalScrollBar()->setValue(horizontalScrollBar()->value() + (move.x() * (isRightToLeft() ? -1 : 1)));
+        horizontalScrollBar()->setValue(horizontalScrollBar()->value()
+                                        + (move.x() * (isRightToLeft() ? -1 : 1)));
         verticalScrollBar()->setValue(verticalScrollBar()->value() + move.y());
         lastZoomRoundingError = mapToScene(pos) - scenePos;
-    }
-    else
-    {
+    } else {
         centerOn(loadedPixmapItem);
     }
 
-    if (qvGetSettingBool(ScalingEnabled) && !isOriginalSize)
-    {
+    if (qvGetSettingBool(ScalingEnabled) && !isOriginalSize) {
         expensiveScaleTimerNew->start();
     }
 }
@@ -385,16 +374,17 @@ void QVGraphicsView::scaleExpensively()
         flipped = true;
 
     // If we are above maximum scaling size
-    if ((currentScale >= MAX_EXPENSIVE_SCALING_SIZE) ||
-        (!qvGetSettingBool(ScalingTwoEnabled) && currentScale > 1.00001))
-    {
+    if ((currentScale >= MAX_EXPENSIVE_SCALING_SIZE)
+        || (!qvGetSettingBool(ScalingTwoEnabled) && currentScale > 1.00001)) {
         // Return to original size
         makeUnscaled();
         return;
     }
 
-    // Map size of the original pixmap to the scale acquired in fitting with modification from zooming percentage
-    const QRectF mappedRect = absoluteTransform.mapRect(QRectF({}, getCurrentFileDetails().loadedPixmapSize));
+    // Map size of the original pixmap to the scale acquired in fitting with modification from
+    // zooming percentage
+    const QRectF mappedRect =
+            absoluteTransform.mapRect(QRectF({}, getCurrentFileDetails().loadedPixmapSize));
     const QSizeF mappedPixmapSize = mappedRect.size() * devicePixelRatioF();
 
     // Undo mirror/flip before new transform
@@ -408,7 +398,8 @@ void QVGraphicsView::scaleExpensively()
     loadedPixmapItem->setPixmap(imageCore.scaleExpensively(mappedPixmapSize));
 
     // Reset transformation
-    setTransform(QTransform::fromScale(qPow(devicePixelRatioF(), -1), qPow(devicePixelRatioF(), -1)));
+    setTransform(
+            QTransform::fromScale(qPow(devicePixelRatioF(), -1), qPow(devicePixelRatioF(), -1)));
 
     // Redo mirror/flip after new transform
     if (mirrored)
@@ -453,28 +444,29 @@ void QVGraphicsView::makeUnscaled()
     zoomBasisScaleFactor = 1.0;
 }
 
-void QVGraphicsView::updateFilteringMode() {
+void QVGraphicsView::updateFilteringMode()
+{
     const bool exceededSmoothScaleLimit = currentScale >= MAX_FILTERING_SIZE;
-    loadedPixmapItem->setTransformationMode(!exceededSmoothScaleLimit && qvGetSettingBool(FilteringEnabled) ? Qt::SmoothTransformation : Qt::FastTransformation);
+    loadedPixmapItem->setTransformationMode(!exceededSmoothScaleLimit
+                                                            && qvGetSettingBool(FilteringEnabled)
+                                                    ? Qt::SmoothTransformation
+                                                    : Qt::FastTransformation);
 }
 
 void QVGraphicsView::animatedFrameChanged(QRect rect)
 {
     Q_UNUSED(rect)
 
-    if (qvGetSettingBool(ScalingEnabled))
-    {
+    if (qvGetSettingBool(ScalingEnabled)) {
         scaleExpensively();
-    }
-    else
-    {
+    } else {
         loadedPixmapItem->setPixmap(getLoadedMovie().currentPixmap());
     }
 }
 
 void QVGraphicsView::updateLoadedPixmapItem()
 {
-    //set pixmap and offset
+    // set pixmap and offset
     loadedPixmapItem->setPixmap(getLoadedPixmap());
     scaledSize = loadedPixmapItem->boundingRect().size().toSize();
 
@@ -496,11 +488,9 @@ void QVGraphicsView::resetScale()
 
 void QVGraphicsView::originalSize()
 {
-    if (isOriginalSize)
-    {
+    if (isOriginalSize) {
         // If we are at the actual original size
-        if (transform() == QTransform())
-        {
+        if (transform() == QTransform()) {
             resetScale(); // back to normal mode
             return;
         }
@@ -517,15 +507,14 @@ void QVGraphicsView::originalSize()
     isOriginalSize = true;
 }
 
-
 void QVGraphicsView::goToFile(const GoToFileMode &mode, int index)
 {
     bool shouldRetryFolderInfoUpdate = false;
 
     // Update folder info only after a little idle time as an optimization for when
     // the user is rapidly navigating through files.
-    if (!getCurrentFileDetails().timeSinceLoaded.isValid() || getCurrentFileDetails().timeSinceLoaded.hasExpired(3000))
-    {
+    if (!getCurrentFileDetails().timeSinceLoaded.isValid()
+        || getCurrentFileDetails().timeSinceLoaded.hasExpired(3000)) {
         // Make sure the file still exists because if it disappears from the file listing we'll lose
         // track of our index within the folder. Use the static 'exists' method to avoid caching.
         // If we skip updating now, flag it for retry later once we locate a new file.
@@ -543,70 +532,64 @@ void QVGraphicsView::goToFile(const GoToFileMode &mode, int index)
     int searchDirection = 0;
 
     switch (mode) {
-    case GoToFileMode::constant:
-    {
+    case GoToFileMode::constant: {
         newIndex = index;
         break;
     }
-    case GoToFileMode::first:
-    {
+    case GoToFileMode::first: {
         newIndex = 0;
         searchDirection = 1;
         break;
     }
-    case GoToFileMode::previous:
-    {
-        if (newIndex == 0)
-        {
+    case GoToFileMode::previous: {
+        if (newIndex == 0) {
             if (qvGetSettingBool(LoopFoldersEnabled))
-                newIndex = fileList.size()-1;
+                newIndex = fileList.size() - 1;
             else
                 emit cancelSlideshow();
-        }
-        else
+        } else
             newIndex--;
         searchDirection = -1;
         break;
     }
-    case GoToFileMode::next:
-    {
-        if (fileList.size()-1 == newIndex)
-        {
+    case GoToFileMode::next: {
+        if (fileList.size() - 1 == newIndex) {
             if (qvGetSettingBool(LoopFoldersEnabled))
                 newIndex = 0;
-            else                emit cancelSlideshow();
-        }
-        else
+            else
+                emit cancelSlideshow();
+        } else
             newIndex++;
         searchDirection = 1;
         break;
     }
-    case GoToFileMode::last:
-    {
-        newIndex = fileList.size()-1;
+    case GoToFileMode::last: {
+        newIndex = fileList.size() - 1;
         searchDirection = -1;
         break;
     }
     }
 
-    if (searchDirection != 0)
-    {
-        while (searchDirection == 1 && newIndex < fileList.size()-1 && !QFile::exists(fileList.value(newIndex).absoluteFilePath))
+    if (searchDirection != 0) {
+        while (searchDirection == 1 && newIndex < fileList.size() - 1
+               && !QFile::exists(fileList.value(newIndex).absoluteFilePath))
             newIndex++;
-        while (searchDirection == -1 && newIndex > 0 && !QFile::exists(fileList.value(newIndex).absoluteFilePath))
+        while (searchDirection == -1 && newIndex > 0
+               && !QFile::exists(fileList.value(newIndex).absoluteFilePath))
             newIndex--;
     }
 
     const QString nextImageFilePath = fileList.value(newIndex).absoluteFilePath;
 
-    if (!QFile::exists(nextImageFilePath) || nextImageFilePath == getCurrentFileDetails().fileInfo.absoluteFilePath())
+    if (!QFile::exists(nextImageFilePath)
+        || nextImageFilePath == getCurrentFileDetails().fileInfo.absoluteFilePath())
         return;
 
-    if (shouldRetryFolderInfoUpdate)
-    {
-        // If the user just deleted a file through qView, closeImage will have been called which empties
-        // currentFileDetails.fileInfo. In this case updateFolderInfo can't infer the directory from
-        // fileInfo like it normally does, so we'll explicity pass in the folder here.
+    if (shouldRetryFolderInfoUpdate) {
+        // If the user just deleted a file through qView, closeImage will have been called which
+        // empties currentFileDetails.fileInfo. In this case updateFolderInfo can't infer the
+        // directory from fileInfo like it normally does, so we'll explicity pass in the folder
+        // here.
         imageCore.updateFolderInfo(QFileInfo(nextImageFilePath).path());
     }
 
@@ -656,20 +639,17 @@ void QVGraphicsView::fitInViewMarginless(const QRectF &rect)
 
     QRectF viewRect;
     // Resize to window size unless you are meant to stop at the actual size, basically
-    if (qvGetSettingBool(PastActualSizeEnabled) || (adjustedImageSize.width() >= adjWidth || adjustedImageSize.height() >= adjHeight))
-    {
+    if (qvGetSettingBool(PastActualSizeEnabled)
+        || (adjustedImageSize.width() >= adjWidth || adjustedImageSize.height() >= adjHeight)) {
         viewRect = viewport()->rect().adjusted(MARGIN, MARGIN, -MARGIN, -MARGIN);
         viewRect.setHeight(viewRect.height() - obscuredHeight);
-    }
-    else
-    {
+    } else {
         // stop at actual size
         viewRect = QRect(QPoint(), getCurrentFileDetails().loadedPixmapSize);
         QPoint center = this->rect().center();
         center.setY(center.y() - obscuredHeight);
         viewRect.moveCenter(center);
     }
-
 
     if (viewRect.isEmpty())
         return;
@@ -687,8 +667,8 @@ void QVGraphicsView::fitInViewMarginless(const QRectF &rect)
     // Find and set the transform required to fit the original image
     // Compact version of above code
     QRectF sceneRect2 = transform().mapRect(QRectF({}, adjustedImageSize));
-    qreal absoluteRatio = qMin(viewRect.width() / sceneRect2.width(),
-                               viewRect.height() / sceneRect2.height());
+    qreal absoluteRatio =
+            qMin(viewRect.width() / sceneRect2.width(), viewRect.height() / sceneRect2.height());
 
     absoluteTransform = QTransform::fromScale(absoluteRatio, absoluteRatio);
 
@@ -722,16 +702,13 @@ void QVGraphicsView::centerOn(const QPointF &pos)
     qreal height = viewport()->height() - obscuredHeight;
     QPointF viewPoint = transform().map(pos);
 
-    if (isRightToLeft())
-    {
+    if (isRightToLeft()) {
         qint64 horizontal = 0;
         horizontal += horizontalScrollBar()->minimum();
         horizontal += horizontalScrollBar()->maximum();
         horizontal -= int(viewPoint.x() - width / 2.0);
         horizontalScrollBar()->setValue(horizontal);
-    }
-    else
-    {
+    } else {
         horizontalScrollBar()->setValue(int(viewPoint.x() - width / 2.0));
     }
 

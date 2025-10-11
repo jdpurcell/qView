@@ -121,7 +121,10 @@ public:
 
     int getTitlebarOverlap() const;
 
-    const QVImageCore::FileDetails& getCurrentFileDetails() const { return graphicsView->getCurrentFileDetails(); }
+    const QVImageCore::FileDetails &getCurrentFileDetails() const
+    {
+        return graphicsView->getCurrentFileDetails();
+    }
 
 public slots:
     void openFile(const QString &fileName);

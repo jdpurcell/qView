@@ -14,15 +14,20 @@
 #include <QRegularExpression>
 
 #if defined(qvApp)
-#undef qvApp
+#  undef qvApp
 #endif
 
-#define qvApp (qobject_cast<QVApplication *>(QCoreApplication::instance()))	// global qvapplication object
+#define qvApp \
+    (qobject_cast<QVApplication *>(QCoreApplication::instance())) // global qvapplication object
 
-#define qvGetSettingBool(setting) qvApp->getSettingsManager().getBool(SettingsManager::Setting::setting)
-#define qvGetSettingInt(setting) qvApp->getSettingsManager().getInt(SettingsManager::Setting::setting)
-#define qvGetSettingDouble(setting) qvApp->getSettingsManager().getDouble(SettingsManager::Setting::setting)
-#define qvGetSettingString(setting) qvApp->getSettingsManager().getString(SettingsManager::Setting::setting)
+#define qvGetSettingBool(setting) \
+    qvApp->getSettingsManager().getBool(SettingsManager::Setting::setting)
+#define qvGetSettingInt(setting) \
+    qvApp->getSettingsManager().getInt(SettingsManager::Setting::setting)
+#define qvGetSettingDouble(setting) \
+    qvApp->getSettingsManager().getDouble(SettingsManager::Setting::setting)
+#define qvGetSettingString(setting) \
+    qvApp->getSettingsManager().getString(SettingsManager::Setting::setting)
 
 class QVApplication : public QApplication
 {
@@ -66,7 +71,7 @@ public:
 
     void defineFilterLists();
 
-    QMenuBar *getMenuBar() const {  return menuBar; }
+    QMenuBar *getMenuBar() const { return menuBar; }
 
     const QStringList &getNameFilterList() const { return nameFilterList; }
 
@@ -85,8 +90,7 @@ public:
     static qreal getPerceivedBrightness(const QColor &color);
 
 private:
-
-    QList<MainWindow*> lastActiveWindows;
+    QList<MainWindow *> lastActiveWindows;
 
     QMenu *dockMenu;
 
@@ -97,7 +101,7 @@ private:
     QStringList mimeTypeNameList;
 
     // This order is very important
-    SettingsManager settingsManager; 
+    SettingsManager settingsManager;
     ActionManager actionManager;
     ShortcutManager shortcutManager;
 
@@ -107,7 +111,7 @@ private:
 
 #ifndef QV_DISABLE_ONLINE_VERSION_CHECK
     UpdateChecker updateChecker;
-#endif //QV_DISABLE_ONLINE_VERSION_CHECK
+#endif // QV_DISABLE_ONLINE_VERSION_CHECK
 };
 
 #endif // QVAPPLICATION_H

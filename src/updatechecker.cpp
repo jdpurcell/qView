@@ -16,10 +16,11 @@ UpdateChecker::UpdateChecker(QObject *parent) : QObject(parent)
 
 void UpdateChecker::check(bool isStartupCheck)
 {
-    if (isStartupCheck)
-    {
+    if (isStartupCheck) {
         QDateTime lastCheckTime = getLastCheckTime();
-        if (lastCheckTime.isValid() && QDateTime::currentDateTimeUtc() < lastCheckTime.addSecs(STARTUP_CHECK_INTERVAL_HOURS * 3600))
+        if (lastCheckTime.isValid()
+            && QDateTime::currentDateTimeUtc()
+                    < lastCheckTime.addSecs(STARTUP_CHECK_INTERVAL_HOURS * 3600))
             return;
     }
 
@@ -37,8 +38,7 @@ void UpdateChecker::sendRequest(const QUrl &url)
 
 void UpdateChecker::readReply(QNetworkReply *reply)
 {
-    if (reply->error() != QNetworkReply::NoError)
-    {
+    if (reply->error() != QNetworkReply::NoError) {
         qWarning() << "Error checking for updates: " + reply->errorString();
         latestVersionNum = -1.0;
         emit checkedUpdates();
@@ -48,8 +48,7 @@ void UpdateChecker::readReply(QNetworkReply *reply)
     QByteArray byteArray = reply->readAll();
     QJsonDocument json = QJsonDocument::fromJson(byteArray);
 
-    if (json.isNull())
-    {
+    if (json.isNull()) {
         qWarning() << "Error checking for updates: Received null JSON";
         latestVersionNum = -1.0;
         emit checkedUpdates();
@@ -80,7 +79,8 @@ void UpdateChecker::readReply(QNetworkReply *reply)
 QDateTime UpdateChecker::getLastCheckTime() const
 {
     qint64 secsSinceEpoch = QSettings().value("lastupdatecheck").toLongLong();
-    return secsSinceEpoch == 0 ? QDateTime() : QDateTime::fromSecsSinceEpoch(secsSinceEpoch, Qt::UTC);
+    return secsSinceEpoch == 0 ? QDateTime()
+                               : QDateTime::fromSecsSinceEpoch(secsSinceEpoch, Qt::UTC);
 }
 
 void UpdateChecker::setLastCheckTime(QDateTime value)
@@ -91,25 +91,29 @@ void UpdateChecker::setLastCheckTime(QDateTime value)
 void UpdateChecker::openDialog()
 {
     QLocale locale;
-    auto *downloadButton = new QPushButton(QIcon::fromTheme("edit-download", QIcon::fromTheme("document-save")), tr("Download"));
+    auto *downloadButton = new QPushButton(
+            QIcon::fromTheme("edit-download", QIcon::fromTheme("document-save")), tr("Download"));
 
     auto *msgBox = new QMessageBox();
     msgBox->setWindowTitle(tr("qView Update Available"));
-    msgBox->setText(tr("qView %1 is available to download.").arg(QString::number(latestVersionNum, 'f', 1))
-                    + "\n\n" + releaseDate.toString(locale.dateFormat()) + "\n\n" + changelog);
+    msgBox->setText(
+            tr("qView %1 is available to download.").arg(QString::number(latestVersionNum, 'f', 1))
+            + "\n\n" + releaseDate.toString(locale.dateFormat()) + "\n\n" + changelog);
     msgBox->setWindowModality(Qt::ApplicationModal);
     msgBox->setStandardButtons(QMessageBox::Close | QMessageBox::Reset);
     msgBox->button(QMessageBox::Reset)->setText(tr("&Disable Update Checking"));
     msgBox->addButton(downloadButton, QMessageBox::ActionRole);
-    connect(downloadButton, &QAbstractButton::clicked, this, [this]{
-        QDesktopServices::openUrl(DOWNLOAD_URL);
-    });
-    connect(msgBox->button(QMessageBox::Reset), &QAbstractButton::clicked, qvApp, []{
+    connect(downloadButton, &QAbstractButton::clicked, this,
+            [this] { QDesktopServices::openUrl(DOWNLOAD_URL); });
+    connect(msgBox->button(QMessageBox::Reset), &QAbstractButton::clicked, qvApp, [] {
         QSettings settings;
         settings.beginGroup("options");
         settings.setValue("updatenotifications", false);
         qvApp->getSettingsManager().loadSettings();
-        QMessageBox::information(nullptr, tr("qView Update Checking Disabled"), tr("Update notifications on startup have been disabled.\nYou can reenable them in the options dialog."), QMessageBox::Ok);
+        QMessageBox::information(nullptr, tr("qView Update Checking Disabled"),
+                                 tr("Update notifications on startup have been disabled.\nYou can "
+                                    "reenable them in the options dialog."),
+                                 QMessageBox::Ok);
     });
     msgBox->open();
     msgBox->setDefaultButton(QMessageBox::Close);

@@ -12,18 +12,11 @@ public:
 
 private slots:
     void testClonedActionsUntracked();
-
 };
 
-ActionManagerTests::ActionManagerTests()
-{
+ActionManagerTests::ActionManagerTests() { }
 
-}
-
-ActionManagerTests::~ActionManagerTests()
-{
-
-}
+ActionManagerTests::~ActionManagerTests() { }
 
 void ActionManagerTests::testClonedActionsUntracked()
 {
@@ -36,13 +29,15 @@ void ActionManagerTests::testClonedActionsUntracked()
     MainWindow window;
     window.show();
     // Make sure they were cloned
-    QVERIFY(qvApp->getActionManager().getAllInstancesOfAction("fullscreen").length() != fullscreenCount);
+    QVERIFY(qvApp->getActionManager().getAllInstancesOfAction("fullscreen").length()
+            != fullscreenCount);
     QVERIFY(qvApp->getActionManager().getAllInstancesOfAction("open").length() != openCount);
     // Untrack them
     window.close();
 
     // Make sure the count has not changed from the initial
-    QCOMPARE(qvApp->getActionManager().getAllInstancesOfAction("fullscreen").length(), fullscreenCount);
+    QCOMPARE(qvApp->getActionManager().getAllInstancesOfAction("fullscreen").length(),
+             fullscreenCount);
     QCOMPARE(qvApp->getActionManager().getAllInstancesOfAction("open").length(), openCount);
 }
 

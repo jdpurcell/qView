@@ -12,7 +12,7 @@
 #include <QElapsedTimer>
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-#include <QColorSpace>
+#  include <QColorSpace>
 #else
 typedef QString QColorSpace;
 #endif
@@ -64,10 +64,10 @@ public:
         int sortMode;
         bool sortDescending;
 
-        bool operator!=(const DirInfo &other) const {
-          return dirPath != other.dirPath || fileCount != other.fileCount ||
-                 sortMode != other.sortMode ||
-                 sortDescending != other.sortDescending;
+        bool operator!=(const DirInfo &other) const
+        {
+            return dirPath != other.dirPath || fileCount != other.fileCount
+                    || sortMode != other.sortMode || sortDescending != other.sortDescending;
         }
     };
 
@@ -92,7 +92,8 @@ public:
     void requestCaching();
     void requestCachingFile(const QString &filePath, const QColorSpace &targetColorSpace);
     void addToCache(const ReadData &&readImageAndFileInfo);
-    static QString getPixmapCacheKey(const QString &absoluteFilePath, const qint64 &fileSize, const QColorSpace &targetColorSpace);
+    static QString getPixmapCacheKey(const QString &absoluteFilePath, const qint64 &fileSize,
+                                     const QColorSpace &targetColorSpace);
     QColorSpace getTargetColorSpace() const;
     QColorSpace detectDisplayColorSpace() const;
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0) && QT_VERSION < QT_VERSION_CHECK(6, 7, 2)
@@ -112,11 +113,11 @@ public:
     QPixmap scaleExpensively(const int desiredWidth, const int desiredHeight);
     QPixmap scaleExpensively(const QSizeF desiredSize);
 
-    //returned const reference is read-only
-    const QPixmap& getLoadedPixmap() const {return loadedPixmap; }
-    const QMovie& getLoadedMovie() const {return loadedMovie; }
-    const FileDetails& getCurrentFileDetails() const {return currentFileDetails; }
-    int getCurrentRotation() const {return currentRotation; }
+    // returned const reference is read-only
+    const QPixmap &getLoadedPixmap() const { return loadedPixmap; }
+    const QMovie &getLoadedMovie() const { return loadedMovie; }
+    const FileDetails &getCurrentFileDetails() const { return currentFileDetails; }
+    int getCurrentRotation() const { return currentRotation; }
 
 signals:
     void animatedFrameChanged(QRect rect);

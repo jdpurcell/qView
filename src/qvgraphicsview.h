@@ -16,25 +16,13 @@ class QVGraphicsView : public QGraphicsView
 public:
     QVGraphicsView(QWidget *parent = nullptr);
 
-    enum class ScaleMode
-    {
-       resetScale,
-       zoom
-    };
+    enum class ScaleMode { resetScale, zoom };
     Q_ENUM(ScaleMode)
 
-    enum class GoToFileMode
-    {
-       constant,
-       first,
-       previous,
-       next,
-       last
-    };
+    enum class GoToFileMode { constant, first, previous, next, last };
     Q_ENUM(GoToFileMode)
 
-
-    QMimeData* getMimeData() const;
+    QMimeData *getMimeData() const;
     void loadMimeData(const QMimeData *mimeData);
     void loadFile(const QString &fileName);
 
@@ -62,9 +50,12 @@ public:
     void setSpeed(const int &desiredSpeed);
     void rotateImage(int rotation);
 
-    const QVImageCore::FileDetails& getCurrentFileDetails() const { return imageCore.getCurrentFileDetails(); }
-    const QPixmap& getLoadedPixmap() const { return imageCore.getLoadedPixmap(); }
-    const QMovie& getLoadedMovie() const { return imageCore.getLoadedMovie(); }
+    const QVImageCore::FileDetails &getCurrentFileDetails() const
+    {
+        return imageCore.getCurrentFileDetails();
+    }
+    const QPixmap &getLoadedPixmap() const { return imageCore.getLoadedPixmap(); }
+    const QMovie &getLoadedMovie() const { return imageCore.getLoadedMovie(); }
 
 signals:
     void cancelSlideshow();
@@ -109,7 +100,6 @@ protected:
 
     void centerOn(const QGraphicsItem *item);
 
-
 private slots:
     void animatedFrameChanged(QRect rect);
 
@@ -119,7 +109,6 @@ private slots:
 
 private:
     void updateFilteringMode();
-
 
     QGraphicsPixmapItem *loadedPixmapItem;
 
@@ -140,7 +129,7 @@ private:
     QTransform zoomBasis;
     qreal zoomBasisScaleFactor;
 
-    QVImageCore imageCore { this };
+    QVImageCore imageCore{ this };
 
     QTimer *expensiveScaleTimerNew;
     QPointF centerPoint;
