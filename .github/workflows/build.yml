@@ -21,10 +21,6 @@ jobs:
         include:
           - runner: 'ubuntu-22.04'
             qtVersion: '5.15.2'
-          - runner: 'ubuntu-22.04'
-            qtVersion: '5.9'
-            osSuffix: '_qt5.9'
-            skipPlugins: 'true'
           - runner: 'macos-14'
             qtVersion: '6.8.3'
             qtModules: 'qtimageformats'
