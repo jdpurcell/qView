@@ -190,7 +190,6 @@ bool QVGraphicsView::event(QEvent *event)
 
 void QVGraphicsView::wheelEvent(QWheelEvent *event)
 {
-
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
     const QPoint eventPos = event->position().toPoint();
 #else
@@ -241,7 +240,7 @@ void QVGraphicsView::wheelEvent(QWheelEvent *event)
     if (yDelta == 0)
         return;
 
-    const qreal zoomAmountPerWheelClick = qvGetSettingDouble(ScaleFactor) - 1.0;
+    const qreal zoomAmountPerWheelClick = qvGetSettingInt(ScaleFactor)/100.0;
     qreal zoomFactor = zoomAmountPerWheelClick;
     if (qvGetSettingBool(FractionalZoom) || touchDeviceDetected) {
         const qreal fractionalWheelClicks = qFabs(yDelta) / yScale;
@@ -314,12 +313,12 @@ void QVGraphicsView::postLoad()
 
 void QVGraphicsView::zoomIn(const QPoint &pos)
 {
-    zoom(qvGetSettingDouble(ScaleFactor), pos);
+    zoom(qvGetSettingInt(ScaleFactor)/100.0, pos);
 }
 
 void QVGraphicsView::zoomOut(const QPoint &pos)
 {
-    zoom(qPow(qvGetSettingDouble(ScaleFactor), -1), pos);
+    zoom(qPow(qvGetSettingInt(ScaleFactor)/100.0, -1), pos);
 }
 
 void QVGraphicsView::zoom(qreal scaleFactor, const QPoint &pos)
