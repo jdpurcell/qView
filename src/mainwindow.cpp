@@ -1291,7 +1291,12 @@ void MainWindow::lastFile()
 
 void MainWindow::randomFile()
 {
-    graphicsView->goToFile(Qv::GoToFileMode::Random);
+    graphicsView->goToFile(Qv::GoToFileMode::NextRandom);
+}
+
+void MainWindow::previousRandomFile()
+{
+    graphicsView->goToFile(Qv::GoToFileMode::PreviousRandom);
 }
 
 void MainWindow::saveFrameAs()

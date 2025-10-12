@@ -246,6 +246,7 @@ QMenuBar *ActionManager::buildMenuBar(QWidget *parent)
     addCloneOfAction(goMenu, "nextfile");
     addCloneOfAction(goMenu, "lastfile");
     addCloneOfAction(goMenu, "randomfile");
+    addCloneOfAction(goMenu, "previousrandomfile");
 
     menuBar->addMenu(goMenu);
     // End of go menu
@@ -760,6 +761,8 @@ void ActionManager::actionTriggered(QAction *triggeredAction, MainWindow *releva
         relevantWindow->lastFile();
     } else if (key == "randomfile") {
         relevantWindow->randomFile();
+    } else if (key == "previousrandomfile") {
+        relevantWindow->previousRandomFile();
     } else if (key == "saveframeas") {
         relevantWindow->saveFrameAs();
     } else if (key == "pause") {
@@ -949,6 +952,10 @@ void ActionManager::initializeActionLibrary()
     auto *randomFileAction = new QAction(qvApp->iconFromFont(Qv::MaterialIcon::Shuffle), tr("&Random File"));
     randomFileAction->setData({"folderdisable"});
     actionLibrary.insert("randomfile", randomFileAction);
+
+    auto *previousRandomFileAction = new QAction(qvApp->iconFromFont(Qv::MaterialIcon::Shuffle), tr("&Previous Random File"));
+    previousRandomFileAction->setData({"folderdisable"});
+    actionLibrary.insert("previousrandomfile", previousRandomFileAction);
 
     auto *saveFrameAsAction = new QAction(qvApp->iconFromFont(Qv::MaterialIcon::Save), tr("Save Frame &As..."));
     saveFrameAsAction->setData({"gifdisable"});

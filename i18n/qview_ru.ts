@@ -264,6 +264,10 @@
         <translation>Случайный файл</translation>
     </message>
     <message>
+        <source>Previous Random File</source>
+        <translation>Предыдущий случайный файл</translation>
+    </message>
+    <message>
         <source>Save Frame &amp;As...</source>
         <translation>Сохранить кадр как...</translation>
     </message>
@@ -1407,6 +1411,10 @@ No write permission or file is read-only.</source>
     <message>
         <source>Random File</source>
         <translation>Случайный файл</translation>
+    </message>
+    <message>
+        <source>Previous Random File</source>
+        <translation>Предыдущий случайный файл</translation>
     </message>
     <message>
         <source>Zoom In</source>

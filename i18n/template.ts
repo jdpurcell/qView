@@ -264,6 +264,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Previous Random File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Save Frame &amp;As...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1393,6 +1397,10 @@ No write permission or file is read-only.</source>
     </message>
     <message>
         <source>Random File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Previous Random File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
