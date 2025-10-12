@@ -313,12 +313,12 @@ void QVGraphicsView::postLoad()
 
 void QVGraphicsView::zoomIn(const QPoint &pos)
 {
-    zoom(qvGetSettingInt(ScaleFactor)/100.0, pos);
+    zoom(qvGetSettingInt(ScaleFactor)/100.0 + 1, pos);
 }
 
 void QVGraphicsView::zoomOut(const QPoint &pos)
 {
-    zoom(qPow(qvGetSettingInt(ScaleFactor)/100.0, -1), pos);
+    zoom(qPow(qvGetSettingInt(ScaleFactor)/100.0 + 1, -1), pos);
 }
 
 void QVGraphicsView::zoom(qreal scaleFactor, const QPoint &pos)
