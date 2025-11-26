@@ -264,6 +264,10 @@
         <translation>무작위 파일</translation>
     </message>
     <message>
+        <source>Previous Random File</source>
+        <translation>이전 무작위 파일</translation>
+    </message>
+    <message>
         <source>Save Frame &amp;As...</source>
         <translation>프레임을 다른 이름으로 저장...</translation>
     </message>
@@ -1411,6 +1415,10 @@ No write permission or file is read-only.</source>
     <message>
         <source>Random File</source>
         <translation>무작위 파일</translation>
+    </message>
+    <message>
+        <source>Previous Random File</source>
+        <translation>이전 무작위 파일</translation>
     </message>
     <message>
         <source>Zoom In</source>

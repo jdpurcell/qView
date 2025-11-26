@@ -353,14 +353,24 @@ QVImageCore::GoToFileResult QVImageCore::goToFile(const Qv::GoToFileMode mode, c
         searchDirection = -1;
         break;
     }
-    case Qv::GoToFileMode::Random:
+    case Qv::GoToFileMode::NextRandom:
     {
         if (fileList.size() > 1)
         {
-            int randomIndex = QRandomGenerator::global()->bounded(fileList.size()-1);
-            newIndex = randomIndex + (randomIndex >= newIndex ? 1 : 0);
+            randomGenerator.ensureParamsUpToDate(fileList.size());
+            newIndex = randomGenerator.nextIndex(newIndex);
+            searchDirection = 0;
         }
-        searchDirection = 1;
+        break;
+    }
+    case Qv::GoToFileMode::PreviousRandom:
+    {
+        if (fileList.size() > 1)
+        {
+            randomGenerator.ensureParamsUpToDate(fileList.size());
+            newIndex = randomGenerator.previousIndex(newIndex);
+            searchDirection = 0;
+        }
         break;
     }
     }

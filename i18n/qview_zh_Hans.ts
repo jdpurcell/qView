@@ -264,6 +264,10 @@
         <translation>随机一张图片</translation>
     </message>
     <message>
+        <source>Previous Random File</source>
+        <translation>上一张随机图片</translation>
+    </message>
+    <message>
         <source>Save Frame &amp;As...</source>
         <translation>保存帧为...</translation>
     </message>
@@ -1410,6 +1414,10 @@ No write permission or file is read-only.</source>
     <message>
         <source>Random File</source>
         <translation>随机一张图片</translation>
+    </message>
+    <message>
+        <source>Previous Random File</source>
+        <translation>上一张随机图片</translation>
     </message>
     <message>
         <source>Zoom In</source>

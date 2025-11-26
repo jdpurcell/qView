@@ -79,6 +79,7 @@ void ShortcutManager::initializeShortcutsList()
     shortcutsList.append({tr("Next File"), "nextfile", QStringList(QKeySequence(Qt::Key_Right).toString()), {}});
     shortcutsList.append({tr("Last File"), "lastfile", QStringList(QKeySequence(Qt::Key_End).toString()), {}});
     shortcutsList.append({tr("Random File"), "randomfile", QStringList(QKeySequence(Qt::Key_R).toString()), {}});
+    shortcutsList.append({tr("Previous Random File"), "previousrandomfile", QStringList(QKeySequence(Qt::SHIFT | Qt::Key_R).toString()), {}});
     shortcutsList.append({tr("Zoom In"), "zoomin", keyBindingsToStringList(QKeySequence::ZoomIn), {}});
     // Allow zooming with Ctrl + plus like a regular person (without holding shift)
     if (!shortcutsList.last().defaultShortcuts.contains(QKeySequence(Qt::CTRL | Qt::Key_Equal).toString()))

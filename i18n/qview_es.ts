@@ -264,6 +264,10 @@
         <translation>Archivo aleatorio</translation>
     </message>
     <message>
+        <source>Previous Random File</source>
+        <translation>Archivo aleatorio anterior</translation>
+    </message>
+    <message>
         <source>Save Frame &amp;As...</source>
         <translation>Guardar fotograma como...</translation>
     </message>
@@ -1411,6 +1415,10 @@ No tiene permiso de escritura o el archivo es de solo lectura.</translation>
     <message>
         <source>Random File</source>
         <translation>Archivo aleatorio</translation>
+    </message>
+    <message>
+        <source>Previous Random File</source>
+        <translation>Archivo aleatorio anterior</translation>
     </message>
     <message>
         <source>Zoom In</source>

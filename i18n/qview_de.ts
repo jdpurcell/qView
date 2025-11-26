@@ -264,6 +264,10 @@
         <translation>Zufällige Datei</translation>
     </message>
     <message>
+        <source>Previous Random File</source>
+        <translation>Vorherige zufällige Datei</translation>
+    </message>
+    <message>
         <source>Save Frame &amp;As...</source>
         <translation>Frame speichern als ...</translation>
     </message>
@@ -1411,6 +1415,10 @@ Keine Schreibberechtigung oder Datei ist schreibgeschützt.</translation>
     <message>
         <source>Random File</source>
         <translation>Zufällige Datei</translation>
+    </message>
+    <message>
+        <source>Previous Random File</source>
+        <translation>Vorherige zufällige Datei</translation>
     </message>
     <message>
         <source>Zoom In</source>

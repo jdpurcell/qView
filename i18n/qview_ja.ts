@@ -264,6 +264,10 @@
         <translation>ランダムなファイル</translation>
     </message>
     <message>
+        <source>Previous Random File</source>
+        <translation>前のランダムなファイル</translation>
+    </message>
+    <message>
         <source>Save Frame &amp;As...</source>
         <translation>フレームを別名で保存...</translation>
     </message>
@@ -1411,6 +1415,10 @@ No write permission or file is read-only.</source>
     <message>
         <source>Random File</source>
         <translation>ランダムなファイル</translation>
+    </message>
+    <message>
+        <source>Previous Random File</source>
+        <translation>前のランダムなファイル</translation>
     </message>
     <message>
         <source>Zoom In</source>

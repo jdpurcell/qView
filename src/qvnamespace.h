@@ -134,7 +134,8 @@ namespace Qv
         Previous,
         Next,
         Last,
-        Random
+        NextRandom,
+        PreviousRandom
     };
 
     enum class MaterialIcon : quint16

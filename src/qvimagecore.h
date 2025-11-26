@@ -14,6 +14,7 @@
 #include <QCache>
 #include <QElapsedTimer>
 #include <QColorSpace>
+#include "qvrandom.h"
 
 class QVImageCore : public QObject
 {
@@ -127,6 +128,8 @@ private:
     int largestDimension {1920};
 
     bool waitingOnLoad {false};
+
+    QVRandom randomGenerator;
 };
 
 #endif // QVIMAGECORE_H

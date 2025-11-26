@@ -264,6 +264,10 @@
         <translation>Fichier aléatoire</translation>
     </message>
     <message>
+        <source>Previous Random File</source>
+        <translation>Fichier aléatoire précédent</translation>
+    </message>
+    <message>
         <source>Save Frame &amp;As...</source>
         <translation>Enregistrer la trame sous...</translation>
     </message>
@@ -1411,6 +1415,10 @@ Pas d&apos;autorisation d&apos;écriture ou le fichier est en lecture seule.</tr
     <message>
         <source>Random File</source>
         <translation>Fichier aléatoire</translation>
+    </message>
+    <message>
+        <source>Previous Random File</source>
+        <translation>Fichier aléatoire précédent</translation>
     </message>
     <message>
         <source>Zoom In</source>

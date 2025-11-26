@@ -20,7 +20,8 @@ SOURCES += \
     $$PWD/settingsmanager.cpp \
     $$PWD/shortcutmanager.cpp \
     $$PWD/simplefonticonengine.cpp \
-    $$PWD/updatechecker.cpp
+    $$PWD/updatechecker.cpp \
+    $$PWD/qvrandom.cpp
 
 macx:!CONFIG(NO_COCOA):SOURCES += $$PWD/qvcocoafunctions.mm
 win32:!CONFIG(NO_WIN32):SOURCES += $$PWD/qvwin32functions.cpp
@@ -48,7 +49,8 @@ HEADERS += \
     $$PWD/settingsmanager.h \
     $$PWD/shortcutmanager.h \
     $$PWD/simplefonticonengine.h \
-    $$PWD/updatechecker.h
+    $$PWD/updatechecker.h \
+    $$PWD/qvrandom.h
 
 macx:!CONFIG(NO_COCOA):HEADERS += $$PWD/qvcocoafunctions.h
 win32:!CONFIG(NO_WIN32):HEADERS += $$PWD/qvwin32functions.h
