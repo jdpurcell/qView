@@ -14,7 +14,20 @@
 
 QVApplication::QVApplication(int &argc, char **argv) : QApplication(argc, argv)
 {
-    setDesktopFileName("com.interversehq.qView.desktop");
+#if defined Q_OS_UNIX && !defined Q_OS_MACOS
+    setDesktopFileName("com.interversehq.qView");
+
+    QIcon appIcon;
+    appIcon.addFile(":/icons/qView-16.png");
+    appIcon.addFile(":/icons/qView-32.png");
+    appIcon.addFile(":/icons/qView-64.png");
+    appIcon.addFile(":/icons/qView-128.png");
+    appIcon.addFile(":/icons/qView-256.png");
+    QApplication::setWindowIcon(appIcon);
+
+    // Add fallback fromTheme icon search
+    QIcon::setFallbackSearchPaths(QIcon::fallbackSearchPaths() << "/usr/share/pixmaps");
+#endif
 
     // Connections
     connect(this, &QGuiApplication::commitDataRequest, this, &QVApplication::onCommitDataRequest, Qt::DirectConnection);
@@ -22,11 +35,6 @@ QVApplication::QVApplication(int &argc, char **argv) : QApplication(argc, argv)
     connect(&settingsManager, &SettingsManager::settingsUpdated, this, &QVApplication::settingsUpdated);
     connect(&actionManager, &ActionManager::recentsMenuUpdated, this, &QVApplication::recentsMenuUpdated);
     connect(&updateChecker, &UpdateChecker::checkedUpdates, this, &QVApplication::checkedUpdates);
-
-    // Add fallback fromTheme icon search on linux
-#if defined Q_OS_UNIX && !defined Q_OS_MACOS
-    QIcon::setFallbackSearchPaths(QIcon::fallbackSearchPaths() << "/usr/share/pixmaps");
-#endif
 
     settingsUpdated();
 

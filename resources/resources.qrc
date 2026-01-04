@@ -4,7 +4,4 @@
         <file>Lato-Regular.ttf</file>
         <file>MaterialIconsOutlined-Regular.otf</file>
     </qresource>
-    <qresource prefix="/images">
-        <file>checkmark.png</file>
-    </qresource>
 </RCC>

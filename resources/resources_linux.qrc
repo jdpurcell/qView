@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/icons">
+        <file alias="qView-16.png">../dist/linux/hicolor/16x16/apps/com.interversehq.qView.png</file>
+        <file alias="qView-32.png">../dist/linux/hicolor/32x32/apps/com.interversehq.qView.png</file>
+        <file alias="qView-64.png">../dist/linux/hicolor/64x64/apps/com.interversehq.qView.png</file>
+        <file alias="qView-128.png">../dist/linux/hicolor/128x128/apps/com.interversehq.qView.png</file>
+        <file alias="qView-256.png">../dist/linux/hicolor/256x256/apps/com.interversehq.qView.png</file>
+    </qresource>
+</RCC>

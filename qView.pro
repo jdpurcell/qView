@@ -65,11 +65,13 @@ macx {
 }
 
 # Linux specific stuff
-linux {
+unix:!macx {
     !CONFIG(NO_X11) {
         LIBS += -lX11
         DEFINES += X11_LOADED
     }
+
+    RESOURCES += resources/resources_linux.qrc
 }
 
 # Stuff for make install
@@ -127,7 +129,6 @@ DEFINES += QT_NO_FOREACH
 
 include(src/src.pri)
 
-
 CONFIG += lrelease embed_translations
 TRANSLATIONS += $$files(i18n/qview_*.ts)
 
@@ -137,4 +138,3 @@ lupdate_only {
 
 RESOURCES += \
     resources/resources.qrc
-
