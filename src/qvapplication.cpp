@@ -19,7 +19,9 @@ QVApplication::QVApplication(int &argc, char **argv) : QApplication(argc, argv)
 
     QIcon appIcon;
     appIcon.addFile(":/icons/qView-16.png");
+    appIcon.addFile(":/icons/qView-24.png");
     appIcon.addFile(":/icons/qView-32.png");
+    appIcon.addFile(":/icons/qView-48.png");
     appIcon.addFile(":/icons/qView-64.png");
     appIcon.addFile(":/icons/qView-128.png");
     appIcon.addFile(":/icons/qView-256.png");

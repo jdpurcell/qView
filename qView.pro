@@ -93,8 +93,12 @@ desktop.path = $$PREFIX/share/applications
 desktop.files = dist/linux/com.interversehq.qView.desktop
 icon16.path = $$PREFIX/share/icons/hicolor/16x16/apps/
 icon16.files = dist/linux/hicolor/16x16/apps/com.interversehq.qView.png
+icon24.path = $$PREFIX/share/icons/hicolor/24x24/apps/
+icon24.files = dist/linux/hicolor/24x24/apps/com.interversehq.qView.png
 icon32.path = $$PREFIX/share/icons/hicolor/32x32/apps/
 icon32.files = dist/linux/hicolor/32x32/apps/com.interversehq.qView.png
+icon48.path = $$PREFIX/share/icons/hicolor/48x48/apps/
+icon48.files = dist/linux/hicolor/48x48/apps/com.interversehq.qView.png
 icon64.path = $$PREFIX/share/icons/hicolor/64x64/apps/
 icon64.files = dist/linux/hicolor/64x64/apps/com.interversehq.qView.png
 icon128.path = $$PREFIX/share/icons/hicolor/128x128/apps/
@@ -110,7 +114,7 @@ license.files = LICENSE
 appstream.path = $$PREFIX/share/metainfo/
 appstream.files = dist/linux/com.interversehq.qView.appdata.xml
 
-unix:INSTALLS += binary desktop icon16 icon32 icon64 icon128 icon256 iconsvg iconsym license appstream
+unix:INSTALLS += binary desktop icon16 icon24 icon32 icon48 icon64 icon128 icon256 iconsvg iconsym license appstream
 unix:!macx:TARGET = qview
 
 # The following define makes your compiler emit warnings if you use
