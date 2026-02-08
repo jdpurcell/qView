@@ -903,7 +903,7 @@ void ActionManager::initializeActionLibrary()
     actionLibrary.insert("resettransformation", resetTransformationAction);
 
     auto *matchImageSizeAction = new QAction(qvApp->iconFromFont(Qv::MaterialIcon::Wallpaper), tr("M&atch Image Size"));
-    matchImageSizeAction->setData({"windowdisable"});
+    matchImageSizeAction->setData({"disable"});
     actionLibrary.insert("matchimagesize", matchImageSizeAction);
 
     auto *windowOnTopAction = new QAction(qvApp->iconFromFont(Qv::MaterialIcon::KeyboardDoubleArrowUp), tr("Window On To&p"));
