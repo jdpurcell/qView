@@ -14,17 +14,17 @@ jobs:
       matrix:
         include:
           - runner: 'ubuntu-22.04'
-            qtVersion: '6.10.2'
+            qtVersion: '6.11.0'
             qtModules: 'qtimageformats'
             osSuffix: '_x86_64'
             buildArch: 'X64'
           - runner: 'ubuntu-24.04-arm'
-            qtVersion: '6.10.2'
+            qtVersion: '6.11.0'
             qtModules: 'qtimageformats'
             osSuffix: '_aarch64'
             buildArch: 'Arm64'
           - runner: 'macos-26'
-            qtVersion: '6.10.2'
+            qtVersion: '6.11.0'
             qtModules: 'qtimageformats'
             buildArch: 'Universal'
           - runner: 'macos-15'
@@ -33,13 +33,13 @@ jobs:
             qtModules: 'qtimageformats'
             buildArch: 'Universal'
           - runner: 'windows-2022'
-            qtVersion: '6.10.2'
+            qtVersion: '6.11.0'
             qtArch: 'win64_msvc2022_64'
             osSuffix: '_64'
             qtModules: 'qtimageformats'
             buildArch: 'X64'
           - runner: 'windows-2022'
-            qtVersion: '6.10.2'
+            qtVersion: '6.11.0'
             qtArch: 'win64_msvc2022_arm64_cross_compiled'
             osSuffix: '_arm64'
             qtModules: 'qtimageformats'
@@ -68,6 +68,7 @@ jobs:
           arch: ${{ matrix.qtArch }}
           modules: ${{ matrix.qtModules }}
           cache: false
+          nohash: true
           use-naqt: true
           setup-python: false
 
