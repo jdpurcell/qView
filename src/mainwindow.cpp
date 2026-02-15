@@ -1026,6 +1026,7 @@ void MainWindow::showFileInfo()
     refreshProperties();
     info->show();
     info->raise();
+    info->activateWindow();
 }
 
 void MainWindow::askDeleteFile(bool permanent)

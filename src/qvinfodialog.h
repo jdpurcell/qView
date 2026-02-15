@@ -21,6 +21,9 @@ public:
 
     void updateInfo();
 
+protected:
+    void keyPressEvent(QKeyEvent *event) override;
+
 private:
     Ui::QVInfoDialog *ui;
 

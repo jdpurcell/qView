@@ -1,5 +1,6 @@
 #include "qvinfodialog.h"
 #include "ui_qvinfodialog.h"
+#include "qvapplication.h"
 #include <QDateTime>
 #include <QMimeDatabase>
 #include <QTimer>
@@ -72,4 +73,15 @@ void QVInfoDialog::updateInfo()
         ui->framesLabel->hide();
     }
     window()->adjustSize();
+}
+
+void QVInfoDialog::keyPressEvent(QKeyEvent *event)
+{
+    if (qvApp->getActionManager().wouldTriggerAction(event, "showfileinfo"))
+    {
+        close();
+        return;
+    }
+
+    QDialog::keyPressEvent(event);
 }
