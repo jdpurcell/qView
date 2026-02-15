@@ -1,8 +1,5 @@
 #!/usr/bin/bash
 
-sudo apt update
-sudo apt install libfuse2
-
 if [[ "$buildArch" == "X64" ]]; then
     ARCH_NAME="x86_64"
 elif [[ "$buildArch" == "Arm64" ]]; then
