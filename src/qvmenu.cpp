@@ -9,6 +9,7 @@ bool QVMenu::event(QEvent *e)
     {
         auto *shadowEffect = new QGraphicsDropShadowEffect(this);
         shadowEffect->setOffset(1);
+        shadowEffect->setColor(QColor(128, 128, 128, 40));
         setGraphicsEffect(shadowEffect);
     }
     return result;
