@@ -48,7 +48,7 @@ QVApplication::QVApplication(int &argc, char **argv) : QApplication(argc, argv)
     showSubmenuIcons = getSettingsManager().getBoolean("submenuicons");
 #ifdef Q_OS_WIN
     // Workaround for ugly menu shadows in windows11 style (QTBUG-132142)
-    useCustomMenuShadow = style()->objectName().compare("windows11", Qt::CaseInsensitive) == 0;
+    //useCustomMenuShadow = style()->objectName().compare("windows11", Qt::CaseInsensitive) == 0;
 #endif
 
     // Ask Qt to show menu icons - the action clone logic decides whether to actually set icons
