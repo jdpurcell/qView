@@ -1227,12 +1227,12 @@ void MainWindow::originalSize()
 
 void MainWindow::setZoomToFit(const bool value)
 {
-    graphicsView->setCalculatedZoomMode(value ? std::make_optional(Qv::CalculatedZoomMode::ZoomToFit) : std::nullopt);
+    graphicsView->setCalculatedZoomMode(value ? std::optional(Qv::CalculatedZoomMode::ZoomToFit) : std::nullopt);
 }
 
 void MainWindow::setFillWindow(const bool value)
 {
-    graphicsView->setCalculatedZoomMode(value ? std::make_optional(Qv::CalculatedZoomMode::FillWindow) : std::nullopt);
+    graphicsView->setCalculatedZoomMode(value ? std::optional(Qv::CalculatedZoomMode::FillWindow) : std::nullopt);
 }
 
 void MainWindow::setNavigationResetsZoom(const bool value)

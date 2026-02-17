@@ -266,7 +266,9 @@ bool QVGraphicsView::event(QEvent *event)
     {
         const QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
         const ActionManager &actionManager = qvApp->getActionManager();
-        if (actionManager.wouldTriggerAction(keyEvent, "previousfile") || actionManager.wouldTriggerAction(keyEvent, "nextfile"))
+        if (actionManager.wouldTriggerAction(keyEvent, "previousfile") ||
+            actionManager.wouldTriggerAction(keyEvent, "nextfile") ||
+            actionManager.wouldTriggerAction(keyEvent, "randomfile"))
         {
             // Accept event to override shortcut and deliver as key press instead
             event->accept();
@@ -277,7 +279,9 @@ bool QVGraphicsView::event(QEvent *event)
     {
         const QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
         if (!keyEvent->isAutoRepeat() &&
-            (ActionManager::wouldTriggerAction(keyEvent, navPrevShortcuts) || ActionManager::wouldTriggerAction(keyEvent, navNextShortcuts)))
+            (ActionManager::wouldTriggerAction(keyEvent, navPrevShortcuts) ||
+             ActionManager::wouldTriggerAction(keyEvent, navNextShortcuts) ||
+             ActionManager::wouldTriggerAction(keyEvent, navRandomShortcuts)))
         {
             cancelTurboNav();
         }
@@ -332,7 +336,9 @@ void QVGraphicsView::keyPressEvent(QKeyEvent *event)
 {
     if (turboNavMode.has_value())
     {
-        if (ActionManager::wouldTriggerAction(event, navPrevShortcuts) || ActionManager::wouldTriggerAction(event, navNextShortcuts))
+        if (ActionManager::wouldTriggerAction(event, navPrevShortcuts) ||
+            ActionManager::wouldTriggerAction(event, navNextShortcuts) ||
+            ActionManager::wouldTriggerAction(event, navRandomShortcuts))
         {
             lastTurboNavKeyPress.start();
             return;
@@ -341,14 +347,16 @@ void QVGraphicsView::keyPressEvent(QKeyEvent *event)
     else
     {
         const ActionManager &actionManager = qvApp->getActionManager();
-        const bool navPrev = actionManager.wouldTriggerAction(event, "previousfile");
-        const bool navNext = actionManager.wouldTriggerAction(event, "nextfile");
-        if (navPrev || navNext)
+        const std::optional<Qv::GoToFileMode> triggeredNavMode =
+            actionManager.wouldTriggerAction(event, "previousfile") ? Qv::GoToFileMode::Previous :
+            actionManager.wouldTriggerAction(event, "nextfile") ? Qv::GoToFileMode::Next :
+            actionManager.wouldTriggerAction(event, "randomfile") ? Qv::GoToFileMode::Random :
+            std::optional<Qv::GoToFileMode>();
+        if (triggeredNavMode.has_value())
         {
-            const Qv::GoToFileMode navMode = navPrev ? Qv::GoToFileMode::Previous : Qv::GoToFileMode::Next;
             if (event->isAutoRepeat())
             {
-                turboNavMode = navMode;
+                turboNavMode = triggeredNavMode;
                 lastTurboNav.start();
                 lastTurboNavKeyPress.start();
                 // Remove keyboard shortcuts while turbo navigation is in progress to eliminate any
@@ -357,10 +365,12 @@ void QVGraphicsView::keyPressEvent(QKeyEvent *event)
                 // the key repeat rate to max without unbinding the shortcuts - it's really bad).
                 navPrevShortcuts = actionManager.getAction("previousfile")->shortcuts();
                 navNextShortcuts = actionManager.getAction("nextfile")->shortcuts();
+                navRandomShortcuts = actionManager.getAction("randomfile")->shortcuts();
                 actionManager.setActionShortcuts("previousfile", {});
                 actionManager.setActionShortcuts("nextfile", {});
+                actionManager.setActionShortcuts("randomfile", {});
             }
-            goToFile(navMode);
+            goToFile(triggeredNavMode.value());
             return;
         }
     }
@@ -919,7 +929,7 @@ void QVGraphicsView::loadSessionState(const QJsonObject &state)
 
     setNavigationResetsZoom(state["navResetsZoom"].toBool());
 
-    calculatedZoomMode = state.contains("calcZoomMode") ? std::make_optional(static_cast<Qv::CalculatedZoomMode>(state["calcZoomMode"].toInt())) : std::nullopt;
+    calculatedZoomMode = state.contains("calcZoomMode") ? std::optional(static_cast<Qv::CalculatedZoomMode>(state["calcZoomMode"].toInt())) : std::nullopt;
     emit calculatedZoomModeChanged();
 
     if (state.contains("sortMode") && state.contains("sortDescending"))
@@ -1103,8 +1113,10 @@ void QVGraphicsView::cancelTurboNav()
     turboNavMode = {};
     actionManager.setActionShortcuts("previousfile", navPrevShortcuts);
     actionManager.setActionShortcuts("nextfile", navNextShortcuts);
+    actionManager.setActionShortcuts("randomfile", navRandomShortcuts);
     navPrevShortcuts = {};
     navNextShortcuts = {};
+    navRandomShortcuts = {};
 }
 
 MainWindow* QVGraphicsView::getMainWindow() const
@@ -1130,7 +1142,7 @@ void QVGraphicsView::settingsUpdated(const bool isInitialLoad)
     expensiveScalingAboveWindowSize = settingsManager.getBoolean("scalingtwoenabled");
 
     //smooth scaling limit
-    smoothScalingLimit = settingsManager.getBoolean("smoothscalinglimitenabled") ? std::make_optional(settingsManager.getInteger("smoothscalinglimitpercent") / 100.0) : std::nullopt;
+    smoothScalingLimit = settingsManager.getBoolean("smoothscalinglimitenabled") ? std::optional(settingsManager.getInteger("smoothscalinglimitpercent") / 100.0) : std::nullopt;
 
     //calculated zoom mode
     defaultCalculatedZoomMode = settingsManager.getEnum<Qv::CalculatedZoomMode>("calculatedzoommode");
@@ -1139,7 +1151,7 @@ void QVGraphicsView::settingsUpdated(const bool isInitialLoad)
     zoomMultiplier = 1.0 + (settingsManager.getInteger("scalefactor") / 100.0);
 
     //fit zoom limit
-    fitZoomLimit = settingsManager.getBoolean("fitzoomlimitenabled") ? std::make_optional(settingsManager.getInteger("fitzoomlimitpercent") / 100.0) : std::nullopt;
+    fitZoomLimit = settingsManager.getBoolean("fitzoomlimitenabled") ? std::optional(settingsManager.getInteger("fitzoomlimitpercent") / 100.0) : std::nullopt;
 
     //fit overscan
     fitOverscan = settingsManager.getInteger("fitoverscan");

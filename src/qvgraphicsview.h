@@ -247,6 +247,7 @@ private:
     std::optional<Qv::GoToFileMode> turboNavMode;
     QList<QKeySequence> navPrevShortcuts;
     QList<QKeySequence> navNextShortcuts;
+    QList<QKeySequence> navRandomShortcuts;
     QElapsedTimer lastTurboNav;
     QElapsedTimer lastTurboNavKeyPress;
     int turboNavInterval {0};
