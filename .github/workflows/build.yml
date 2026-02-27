@@ -18,32 +18,38 @@ jobs:
             qtModules: 'qtimageformats'
             osSuffix: '_x86_64'
             buildArch: 'X64'
+            zipArtifact: false
           - runner: 'ubuntu-24.04-arm'
             qtVersion: '6.9.3'
             qtModules: 'qtimageformats'
             osSuffix: '_aarch64'
             buildArch: 'Arm64'
+            zipArtifact: false
           - runner: 'macos-26'
             qtVersion: '6.9.3'
             qtModules: 'qtimageformats'
             buildArch: 'Universal'
+            zipArtifact: false
           - runner: 'macos-15'
             qtVersion: '6.7.3'
             osSuffix: '_legacy'
             qtModules: 'qtimageformats'
             buildArch: 'Universal'
+            zipArtifact: false
           - runner: 'windows-2022'
             qtVersion: '6.9.3'
             qtArch: 'win64_msvc2022_64'
             osSuffix: '_64'
             qtModules: 'qtimageformats'
             buildArch: 'X64'
+            zipArtifact: true
           - runner: 'windows-2022'
             qtVersion: '6.9.3'
             qtArch: 'win64_msvc2022_arm64_cross_compiled'
             osSuffix: '_arm64'
             qtModules: 'qtimageformats'
             buildArch: 'Arm64'
+            zipArtifact: true
     runs-on: ${{ matrix.runner }}
     env:
       AUTOSIGN_REQUESTED: ${{ github.ref == 'refs/heads/master' }}
@@ -116,7 +122,8 @@ jobs:
           }
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
-          name: qView-JDP-${{ env.buildNumString }}-${{ runner.os }}${{ matrix.osSuffix }}
+          name: qView-JDP-${{ env.buildNumString }}-${{ runner.os }}${{ matrix.osSuffix }}.zip
           path: bin
+          archive: ${{ matrix.zipArtifact }}
