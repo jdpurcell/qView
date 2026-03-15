@@ -28,9 +28,9 @@ rm -f qView.app/Contents/PlugIns/tls/libqopensslbackend.dylib
 echo "Running codesign"
 if [[ "$APPLE_NOTARIZE_REQUESTED" == "true" ]]; then
     APP_IDENTIFIER=$(/usr/libexec/PlistBuddy -c "Print CFBundleIdentifier" "qView.app/Contents/Info.plist")
-    codesign --sign "$CODESIGN_CERT_NAME" --deep --force --options runtime --timestamp "qView.app"
+    codesign --sign "$APPLE_DEVID_APP_CERT_NAME" --deep --force --options runtime --timestamp "qView.app"
 else
-    codesign --sign "$CODESIGN_CERT_NAME" --deep --force "qView.app"
+    codesign --sign - --deep --force "qView.app"
 fi
 
 echo "Creating disk image"
@@ -40,8 +40,8 @@ hdiutil create -srcfolder "qView.app" -volname "$BUILD_NAME" -format UDSB "qView
 hdiutil convert "qView.sparsebundle" -format ULFO -o "$DMG_FILENAME"
 rm -r qView.sparsebundle
 if [[ "$APPLE_NOTARIZE_REQUESTED" == "true" ]]; then
-    codesign --sign "$CODESIGN_CERT_NAME" --timestamp --identifier "$APP_IDENTIFIER.dmg" "$DMG_FILENAME"
-    xcrun notarytool submit "$DMG_FILENAME" --apple-id "$APPLE_ID_USER" --password "$APPLE_ID_PASS" --team-id "${CODESIGN_CERT_NAME: -11:10}" --wait
+    codesign --sign "$APPLE_DEVID_APP_CERT_NAME" --timestamp --identifier "$APP_IDENTIFIER.dmg" "$DMG_FILENAME"
+    xcrun notarytool submit "$DMG_FILENAME" --apple-id "$APPLE_ID_USER" --password "$APPLE_ID_PASS" --team-id "${APPLE_DEVID_APP_CERT_NAME: -11:10}" --wait
     xcrun stapler staple "$DMG_FILENAME"
     xcrun stapler validate "$DMG_FILENAME"
 fi
