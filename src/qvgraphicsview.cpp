@@ -1,13 +1,13 @@
 #include "qvgraphicsview.h"
 #include "qvapplication.h"
 #include "qvinfodialog.h"
+#include "qvmovie.h"
 #include "qvcocoafunctions.h"
 #include <QWheelEvent>
 #include <QGraphicsPixmapItem>
 #include <QGraphicsScene>
 #include <QSettings>
 #include <QMessageBox>
-#include <QMovie>
 #include <QtMath>
 #include <QGestureEvent>
 #include <QScrollBar>

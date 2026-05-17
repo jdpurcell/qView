@@ -20,7 +20,7 @@ QVImageCore::QVImageCore(QObject *parent) : QObject(parent)
 {
     QImageReader::setAllocationLimit(8192); // 8 GiB
 
-    connect(&loadedMovie, &QMovie::updated, this, [this](QRect rect){
+    connect(&loadedMovie, &QVMovie::updated, this, [this](QRect rect){
         QImage movieImage = loadedMovie.currentImage();
         handleColorSpaceConversion(movieImage, currentFileDetails.targetColorSpace);
         loadedPixmap = QPixmap::fromImage(movieImage);
@@ -234,7 +234,7 @@ void QVImageCore::loadPixmap(const ReadData &readData)
     // Animation detection
     loadedMovie.stop();
     loadedMovie.setFormat("");
-    loadedMovie.setCacheMode(QMovie::CacheAll);
+    loadedMovie.setCacheMode(QVMovie::CacheAll);
     loadedMovie.setFileName(currentFileDetails.fileInfo.absoluteFilePath());
 
     // APNG workaround
@@ -247,7 +247,7 @@ void QVImageCore::loadPixmap(const ReadData &readData)
     if (!readData.isMultiFrameImage && loadedMovie.isValid() && loadedMovie.frameCount() != 1)
         loadedMovie.start();
 
-    currentFileDetails.isMovieLoaded = loadedMovie.state() == QMovie::Running;
+    currentFileDetails.isMovieLoaded = loadedMovie.state() == QVMovie::Running;
 
     if (!currentFileDetails.isMovieLoaded)
         if (auto device = loadedMovie.device())

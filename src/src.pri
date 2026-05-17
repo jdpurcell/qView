@@ -12,6 +12,7 @@ SOURCES += \
     $$PWD/qvwelcomedialog.cpp \
     $$PWD/qvinfodialog.cpp \
     $$PWD/qvimagecore.cpp \
+    $$PWD/qvmovie.cpp \
     $$PWD/qvshortcutdialog.cpp \
     $$PWD/actionmanager.cpp \
     $$PWD/axislocker.cpp \
@@ -40,6 +41,7 @@ HEADERS += \
     $$PWD/qvwelcomedialog.h \
     $$PWD/qvinfodialog.h \
     $$PWD/qvimagecore.h \
+    $$PWD/qvmovie.h \
     $$PWD/qvshortcutdialog.h \
     $$PWD/actionmanager.h \
     $$PWD/axislocker.h \

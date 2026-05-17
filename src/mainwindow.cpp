@@ -5,6 +5,7 @@
 #include "qvwin32functions.h"
 #include "qvrenamedialog.h"
 #include "qvmenu.h"
+#include "qvmovie.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
@@ -17,7 +18,6 @@
 #include <QProcess>
 #include <QDesktopServices>
 #include <QContextMenuEvent>
-#include <QMovie>
 #include <QImageWriter>
 #include <QSettings>
 #include <QStyle>
@@ -362,7 +362,7 @@ void MainWindow::fullscreenChanged()
 
 void MainWindow::pauseChanged()
 {
-    const bool isPaused = getCurrentFileDetails().isMovieLoaded && graphicsView->getLoadedMovie().state() != QMovie::Running;
+    const bool isPaused = getCurrentFileDetails().isMovieLoaded && graphicsView->getLoadedMovie().state() != QVMovie::Running;
 
     const auto pauseActions = qvApp->getActionManager().getAllClonesOfAction("pause", this);
     for (const auto &pauseAction : pauseActions)
@@ -1315,7 +1315,7 @@ void MainWindow::saveFrameAs()
     if (!getCurrentFileDetails().isMovieLoaded)
         return;
 
-    if (graphicsView->getLoadedMovie().state() == QMovie::Running)
+    if (graphicsView->getLoadedMovie().state() == QVMovie::Running)
     {
         pause();
     }
@@ -1336,7 +1336,7 @@ void MainWindow::pause()
     if (!getCurrentFileDetails().isMovieLoaded)
         return;
 
-    const bool isPausing = graphicsView->getLoadedMovie().state() == QMovie::Running;
+    const bool isPausing = graphicsView->getLoadedMovie().state() == QVMovie::Running;
     graphicsView->setPaused(isPausing);
     pauseChanged();
 }

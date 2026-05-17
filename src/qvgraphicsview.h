@@ -90,7 +90,7 @@ public:
     LogicalPixelFitter getPixelFitter() const;
 
     const QVImageCore::FileDetails& getCurrentFileDetails() const { return imageCore.getCurrentFileDetails(); }
-    const QMovie& getLoadedMovie() const { return imageCore.getLoadedMovie(); }
+    const QVMovie& getLoadedMovie() const { return imageCore.getLoadedMovie(); }
     qreal getZoomLevel() const { return zoomLevel; }
 
     int getFitOverscan() const { return fitOverscan; }

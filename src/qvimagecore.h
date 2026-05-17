@@ -3,11 +3,11 @@
 
 #include "qvnamespace.h"
 #include "qvfileenumerator.h"
+#include "qvmovie.h"
 #include <optional>
 #include <QObject>
 #include <QImageReader>
 #include <QPixmap>
-#include <QMovie>
 #include <QFileInfo>
 #include <QFutureWatcher>
 #include <QTimer>
@@ -80,7 +80,7 @@ public:
     QPixmap scaleExpensively(const QSizeF desiredSize);
 
     const QPixmap& getLoadedPixmap() const { return loadedPixmap; }
-    const QMovie& getLoadedMovie() const { return loadedMovie; }
+    const QVMovie& getLoadedMovie() const { return loadedMovie; }
     const FileDetails& getCurrentFileDetails() const { return currentFileDetails; }
 
 signals:
@@ -109,7 +109,7 @@ private:
     QVFileEnumerator fileEnumerator {this};
 
     QPixmap loadedPixmap;
-    QMovie loadedMovie;
+    QVMovie loadedMovie;
 
     FileDetails currentFileDetails;
 
