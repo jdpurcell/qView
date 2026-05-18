@@ -15,6 +15,7 @@
 #include "qbuffer.h"
 #include "qdir.h"
 
+#include <chrono>
 #include <map>
 #include <memory>
 
@@ -71,6 +72,7 @@ public:
     bool jumpToNextFrame();
     QFrameInfo infoForFrame(int frameNumber);
     void reset();
+    void cancelNextLoad();
 
     inline void enterState(QVMovie::MovieState newState) {
         movieState = newState;
@@ -91,6 +93,7 @@ public:
     int nextFrameNumber = 0;
     int greatestFrameNumber = -1;
     int nextDelay = 0;
+    std::optional<std::chrono::steady_clock::time_point> nextLoadTime = std::nullopt;
     int playCounter = -1;
     qint64 initialDevicePos = 0;
     QVMovie::CacheMode cacheMode = QVMovie::CacheNone;
@@ -111,6 +114,7 @@ void QVMoviePrivate::init(QVMovie *qq, std::unique_ptr<QImageReader> r)
     q_ptr = qq;
     reader = std::move(r);
     nextImageTimer = new QTimer(qq);
+    nextImageTimer->setTimerType(Qt::PreciseTimer);
     nextImageTimer->setSingleShot(true);
     QObject::connect(nextImageTimer, &QTimer::timeout, qq, [this]() {
         _q_loadNextFrame();
@@ -119,7 +123,7 @@ void QVMoviePrivate::init(QVMovie *qq, std::unique_ptr<QImageReader> r)
 
 void QVMoviePrivate::reset()
 {
-    nextImageTimer->stop();
+    cancelNextLoad();
     if (reader->device())
         initialDevicePos = reader->device()->pos();
     currentFrameNumber = -1;
@@ -130,6 +134,12 @@ void QVMoviePrivate::reset()
     haveReadAll = false;
     isFirstIteration = true;
     frameMap.clear();
+}
+
+void QVMoviePrivate::cancelNextLoad()
+{
+    nextLoadTime = std::nullopt;
+    nextImageTimer->stop();
 }
 
 bool QVMoviePrivate::isDone()
@@ -255,8 +265,6 @@ QFrameInfo QVMoviePrivate::infoForFrame(int frameNumber)
 
 bool QVMoviePrivate::next()
 {
-    QElapsedTimer time;
-    time.start();
     QFrameInfo info = infoForFrame(nextFrameNumber);
     if (!info.isValid())
         return false;
@@ -289,12 +297,6 @@ bool QVMoviePrivate::next()
         return true;
 
     nextDelay = speedAdjustedDelay(info.delay);
-    // Adjust delay according to the time it took to read the frame
-    int processingTime = time.elapsed();
-    if (processingTime > nextDelay)
-        nextDelay = 0;
-    else
-        nextDelay = nextDelay - processingTime;
     return true;
 }
 
@@ -306,6 +308,7 @@ void QVMoviePrivate::_q_loadNextFrame()
 void QVMoviePrivate::_q_loadNextFrame(bool starting)
 {
     Q_Q(QVMovie);
+    const auto loadStartTime = std::chrono::steady_clock::now();
     if (next()) {
         if (starting && movieState == QVMovie::NotRunning) {
             enterState(QVMovie::Running);
@@ -320,8 +323,15 @@ void QVMoviePrivate::_q_loadNextFrame(bool starting)
         emit q->updated(frameRect);
         emit q->frameChanged(currentFrameNumber);
 
-        if (speed && movieState == QVMovie::Running)
-            nextImageTimer->start(nextDelay);
+        if (speed && movieState == QVMovie::Running) {
+            nextLoadTime = (nextLoadTime.has_value() ? nextLoadTime.value() : loadStartTime) + std::chrono::milliseconds(nextDelay);
+            const int adjustedNextDelay = std::chrono::duration_cast<std::chrono::milliseconds>(nextLoadTime.value() - std::chrono::steady_clock::now()).count();
+            if (adjustedNextDelay < -1000) {
+                // If we get too far behind, don't try to catch up
+                nextLoadTime = std::nullopt;
+            }
+            nextImageTimer->start(std::max(0, adjustedNextDelay));
+        }
     } else {
         // Could not read another frame
         if (!isDone()) {
@@ -331,6 +341,7 @@ void QVMoviePrivate::_q_loadNextFrame(bool starting)
         // Graceful finish
         if (movieState != QVMovie::Paused) {
             nextFrameNumber = 0;
+            nextLoadTime = std::nullopt;
             isFirstIteration = true;
             playCounter = -1;
             enterState(QVMovie::NotRunning);
@@ -365,7 +376,7 @@ bool QVMoviePrivate::jumpToFrame(int frameNumber)
         return true;
     nextFrameNumber = frameNumber;
     if (movieState == QVMovie::Running)
-        nextImageTimer->stop();
+        cancelNextLoad();
     _q_loadNextFrame();
     return (nextFrameNumber == currentFrameNumber+1);
 }
@@ -552,21 +563,28 @@ void QVMovie::setPaused(bool paused)
         if (d->movieState == NotRunning)
             return;
         d->enterState(Paused);
-        d->nextImageTimer->stop();
+        d->cancelNextLoad();
     } else {
         if (d->movieState == Running)
             return;
         d->enterState(Running);
-        d->nextImageTimer->start(nextFrameDelay());
+        d->_q_loadNextFrame();
     }
 }
 
 void QVMovie::setSpeed(int percentSpeed)
 {
     Q_D(QVMovie);
-    if (!d->speed && d->movieState == Running)
-        d->nextImageTimer->start(nextFrameDelay());
+    if (d->speed == percentSpeed || percentSpeed < 0)
+        return;
+    int oldSpeed = d->speed;
     d->speed = percentSpeed;
+    if (d->movieState == Running) {
+        if (!percentSpeed)
+            d->cancelNextLoad();
+        else if (!oldSpeed)
+            d->_q_loadNextFrame();
+    }
 }
 
 int QVMovie::speed() const
@@ -591,7 +609,7 @@ void QVMovie::stop()
     if (d->movieState == NotRunning)
         return;
     d->enterState(NotRunning);
-    d->nextImageTimer->stop();
+    d->cancelNextLoad();
     d->nextFrameNumber = 0;
 }
 
