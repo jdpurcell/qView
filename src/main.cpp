@@ -1,5 +1,8 @@
 #include "mainwindow.h"
 #include "qvapplication.h"
+#ifdef Q_OS_WIN
+#include "qvwindows11style.h"
+#endif
 
 #include <QCommandLineParser>
 #include <QFontDatabase>
@@ -36,6 +39,11 @@ int main(int argc, char *argv[])
         else
             QApplication::setStyle("windowsvista");
     }
+#endif
+
+#ifdef Q_OS_WIN
+    if (QApplication::style()->name() == "windows11")
+        QApplication::setStyle(new QvWindows11Style(QApplication::style()));
 #endif
 
     QCommandLineParser parser;

@@ -14,6 +14,7 @@ SOURCES += \
     $$PWD/qvimagecore.cpp \
     $$PWD/qvmovie.cpp \
     $$PWD/qvshortcutdialog.cpp \
+    $$PWD/qvwindows11style.cpp \
     $$PWD/actionmanager.cpp \
     $$PWD/axislocker.cpp \
     $$PWD/logicalpixelfitter.cpp \
@@ -43,6 +44,7 @@ HEADERS += \
     $$PWD/qvimagecore.h \
     $$PWD/qvmovie.h \
     $$PWD/qvshortcutdialog.h \
+    $$PWD/qvwindows11style.h \
     $$PWD/actionmanager.h \
     $$PWD/axislocker.h \
     $$PWD/logicalpixelfitter.h \
