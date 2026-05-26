@@ -18,6 +18,18 @@ if ($IsWindows -and $env:buildArch -eq 'Arm64') {
         Move-Item -Path $targetExe -Destination $exe
         Remove-Item -Path $bat
     }
+
+    $targetQtConf = Join-Path -Path $qtBinDir -ChildPath 'target_qt.conf'
+    if (Test-Path $targetQtConf) {
+        $targetQtConfContent = Get-Content -Path $targetQtConf -Raw
+        $updatedTargetQtConfContent = $targetQtConfContent -replace '(?m)^HostSpec=win32-g\+\+$', 'HostSpec=win32-msvc'
+        if ($updatedTargetQtConfContent -ne $targetQtConfContent) {
+            Write-Host "Updating $targetQtConf to replace HostSpec=win32-g++ with HostSpec=win32-msvc"
+            Set-Content -Path $targetQtConf -Value $updatedTargetQtConfContent -NoNewline
+        } else {
+            Write-Host "No HostSpec=win32-g++ line found in $targetQtConf; no update needed"
+        }
+    }
 }
 
 if ($IsWindows) {
