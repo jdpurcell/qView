@@ -65,6 +65,11 @@ if ($IsMacOS) {
         $cmakeArgs += "-A Win32"
     } elseif ($env:buildArch -eq 'Arm64') {
         $cmakeArgs += "-A ARM64"
+        # When cross-compiling for ARM64, point CMake to the x64 host Qt so that
+        # AUTOMOC and friends use the host-executable moc.exe/uic.exe/rcc.exe
+        # instead of the ARM64 target ones which can't run on the build machine.
+        $qtHostPath = Join-Path (Split-Path -Parent $env:QT_ROOT_DIR) 'msvc2022_64'
+        $cmakeArgs += "-DQT_HOST_PATH=$qtHostPath"
     }
 }
 
