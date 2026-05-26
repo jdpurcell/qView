@@ -231,7 +231,7 @@ if(Qt${QT_VERSION_MAJOR}_LinguistTools_FOUND)
         target_sources(${PROJECT_NAME} PRIVATE ${QM_FILES})
     else()
         # For Qt6, use qt_add_translations
-        qt_add_translations(${PROJECT_NAME} TS_FILES ${TRANSLATIONS})
+        qt_add_translations(TARGETS ${PROJECT_NAME} TS_FILES ${TRANSLATIONS})
     endif()
 else()
     message(STATUS "LinguistTools not found, skipping translations.")
