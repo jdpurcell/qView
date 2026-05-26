@@ -9,6 +9,17 @@ param
 $qtVersion = [version](qmake -query QT_VERSION)
 Write-Host "Detected Qt version $qtVersion"
 
+if ($IsWindows -and $env:buildArch -eq 'Arm64') {
+    $qtBinDir = Join-Path -Path $env:QT_ROOT_DIR -ChildPath 'bin'
+    foreach ($name in 'qmake', 'qmake6', 'qtpaths', 'qtpaths6') {
+        $targetExe = Join-Path -Path $qtBinDir -ChildPath "target-$name.exe"
+        $exe = Join-Path -Path $qtBinDir -ChildPath "$name.exe"
+        $bat = Join-Path -Path $qtBinDir -ChildPath "$name.bat"
+        Move-Item -Path $targetExe -Destination $exe
+        Remove-Item -Path $bat
+    }
+}
+
 if ($IsWindows) {
     dist/scripts/vcvars.ps1
 } elseif ($IsMacOS) {
