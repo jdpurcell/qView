@@ -645,8 +645,12 @@ void ActionManager::actionTriggered(QAction *triggeredAction, MainWindow *releva
             msgBox.setText(tr("Would you like to remember your opened images and re-open them at next launch?"));
             QPushButton *yesButton = msgBox.addButton(tr("&Remember"), QMessageBox::YesRole);
             QPushButton *noButton = msgBox.addButton(tr("&End Session"), QMessageBox::NoRole);
+            msgBox.setStandardButtons(QMessageBox::Cancel);
             msgBox.setDefaultButton(yesButton);
+            msgBox.setEscapeButton(QMessageBox::Cancel);
             msgBox.exec();
+            if (msgBox.standardButton(msgBox.clickedButton()) == QMessageBox::Cancel)
+                return;
             qvApp->setUserDeclinedSessionStateSave(msgBox.clickedButton() == noButton);
         }
         QCoreApplication::quit();
