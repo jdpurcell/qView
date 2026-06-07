@@ -13,31 +13,43 @@ jobs:
     strategy:
       matrix:
         include:
-          - runner: 'ubuntu-22.04'
-            qtVersion: '6.11.1'
-            qtModules: 'qtimageformats'
-            osSuffix: '_x86_64'
-            buildArch: 'X64'
-            zipArtifact: false
-          - runner: 'ubuntu-24.04-arm'
-            qtVersion: '6.11.1'
-            qtModules: 'qtimageformats'
-            osSuffix: '_aarch64'
-            buildArch: 'Arm64'
-            zipArtifact: false
-          - runner: 'macos-26'
-            qtVersion: '6.11.1'
-            qtModules: 'qtimageformats'
-            buildArch: 'Universal'
-            zipArtifact: false
-          - runner: 'macos-15'
-            qtVersion: '6.7.3'
-            osSuffix: '_legacy'
-            qtModules: 'qtimageformats'
-            buildArch: 'Universal'
-            zipArtifact: false
           - runner: 'windows-2022'
-            qtVersion: '6.11.1'
+            qtVersion: '6.9.3'
+            qtArch: 'win64_msvc2022_64'
+            osSuffix: '_64'
+            qtModules: 'qtimageformats'
+            buildArch: 'X64'
+            zipArtifact: true
+          - runner: 'windows-2022'
+            qtVersion: '6.10.0'
+            qtArch: 'win64_msvc2022_64'
+            osSuffix: '_64'
+            qtModules: 'qtimageformats'
+            buildArch: 'X64'
+            zipArtifact: true
+          - runner: 'windows-2022'
+            qtVersion: '6.10.1'
+            qtArch: 'win64_msvc2022_64'
+            osSuffix: '_64'
+            qtModules: 'qtimageformats'
+            buildArch: 'X64'
+            zipArtifact: true
+          - runner: 'windows-2022'
+            qtVersion: '6.10.2'
+            qtArch: 'win64_msvc2022_64'
+            osSuffix: '_64'
+            qtModules: 'qtimageformats'
+            buildArch: 'X64'
+            zipArtifact: true
+          - runner: 'windows-2022'
+            qtVersion: '6.10.3'
+            qtArch: 'win64_msvc2022_64'
+            osSuffix: '_64'
+            qtModules: 'qtimageformats'
+            buildArch: 'X64'
+            zipArtifact: true
+          - runner: 'windows-2022'
+            qtVersion: '6.11.0'
             qtArch: 'win64_msvc2022_64'
             osSuffix: '_64'
             qtModules: 'qtimageformats'
@@ -45,14 +57,14 @@ jobs:
             zipArtifact: true
           - runner: 'windows-2022'
             qtVersion: '6.11.1'
-            qtArch: 'win64_msvc2022_arm64_cross_compiled'
-            osSuffix: '_arm64'
+            qtArch: 'win64_msvc2022_64'
+            osSuffix: '_64'
             qtModules: 'qtimageformats'
-            buildArch: 'Arm64'
+            buildArch: 'X64'
             zipArtifact: true
     runs-on: ${{ matrix.runner }}
     env:
-      AUTOSIGN_REQUESTED: ${{ github.ref == 'refs/heads/master' }}
+      AUTOSIGN_REQUESTED: true
       CAN_AUTOSIGN_MACOS: ${{ secrets.APPLE_DEVID_APP_CERT_DATA != '' }}
       CAN_AUTOSIGN_WINDOWS: ${{ vars.AZURE_SIGNING_CERTIFICATE != '' }}
     steps:
@@ -73,7 +85,7 @@ jobs:
           version: ${{ matrix.qtVersion }}
           arch: ${{ matrix.qtArch }}
           modules: ${{ matrix.qtModules }}
-          cache: true
+          cache: false
           use-naqt: true
           setup-python: false
 
@@ -124,6 +136,6 @@ jobs:
       - name: Upload Artifact
         uses: actions/upload-artifact@v7
         with:
-          name: qView-JDP-${{ env.buildNumString }}-${{ runner.os }}${{ matrix.osSuffix }}.zip
+          name: qView-JDP-${{ env.buildNumString }}-${{ runner.os }}${{ matrix.osSuffix }}-Qt${{ matrix.qtVersion }}.zip
           path: bin
           archive: ${{ matrix.zipArtifact }}
