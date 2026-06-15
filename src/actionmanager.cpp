@@ -208,6 +208,9 @@ QMenuBar *ActionManager::buildMenuBar(QWidget *parent)
 #endif
     fileMenu->addSeparator();
     fileMenu->addMenu(buildOpenWithMenu(fileMenu));
+#ifdef Q_OS_MACOS
+    addCloneOfAction(fileMenu, "openwithplaceholder");
+#endif
     addCloneOfAction(fileMenu, "opencontainingfolder");
     addCloneOfAction(fileMenu, "showfileinfo");
     fileMenu->addSeparator();
@@ -354,6 +357,8 @@ QMenu *ActionManager::buildRecentsMenu(QWidget *parent)
         recentsMenu->setIcon(qvApp->iconFromFont(Qv::MaterialIcon::WorkHistory));
 
     connect(recentsMenu, &QMenu::aboutToShow, this, [this]{
+        // This list may already be up to date since we refresh it after opening a file, but
+        // we force a refresh here in case another instance of our app opened a file recently.
         this->loadRecentsList();
     });
 
@@ -1014,6 +1019,14 @@ void ActionManager::initializeActionLibrary()
     openWithOtherAction->setText(tr("Other..."));
 #endif
     actionLibrary.insert("openwithother", openWithOtherAction);
+
+#ifdef Q_OS_MACOS
+    // Qt's QCocoaMenu doesn't support disabling submenus (probably a bug) so we'll just use
+    // a disabled menu item as a placeholder and swap it out with the real submenu later
+    auto *openWithPlaceholderAction = new QAction(qvApp->iconFromFont(Qv::MaterialIcon::Launch), tr("Open With"));
+    openWithPlaceholderAction->setEnabled(false);
+    actionLibrary.insert("openwithplaceholder", openWithPlaceholderAction);
+#endif
 
     // Set data values and disable actions
     const auto keys = actionLibrary.keys();

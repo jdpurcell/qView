@@ -100,6 +100,9 @@ MainWindow::MainWindow(QWidget *parent, const QJsonObject &windowSessionState) :
     actionManager.addCloneOfAction(contextMenu, "openurl");
     contextMenu->addMenu(actionManager.buildRecentsMenu(contextMenu));
     contextMenu->addMenu(actionManager.buildOpenWithMenu(contextMenu));
+#ifdef Q_OS_MACOS
+    actionManager.addCloneOfAction(contextMenu, "openwithplaceholder");
+#endif
     actionManager.addCloneOfAction(contextMenu, "opencontainingfolder");
     actionManager.addCloneOfAction(contextMenu, "showfileinfo");
     contextMenu->addSeparator();
@@ -201,17 +204,14 @@ bool MainWindow::event(QEvent *event)
 
 void MainWindow::contextMenuEvent(QContextMenuEvent *event)
 {
-    QMainWindow::contextMenuEvent(event);
-
-    // Show native menu on macOS with cocoa framework loaded
 #ifdef COCOA_LOADED
-    // On regular context menu, recents submenu updates right before it is shown.
-    // The native cocoa menu does not update elements until the entire menu is reopened, so we update first
-    qvApp->getActionManager().loadRecentsList();
+    // Workaround to show native context menus on macOS
     QVCocoaFunctions::showMenu(contextMenu, event->pos(), windowHandle());
 #else
     contextMenu->popup(event->globalPos());
 #endif
+
+    QMainWindow::contextMenuEvent(event);
 }
 
 void MainWindow::showEvent(QShowEvent *event)
@@ -528,8 +528,19 @@ void MainWindow::disableActions()
     const auto &openWithMenus = qvApp->getActionManager().getAllClonesOfMenu("openwith", this);
     for (const auto &menu : openWithMenus)
     {
-        menu->setEnabled(getCurrentFileDetails().isPixmapLoaded);
+        menu->setEnabled(getIsPixmapLoaded());
+#ifdef Q_OS_MACOS
+        menu->menuAction()->setVisible(getIsPixmapLoaded());
+#endif
     }
+
+#ifdef Q_OS_MACOS
+    const auto &openWithPlaceholderActions = qvApp->getActionManager().getAllClonesOfAction("openwithplaceholder", this);
+    for (const auto &action : openWithPlaceholderActions)
+    {
+        action->setVisible(!getIsPixmapLoaded());
+    }
+#endif
 }
 
 void MainWindow::requestPopulateOpenWithMenu()

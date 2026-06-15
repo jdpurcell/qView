@@ -8,55 +8,29 @@
 
 #import <Cocoa/Cocoa.h>
 
-
-static void fixNativeMenuEccentricities(QMenu *menu, NSMenu *nativeMenu)
+static void hideMenuShortcuts(NSMenu *nativeMenu)
 {
-    // Stop menu items with no actions being disabled automatically
-    [nativeMenu setAutoenablesItems:false];
-    int i = 0;
     for (NSMenuItem *item in nativeMenu.itemArray)
     {
-        // Set menu items as disabled again (setAutoenablesItems resets them all to enabled)
-        [item setEnabled:menu->actions().value(i)->isEnabled()];
-        // Update each item so the submenus actually show up
-        [nativeMenu.delegate menu:nativeMenu updateItem:item atIndex:0 shouldCancel:false];
-        // Hide shortcuts from menu as is typical for context menus
         [item setKeyEquivalent:@""];
-        if (item.hasSubmenu)
-        {
-            // Stop items with submenus from being clickable
-            [item setAction:nil];
 
-            // Do all this stuff for all items within submenu
-            fixNativeMenuEccentricities(menu->actions().value(i)->menu(), item.submenu);
-        }
-        i++;
+        if (item.hasSubmenu)
+            hideMenuShortcuts(item.submenu);
     }
 }
 
 void QVCocoaFunctions::showMenu(QMenu *menu, const QPoint &point, QWindow *window)
 {
-    auto *view = reinterpret_cast<NSView*>(window->winId());
-
+    NSView *view = reinterpret_cast<NSView*>(window->winId());
     NSMenu *nativeMenu = menu->toNSMenu();
-    fixNativeMenuEccentricities(menu, nativeMenu);
 
-    NSPoint transposedPoint = QPoint(point.x(), static_cast<int>(view.frame.size.height)-point.y()).toCGPoint();
-    NSGraphicsContext *graphicsContext = [NSGraphicsContext currentContext];
+    hideMenuShortcuts(nativeMenu);
 
     // Synthesize event to open menu
-    NSEvent *event = [NSEvent mouseEventWithType:NSEventTypeRightMouseDown location:transposedPoint modifierFlags:0
-            timestamp:0 windowNumber:view.window.windowNumber context:graphicsContext eventNumber:0 clickCount:0 pressure:1];
+    NSPoint pointInWindow = [view convertPoint:NSMakePoint(point.x(), point.y()) toView:nil];
+    NSEvent *event = [NSEvent mouseEventWithType:NSEventTypeRightMouseDown location:pointInWindow modifierFlags:0
+            timestamp:0 windowNumber:view.window.windowNumber context:nil eventNumber:0 clickCount:1 pressure:1.0];
     [NSMenu popUpContextMenu:nativeMenu withEvent:event forView:view];
-
-    // Send left and right up events to replace ones that aren't sent automatically
-    NSEvent *eventRightUp = [NSEvent mouseEventWithType:NSEventTypeRightMouseUp location:transposedPoint modifierFlags:0
-            timestamp:0 windowNumber:view.window.windowNumber context:graphicsContext eventNumber:0 clickCount:0 pressure:1];
-    [view rightMouseUp:eventRightUp];
-
-    NSEvent *eventLeftUp = [NSEvent mouseEventWithType:NSEventTypeLeftMouseUp location:transposedPoint modifierFlags:0
-            timestamp:0 windowNumber:view.window.windowNumber context:graphicsContext eventNumber:0 clickCount:0 pressure:1];
-    [view mouseUp:eventLeftUp];
 }
 
 void QVCocoaFunctions::setUserDefaults()
@@ -128,7 +102,6 @@ void QVCocoaFunctions::setVibrancy(bool alwaysDark, QWindow *window)
 
     if (alwaysDark)
     {
-
         [view.window setAppearance: [NSAppearance appearanceNamed:NSAppearanceNameVibrantDark]];
     }
     else
