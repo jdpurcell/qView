@@ -12,9 +12,10 @@ $osName =
 $binaryBaseUrl = "https://github.com/jdpurcell/kimageformats-binaries/releases/download/cont"
 
 $pluginNames = @('QtApng', 'KImageFormats')
+$pluginQtVersion = '6.9.3'
 
 foreach ($pluginName in $pluginNames) {
-    $artifactName = "$pluginName-$osName-$qtVersion-$env:buildArch.zip"
+    $artifactName = "$pluginName-$osName-$pluginQtVersion-$env:buildArch.zip"
     $downloadUrl = "$binaryBaseUrl/$artifactName"
 
     Write-Host "Downloading $downloadUrl"

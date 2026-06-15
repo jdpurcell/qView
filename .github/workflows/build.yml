@@ -14,37 +14,37 @@ jobs:
       matrix:
         include:
           - runner: 'ubuntu-22.04'
-            qtVersion: '6.11.1'
+            qtVersion: '6.12.0'
             qtModules: 'qtimageformats'
             osSuffix: '_x86_64'
             buildArch: 'X64'
             zipArtifact: false
           - runner: 'ubuntu-24.04-arm'
-            qtVersion: '6.11.1'
+            qtVersion: '6.12.0'
             qtModules: 'qtimageformats'
             osSuffix: '_aarch64'
             buildArch: 'Arm64'
             zipArtifact: false
           - runner: 'macos-26'
-            qtVersion: '6.11.1'
+            qtVersion: '6.12.0'
             qtModules: 'qtimageformats'
             buildArch: 'Universal'
             zipArtifact: false
-          - runner: 'macos-15'
-            qtVersion: '6.7.3'
-            osSuffix: '_legacy'
-            qtModules: 'qtimageformats'
-            buildArch: 'Universal'
-            zipArtifact: false
+          # - runner: 'macos-15'
+          #   qtVersion: '6.7.3'
+          #   osSuffix: '_legacy'
+          #   qtModules: 'qtimageformats'
+          #   buildArch: 'Universal'
+          #   zipArtifact: false
           - runner: 'windows-2022'
-            qtVersion: '6.11.1'
+            qtVersion: '6.12.0'
             qtArch: 'win64_msvc2022_64'
             osSuffix: '_64'
             qtModules: 'qtimageformats'
             buildArch: 'X64'
             zipArtifact: true
           - runner: 'windows-2022'
-            qtVersion: '6.11.1'
+            qtVersion: '6.12.0'
             qtArch: 'win64_msvc2022_arm64_cross_compiled'
             osSuffix: '_arm64'
             qtModules: 'qtimageformats'
@@ -73,7 +73,8 @@ jobs:
           version: ${{ matrix.qtVersion }}
           arch: ${{ matrix.qtArch }}
           modules: ${{ matrix.qtModules }}
-          cache: true
+          cache: false
+          nohash: true
           use-naqt: true
           setup-python: false
 
