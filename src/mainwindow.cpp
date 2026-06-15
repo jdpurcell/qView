@@ -362,7 +362,7 @@ void MainWindow::fullscreenChanged()
 
 void MainWindow::pauseChanged()
 {
-    const bool isPaused = getCurrentFileDetails().isMovieLoaded && graphicsView->getLoadedMovie().state() != QVMovie::Running;
+    const bool isPaused = getIsMovieLoaded() && graphicsView->getLoadedMovie().state() != QVMovie::Running;
 
     const auto pauseActions = qvApp->getActionManager().getAllClonesOfAction("pause", this);
     for (const auto &pauseAction : pauseActions)
@@ -503,11 +503,11 @@ void MainWindow::disableActions()
                 const auto &cloneData = clone->data().toStringList();
                 if (cloneData.last() == "disable")
                 {
-                    clone->setEnabled(getCurrentFileDetails().isPixmapLoaded);
+                    clone->setEnabled(getIsPixmapLoaded());
                 }
                 else if (cloneData.last() == "gifdisable")
                 {
-                    clone->setEnabled(getCurrentFileDetails().isMovieLoaded);
+                    clone->setEnabled(getIsMovieLoaded());
                 }
                 else if (cloneData.last() == "undodisable")
                 {
@@ -658,7 +658,7 @@ void MainWindow::updateWindowFilePath()
     if (!windowHandle())
         return;
 
-    const bool shouldPopulate = getCurrentFileDetails().isPixmapLoaded && !getTitlebarHidden();
+    const bool shouldPopulate = getIsPixmapLoaded() && !getTitlebarHidden();
     windowHandle()->setFilePath(shouldPopulate ? getCurrentFileDetails().fileInfo.absoluteFilePath() : "");
 }
 
@@ -725,7 +725,7 @@ void MainWindow::setTitlebarHidden(const bool shouldHide)
 
 void MainWindow::setWindowSize(const bool isReapplying, const bool isExplicitRequest)
 {
-    if (!getCurrentFileDetails().isPixmapLoaded)
+    if (!getIsPixmapLoaded())
         return;
 
     //check if the program is configured to resize the window
@@ -855,7 +855,7 @@ const QJsonObject MainWindow::getSessionState() const
 
     state["titlebarHidden"] = getTitlebarHidden();
 
-    if (getCurrentFileDetails().isPixmapLoaded)
+    if (getIsPixmapLoaded())
     {
         state["path"] = getCurrentFileDetails().fileInfo.absoluteFilePath();
 
@@ -892,11 +892,6 @@ void MainWindow::loadSessionState(const QJsonObject &state, const bool isInitial
         graphicsView->setLoadIsFromSessionRestore(true);
         openFile(path, baseDir);
     }
-}
-
-bool MainWindow::getIsPixmapLoaded() const
-{
-    return getCurrentFileDetails().isPixmapLoaded;
 }
 
 void MainWindow::setJustLaunchedWithImage(bool value)
@@ -999,7 +994,7 @@ void MainWindow::openWith(const OpenWith::OpenWithItem &openWithItem)
 
 void MainWindow::openContainingFolder()
 {
-    if (!getCurrentFileDetails().isPixmapLoaded)
+    if (!getIsPixmapLoaded())
         return;
 
     const QFileInfo selectedFileInfo = getCurrentFileDetails().fileInfo;
@@ -1186,7 +1181,7 @@ void MainWindow::paste()
 
 void MainWindow::rename()
 {
-    if (!getCurrentFileDetails().isPixmapLoaded)
+    if (!getIsPixmapLoaded())
         return;
 
     auto *renameDialog = new QVRenameDialog(this, getCurrentFileDetails().fileInfo);
@@ -1312,7 +1307,7 @@ void MainWindow::saveFrameAs()
 {
     QSettings settings;
     settings.beginGroup("recents");
-    if (!getCurrentFileDetails().isMovieLoaded)
+    if (!getIsMovieLoaded())
         return;
 
     if (graphicsView->getLoadedMovie().state() == QVMovie::Running)
@@ -1333,7 +1328,7 @@ void MainWindow::saveFrameAs()
 
 void MainWindow::pause()
 {
-    if (!getCurrentFileDetails().isMovieLoaded)
+    if (!getIsMovieLoaded())
         return;
 
     const bool isPausing = graphicsView->getLoadedMovie().state() == QVMovie::Running;
@@ -1403,7 +1398,7 @@ void MainWindow::slideshowAction()
 
 void MainWindow::decreaseSpeed()
 {
-    if (!getCurrentFileDetails().isMovieLoaded)
+    if (!getIsMovieLoaded())
         return;
 
     graphicsView->setSpeed(graphicsView->getLoadedMovie().speed()-25);
@@ -1411,7 +1406,7 @@ void MainWindow::decreaseSpeed()
 
 void MainWindow::resetSpeed()
 {
-    if (!getCurrentFileDetails().isMovieLoaded)
+    if (!getIsMovieLoaded())
         return;
 
     graphicsView->setSpeed(100);
@@ -1419,7 +1414,7 @@ void MainWindow::resetSpeed()
 
 void MainWindow::increaseSpeed()
 {
-    if (!getCurrentFileDetails().isMovieLoaded)
+    if (!getIsMovieLoaded())
         return;
 
     graphicsView->setSpeed(graphicsView->getLoadedMovie().speed()+25);

@@ -55,8 +55,6 @@ public:
 
     void setWindowSize(const bool isReapplying = false, const bool isExplicitRequest = false);
 
-    bool getIsPixmapLoaded() const;
-
     void setJustLaunchedWithImage(bool value);
 
     QScreen *screenContaining(const QRect &rect);
@@ -154,6 +152,10 @@ public:
     ViewportPosition getViewportPosition() const;
 
     const QVImageCore::FileDetails& getCurrentFileDetails() const { return graphicsView->getCurrentFileDetails(); }
+
+    bool getIsPixmapLoaded() const { return getCurrentFileDetails().isPixmapLoaded; }
+
+    bool getIsMovieLoaded() const { return getCurrentFileDetails().isMovieLoaded; }
 
     qint64 getLastActivatedTimestamp() const { return lastActivated.msecsSinceReference(); }
 
