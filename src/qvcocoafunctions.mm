@@ -150,13 +150,23 @@ void QVCocoaFunctions::setAlternate(QMenu *menu, int index)
 void QVCocoaFunctions::setDockRecents(const QStringList &recentPathsList)
 {
     NSDocumentController *documentController = [NSDocumentController sharedDocumentController];
-    [documentController clearRecentDocuments:documentController];
-    for (int i = recentPathsList.size()-1; i >= 0; i--)
-    {
-        const auto &path = recentPathsList[i];
-        auto url = QUrl::fromLocalFile(path);
-        [documentController noteNewRecentDocumentURL:url.toNSURL()];
-    }
+
+    [documentController clearRecentDocuments:nil];
+
+    if (recentPathsList.length() == 0)
+        return;
+
+    // The dispatch_async wrapper is a workaround for the first document not getting added after a call
+    // to clear the documents. We just introduce a slight processing delay which is enough to fix it.
+    const QStringList paths = recentPathsList;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        for (int i = paths.size() - 1; i >= 0; i--)
+        {
+            const auto &path = paths[i];
+            auto url = QUrl::fromLocalFile(path);
+            [documentController noteNewRecentDocumentURL:url.toNSURL()];
+        }
+    });
 }
 
 QList<OpenWith::OpenWithItem> QVCocoaFunctions::getOpenWithItems(const QString &filePath, const bool loadIcons)
@@ -173,7 +183,6 @@ QList<OpenWith::OpenWithItem> QVCocoaFunctions::getOpenWithItems(const QString &
         NSLog(@"getResourceValue:forKey:error: returned error == %@", error);
         return QList<OpenWith::OpenWithItem>();
     }
-
 
     NSArray *supportedApplications = [(NSArray *)LSCopyAllRoleHandlersForContentType((CFStringRef)utiType, kLSRolesAll) autorelease];
     NSString *defaultApplication = [(NSString *)LSCopyDefaultRoleHandlerForContentType((CFStringRef)utiType, kLSRolesAll) autorelease];

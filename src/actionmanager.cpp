@@ -471,6 +471,7 @@ void ActionManager::clearRecentsList()
 {
     recentsList.clear();
     saveRecentsList();
+    updateRecentsMenu();
 }
 
 void ActionManager::updateRecentsMenu()
