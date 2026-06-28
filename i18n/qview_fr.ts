@@ -80,22 +80,6 @@
         <translation>Ordre décroissant</translation>
     </message>
     <message>
-        <source>Remember Session?</source>
-        <translation>Se souvenir de la session ?</translation>
-    </message>
-    <message>
-        <source>Would you like to remember your opened images and re-open them at next launch?</source>
-        <translation>Souhaitez-vous mémoriser vos images ouvertes et les rouvrir au prochain lancement ?</translation>
-    </message>
-    <message>
-        <source>&amp;Remember</source>
-        <translation>Se souvenir</translation>
-    </message>
-    <message>
-        <source>&amp;End Session</source>
-        <translation>Terminer la session</translation>
-    </message>
-    <message>
         <source>&amp;Quit</source>
         <translation>Quitter</translation>
     </message>
@@ -554,6 +538,22 @@ Pas d&apos;autorisation d&apos;écriture ou le fichier est en lecture seule.</tr
     <message>
         <source>All Files</source>
         <translation>Tous les fichiers</translation>
+    </message>
+    <message>
+        <source>Remember Session?</source>
+        <translation>Se souvenir de la session ?</translation>
+    </message>
+    <message>
+        <source>Would you like to remember your opened images and re-open them at next launch?</source>
+        <translation>Souhaitez-vous mémoriser vos images ouvertes et les rouvrir au prochain lancement ?</translation>
+    </message>
+    <message>
+        <source>&amp;Remember</source>
+        <translation>Se souvenir</translation>
+    </message>
+    <message>
+        <source>&amp;End Session</source>
+        <translation>Terminer la session</translation>
     </message>
 </context>
 <context>

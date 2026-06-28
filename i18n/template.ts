@@ -80,22 +80,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Remember Session?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Would you like to remember your opened images and re-open them at next launch?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;Remember</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>&amp;End Session</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>&amp;Quit</source>
         <translation type="unfinished"></translation>
     </message>
@@ -548,6 +532,22 @@ No write permission or file is read-only.</source>
     </message>
     <message>
         <source>All Files</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remember Session?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Would you like to remember your opened images and re-open them at next launch?</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;Remember</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>&amp;End Session</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

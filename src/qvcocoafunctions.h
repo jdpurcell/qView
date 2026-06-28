@@ -13,6 +13,8 @@ public:
 
     static void setUserDefaults();
 
+    static void registerWillPowerOffObserver();
+
     static void setFullSizeContentView(QWidget *window, const bool enable);
 
     static bool getTitlebarHidden(const QWidget *window);

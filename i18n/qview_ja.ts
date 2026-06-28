@@ -80,22 +80,6 @@
         <translation>降順</translation>
     </message>
     <message>
-        <source>Remember Session?</source>
-        <translation>セッションを記憶しますか？</translation>
-    </message>
-    <message>
-        <source>Would you like to remember your opened images and re-open them at next launch?</source>
-        <translation>開いた画像を記憶し、次回起動時に再度開きますか？</translation>
-    </message>
-    <message>
-        <source>&amp;Remember</source>
-        <translation>記憶する</translation>
-    </message>
-    <message>
-        <source>&amp;End Session</source>
-        <translation>セッションを終了</translation>
-    </message>
-    <message>
         <source>&amp;Quit</source>
         <translation>終了</translation>
     </message>
@@ -554,6 +538,22 @@ No write permission or file is read-only.</source>
     <message>
         <source>All Files</source>
         <translation>すべてのファイル</translation>
+    </message>
+    <message>
+        <source>Remember Session?</source>
+        <translation>セッションを記憶しますか？</translation>
+    </message>
+    <message>
+        <source>Would you like to remember your opened images and re-open them at next launch?</source>
+        <translation>開いた画像を記憶し、次回起動時に再度開きますか？</translation>
+    </message>
+    <message>
+        <source>&amp;Remember</source>
+        <translation>記憶する</translation>
+    </message>
+    <message>
+        <source>&amp;End Session</source>
+        <translation>セッションを終了</translation>
     </message>
 </context>
 <context>

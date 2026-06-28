@@ -1,4 +1,5 @@
 #include "actionmanager.h"
+#include "qvapplication.h"
 #include "qvcocoafunctions.h"
 
 #include <QUrl>
@@ -36,6 +37,18 @@ void QVCocoaFunctions::showMenu(QMenu *menu, const QPoint &point, QWindow *windo
 void QVCocoaFunctions::setUserDefaults()
 {
     [[NSUserDefaults standardUserDefaults] setBool:NO forKey:@"NSFullScreenMenuItemEverywhere"];
+}
+
+void QVCocoaFunctions::registerWillPowerOffObserver()
+{
+    [[[NSWorkspace sharedWorkspace] notificationCenter]
+        addObserverForName:NSWorkspaceWillPowerOffNotification
+        object:nil
+        queue:[NSOperationQueue mainQueue]
+        usingBlock:^(__unused NSNotification *notification) {
+            if (qvApp)
+                qvApp->onSystemInitiatedQuit();
+        }];
 }
 
 // This function should only be enabled once because it sets observers

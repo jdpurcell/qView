@@ -253,7 +253,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     QVCocoaFunctions::setFullSizeContentView(this, false);
 #endif
 
-    if (qvApp->isSessionStateSaveRequested())
+    if (qvApp->getIsSessionStateSaveRequested())
         qvApp->addClosedWindowSessionState(getSessionState(), getLastActivatedTimestamp());
 
     QSettings settings;

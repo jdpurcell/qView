@@ -80,22 +80,6 @@
         <translation>내림차순</translation>
     </message>
     <message>
-        <source>Remember Session?</source>
-        <translation>세션을 기억하시겠습니까?</translation>
-    </message>
-    <message>
-        <source>Would you like to remember your opened images and re-open them at next launch?</source>
-        <translation>열었던 이미지를 기억하고 다음 실행 시 다시 열겠습니까?</translation>
-    </message>
-    <message>
-        <source>&amp;Remember</source>
-        <translation>기억하기</translation>
-    </message>
-    <message>
-        <source>&amp;End Session</source>
-        <translation>세션 종료</translation>
-    </message>
-    <message>
         <source>&amp;Quit</source>
         <translation>종료</translation>
     </message>
@@ -554,6 +538,22 @@ No write permission or file is read-only.</source>
     <message>
         <source>All Files</source>
         <translation>모든 파일</translation>
+    </message>
+    <message>
+        <source>Remember Session?</source>
+        <translation>세션을 기억하시겠습니까?</translation>
+    </message>
+    <message>
+        <source>Would you like to remember your opened images and re-open them at next launch?</source>
+        <translation>열었던 이미지를 기억하고 다음 실행 시 다시 열겠습니까?</translation>
+    </message>
+    <message>
+        <source>&amp;Remember</source>
+        <translation>기억하기</translation>
+    </message>
+    <message>
+        <source>&amp;End Session</source>
+        <translation>세션 종료</translation>
     </message>
 </context>
 <context>

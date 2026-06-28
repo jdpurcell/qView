@@ -80,22 +80,6 @@
         <translation>降序</translation>
     </message>
     <message>
-        <source>Remember Session?</source>
-        <translation>记住会话？</translation>
-    </message>
-    <message>
-        <source>Would you like to remember your opened images and re-open them at next launch?</source>
-        <translation>您想要记住已打开的图片，并在下次启动时重新打开它们吗？</translation>
-    </message>
-    <message>
-        <source>&amp;Remember</source>
-        <translation>记住</translation>
-    </message>
-    <message>
-        <source>&amp;End Session</source>
-        <translation>结束会话</translation>
-    </message>
-    <message>
         <source>&amp;Quit</source>
         <translation>退出</translation>
     </message>
@@ -553,6 +537,22 @@ No write permission or file is read-only.</source>
     <message>
         <source>All Files</source>
         <translation>所有文件</translation>
+    </message>
+    <message>
+        <source>Remember Session?</source>
+        <translation>记住会话？</translation>
+    </message>
+    <message>
+        <source>Would you like to remember your opened images and re-open them at next launch?</source>
+        <translation>您想要记住已打开的图片，并在下次启动时重新打开它们吗？</translation>
+    </message>
+    <message>
+        <source>&amp;Remember</source>
+        <translation>记住</translation>
+    </message>
+    <message>
+        <source>&amp;End Session</source>
+        <translation>结束会话</translation>
     </message>
 </context>
 <context>

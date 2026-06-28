@@ -80,22 +80,6 @@
         <translation>Absteigend</translation>
     </message>
     <message>
-        <source>Remember Session?</source>
-        <translation>Sitzung speichern?</translation>
-    </message>
-    <message>
-        <source>Would you like to remember your opened images and re-open them at next launch?</source>
-        <translation>Möchten Sie Ihre geöffneten Bilder speichern und beim nächsten Start wieder öffnen?</translation>
-    </message>
-    <message>
-        <source>&amp;Remember</source>
-        <translation>Speichern</translation>
-    </message>
-    <message>
-        <source>&amp;End Session</source>
-        <translation>Sitzung beenden</translation>
-    </message>
-    <message>
         <source>&amp;Quit</source>
         <translation>Beenden</translation>
     </message>
@@ -554,6 +538,22 @@ Keine Schreibberechtigung oder Datei ist schreibgeschützt.</translation>
     <message>
         <source>All Files</source>
         <translation>Alle Dateien</translation>
+    </message>
+    <message>
+        <source>Remember Session?</source>
+        <translation>Sitzung speichern?</translation>
+    </message>
+    <message>
+        <source>Would you like to remember your opened images and re-open them at next launch?</source>
+        <translation>Möchten Sie Ihre geöffneten Bilder speichern und beim nächsten Start wieder öffnen?</translation>
+    </message>
+    <message>
+        <source>&amp;Remember</source>
+        <translation>Speichern</translation>
+    </message>
+    <message>
+        <source>&amp;End Session</source>
+        <translation>Sitzung beenden</translation>
     </message>
 </context>
 <context>

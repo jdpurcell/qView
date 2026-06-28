@@ -30,6 +30,13 @@ public:
         qint64 lastActivatedTimestamp;
     };
 
+    enum class SessionSaveDecision
+    {
+        Yes,
+        No,
+        Cancel
+    };
+
     explicit QVApplication(int &argc, char **argv);
     ~QVApplication() override;
 
@@ -112,18 +119,19 @@ public:
 
     static bool tryRestoreLastSession();
 
-    bool getIsApplicationQuitting() const;
+    void onSystemInitiatedQuit();
 
-    bool isSessionStateEnabled() const;
+    bool getIsApplicationQuitting() const { return isApplicationQuitting; }
 
-    void setUserDeclinedSessionStateSave(const bool value);
-
-    bool isSessionStateSaveRequested() const;
+    bool getIsSessionStateSaveRequested() const { return isSessionStateSaveRequested; }
 
     void addClosedWindowSessionState(const QJsonObject &state, const qint64 lastActivatedTimestamp);
 
 signals:
     void windowOnTopChanged();
+
+protected:
+    SessionSaveDecision getSessionSaveDecision() const;
 
 protected slots:
     void onCommitDataRequest(QSessionManager &manager);
@@ -132,6 +140,7 @@ protected slots:
 
 private:
     std::atomic<bool> isApplicationQuitting {false};
+    std::atomic<bool> isQuitSystemInitiated {false};
 
     QSet<MainWindow*> activeWindows;
 
@@ -162,7 +171,7 @@ private:
 
     UpdateChecker updateChecker;
 
-    bool userDeclinedSessionStateSave {false};
+    bool isSessionStateSaveRequested {false};
     QList<ClosedWindowData> closedWindowData;
 };
 

@@ -9,6 +9,7 @@
 #include <QTimer>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QPushButton>
 #include <QFontDatabase>
 #include <QStyleHints>
 
@@ -79,6 +80,7 @@ QVApplication::QVApplication(int &argc, char **argv) : QApplication(argc, argv)
     // Set mac-specific application settings
 #ifdef COCOA_LOADED
     QVCocoaFunctions::setUserDefaults();
+    QVCocoaFunctions::registerWillPowerOffObserver();
 #endif
 
     hideIncompatibleActions();
@@ -103,6 +105,16 @@ bool QVApplication::event(QEvent *event)
         auto *stateEvent = static_cast<QApplicationStateChangeEvent*>(event);
         if (stateEvent->applicationState() == Qt::ApplicationActive)
             settingsManager.loadSettings();
+    }
+    else if (event->type() == QEvent::Quit)
+    {
+        SessionSaveDecision result = getSessionSaveDecision();
+        if (result == SessionSaveDecision::Cancel)
+        {
+            event->ignore();
+            return true;
+        }
+        isSessionStateSaveRequested = result == SessionSaveDecision::Yes;
     }
     return QApplication::event(event);
 }
@@ -468,24 +480,33 @@ bool QVApplication::tryRestoreLastSession()
     return true;
 }
 
-bool QVApplication::getIsApplicationQuitting() const
+void QVApplication::onSystemInitiatedQuit()
 {
-    return isApplicationQuitting;
+    isQuitSystemInitiated = true;
 }
 
-bool QVApplication::isSessionStateEnabled() const
+QVApplication::SessionSaveDecision QVApplication::getSessionSaveDecision() const
 {
-    return supportsSessionPersistence() && getSettingsManager().getBoolean("persistsession");
-}
+    if (!supportsSessionPersistence())
+        return SessionSaveDecision::No;
+    if (isQuitSystemInitiated)
+        return SessionSaveDecision::Yes;
+    if (!getSettingsManager().getBoolean("persistsession") || !foundLoadedImage())
+        return SessionSaveDecision::No;
 
-void QVApplication::setUserDeclinedSessionStateSave(const bool value)
-{
-    userDeclinedSessionStateSave = value;
-}
-
-bool QVApplication::isSessionStateSaveRequested() const
-{
-    return getIsApplicationQuitting() && isSessionStateEnabled() && !userDeclinedSessionStateSave;
+    QMessageBox msgBox;
+    msgBox.setWindowModality(Qt::ApplicationModal);
+    msgBox.setWindowTitle(tr("Remember Session?"));
+    msgBox.setText(tr("Would you like to remember your opened images and re-open them at next launch?"));
+    QPushButton *yesButton = msgBox.addButton(tr("&Remember"), QMessageBox::YesRole);
+    msgBox.addButton(tr("&End Session"), QMessageBox::NoRole);
+    msgBox.setStandardButtons(QMessageBox::Cancel);
+    msgBox.setDefaultButton(yesButton);
+    msgBox.setEscapeButton(QMessageBox::Cancel);
+    msgBox.exec();
+    if (msgBox.standardButton(msgBox.clickedButton()) == QMessageBox::Cancel)
+        return SessionSaveDecision::Cancel;
+    return msgBox.clickedButton() == yesButton ? SessionSaveDecision::Yes : SessionSaveDecision::No;
 }
 
 void QVApplication::addClosedWindowSessionState(const QJsonObject &state, const qint64 lastActivatedTimestamp)
@@ -504,7 +525,7 @@ void QVApplication::onAboutToQuit()
 {
     isApplicationQuitting = true;
 
-    if (isSessionStateSaveRequested())
+    if (isSessionStateSaveRequested)
     {
         QSettings settings;
         if (!closedWindowData.isEmpty())

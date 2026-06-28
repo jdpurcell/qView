@@ -80,22 +80,6 @@
         <translation>Descendente</translation>
     </message>
     <message>
-        <source>Remember Session?</source>
-        <translation>¿Recordar sesión?</translation>
-    </message>
-    <message>
-        <source>Would you like to remember your opened images and re-open them at next launch?</source>
-        <translation>¿Quieres recordar las imágenes abiertas y volver a abrirlas en el próximo inicio?</translation>
-    </message>
-    <message>
-        <source>&amp;Remember</source>
-        <translation>Recordar</translation>
-    </message>
-    <message>
-        <source>&amp;End Session</source>
-        <translation>Finalizar sesión</translation>
-    </message>
-    <message>
         <source>&amp;Quit</source>
         <translation>Salir</translation>
     </message>
@@ -554,6 +538,22 @@ No tiene permiso de escritura o el archivo es de solo lectura.</translation>
     <message>
         <source>All Files</source>
         <translation>Todos los archivos</translation>
+    </message>
+    <message>
+        <source>Remember Session?</source>
+        <translation>¿Recordar sesión?</translation>
+    </message>
+    <message>
+        <source>Would you like to remember your opened images and re-open them at next launch?</source>
+        <translation>¿Quieres recordar las imágenes abiertas y volver a abrirlas en el próximo inicio?</translation>
+    </message>
+    <message>
+        <source>&amp;Remember</source>
+        <translation>Recordar</translation>
+    </message>
+    <message>
+        <source>&amp;End Session</source>
+        <translation>Finalizar sesión</translation>
     </message>
 </context>
 <context>

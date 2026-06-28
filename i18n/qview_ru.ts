@@ -80,22 +80,6 @@
         <translation>По убыванию</translation>
     </message>
     <message>
-        <source>Remember Session?</source>
-        <translation>Запомнить сеанс?</translation>
-    </message>
-    <message>
-        <source>Would you like to remember your opened images and re-open them at next launch?</source>
-        <translation>Запоминать открытые изображения и открывать их при следующем запуске?</translation>
-    </message>
-    <message>
-        <source>&amp;Remember</source>
-        <translation>Запомнить</translation>
-    </message>
-    <message>
-        <source>&amp;End Session</source>
-        <translation>Завершить сеанс</translation>
-    </message>
-    <message>
         <source>&amp;Quit</source>
         <translation>Выход</translation>
     </message>
@@ -555,6 +539,22 @@ No write permission or file is read-only.</source>
         <source>All Files</source>
         <translation>Все файлы</translation>
     </message>
+    <message>
+        <source>Remember Session?</source>
+        <translation>Запомнить сеанс?</translation>
+    </message>
+    <message>
+        <source>Would you like to remember your opened images and re-open them at next launch?</source>
+        <translation>Запоминать открытые изображения и открывать их при следующем запуске?</translation>
+    </message>
+    <message>
+        <source>&amp;Remember</source>
+        <translation>Запомнить</translation>
+    </message>
+    <message>
+        <source>&amp;End Session</source>
+        <translation>Завершить сеанс</translation>
+    </message>
 </context>
 <context>
     <name>QVCocoaFunctions</name>
@@ -941,7 +941,7 @@ No write permission or file is read-only.</source>
     </message>
     <message>
         <source>Save &amp;recent files</source>
-        <translation>Сохранять недавное файлы</translation>
+        <translation>Сохранять недавние файлы</translation>
     </message>
     <message>
         <source>&amp;Update notifications on startup</source>
@@ -1154,7 +1154,7 @@ No write permission or file is read-only.</source>
     </message>
     <message>
         <source>Display P3</source>
-        <translation>Монитор P3</translation>
+        <translation>Display P3</translation>
     </message>
     <message>
         <source>Adjacent</source>
