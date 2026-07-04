@@ -31,7 +31,6 @@ public:
         QFileInfo fileInfo;
         QVFileEnumerator::CompatibleFileList folderFileInfoList;
         int loadedIndexInFolder = -1;
-        bool isLoadRequested = false;
         bool isPixmapLoaded = false;
         bool isMovieLoaded = false;
         QSize baseImageSize;
@@ -97,10 +96,6 @@ protected:
     void loadPixmap(const ReadData &readData);
     void loadEmptyPixmap();
     void updateFolderInfo(QString dirPath = QString());
-    void requestCaching();
-    void requestCachingFile(const QString &filePath, const QColorSpace &targetColorSpace);
-    void addToCache(const ReadData &readImageAndFileInfo);
-    static QString getPixmapCacheKey(const QString &absoluteFilePath, const qint64 &fileSize, const QColorSpace &targetColorSpace);
     QColorSpace getTargetColorSpace() const;
     QColorSpace detectDisplayColorSpace() const;
     static void handleColorSpaceConversion(QImage &image, const QColorSpace &targetColorSpace);
@@ -113,20 +108,10 @@ private:
 
     FileDetails currentFileDetails;
 
-    QFutureWatcher<ReadData> loadFutureWatcher;
-
     Qv::PreloadMode preloadingMode {Qv::PreloadMode::Adjacent};
     Qv::ColorSpaceConversion colorSpaceConversion {Qv::ColorSpaceConversion::AutoDetect};
 
-    static QCache<QString, ReadData> pixmapCache;
-
-    QStringList lastFilesPreloaded;
-    QSet<QString> preloadsInProgress;
-    QString waitingOnPreloadPath;
-
     int largestDimension {1920};
-
-    bool waitingOnLoad {false};
 };
 
 #endif // QVIMAGECORE_H

@@ -179,12 +179,6 @@ MainWindow *QVApplication::getMainWindow(bool shouldBeEmpty)
 
     for (MainWindow *window : std::as_const(activeWindows))
     {
-        // If an empty window is requested, check this flag because it gets set right
-        // after a load is requested, so it will be set if an image is already loaded
-        // or if a load is currently in progress
-        if (shouldBeEmpty && window->getCurrentFileDetails().isLoadRequested)
-            continue;
-
         if (foundWindow && foundWindow->getLastActivatedTimestamp() >= window->getLastActivatedTimestamp())
             continue;
 
@@ -552,8 +546,6 @@ void QVApplication::onAboutToQuit()
         }
     }
 
-    // Delay destroying application until thread pool threads have finished. If preloader
-    // threads are still running, they require an application instance to construct a
-    // QPixmap (even a null one) without crashing.
+    // Delay destroying application until thread pool threads have finished
     QThreadPool::globalInstance()->waitForDone();
 }

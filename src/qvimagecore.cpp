@@ -14,8 +14,6 @@
 #include <QGuiApplication>
 #include <QScreen>
 
-QCache<QString, QVImageCore::ReadData> QVImageCore::pixmapCache;
-
 QVImageCore::QVImageCore(QObject *parent) : QObject(parent)
 {
     QImageReader::setAllocationLimit(8192); // 8 GiB
@@ -25,10 +23,6 @@ QVImageCore::QVImageCore(QObject *parent) : QObject(parent)
         handleColorSpaceConversion(movieImage, currentFileDetails.targetColorSpace);
         loadedPixmap = QPixmap::fromImage(movieImage);
         emit animatedFrameChanged(rect);
-    });
-
-    connect(&loadFutureWatcher, &QFutureWatcher<ReadData>::finished, this, [this](){
-        loadPixmap(loadFutureWatcher.result());
     });
 
     connect(&fileEnumerator, &QVFileEnumerator::sortParametersChanged, this, [this](){
@@ -51,11 +45,6 @@ QVImageCore::QVImageCore(QObject *parent) : QObject(parent)
 
 void QVImageCore::loadFile(const QString &fileName, const bool isReloading, const QString &baseDir)
 {
-    if (waitingOnLoad)
-    {
-        return;
-    }
-
     QString adjustedFileName = fileName;
 
     //sanitize file name if necessary
@@ -90,35 +79,13 @@ void QVImageCore::loadFile(const QString &fileName, const bool isReloading, cons
     // Pause playing movie because it feels better that way
     setPaused(true);
 
-    currentFileDetails.isLoadRequested = true;
-    waitingOnLoad = true;
-
     QColorSpace targetColorSpace = getTargetColorSpace();
-    QString cacheKey = getPixmapCacheKey(absolutePath, fileInfo.size(), targetColorSpace);
 
-    //check if cached already before loading the long way
-    auto *cachedData = isReloading ? nullptr : QVImageCore::pixmapCache.take(cacheKey);
-    if (cachedData != nullptr)
-    {
-        ReadData readData = *cachedData;
-        delete cachedData;
-        loadPixmap(readData);
-    }
-    else if (preloadsInProgress.contains(absolutePath))
-    {
-        waitingOnPreloadPath = absolutePath;
-    }
-    else
-    {
-        loadFutureWatcher.setFuture(QtConcurrent::run(&QVImageCore::readFile, this, absolutePath, targetColorSpace));
-    }
+    loadPixmap(readFile(absolutePath, targetColorSpace));
 }
 
 QVImageCore::ReadData QVImageCore::readFile(const QString &fileName, const QColorSpace &targetColorSpace)
 {
-    if (qvApp->getIsApplicationQuitting())
-        return {};
-
     QImageReader imageReader;
     imageReader.setAutoTransform(true);
 
@@ -153,14 +120,7 @@ QVImageCore::ReadData QVImageCore::readFile(const QString &fileName, const QColo
             }
         }
     }
-
-    if (qvApp->getIsApplicationQuitting())
-        return {};
-
     handleColorSpaceConversion(readImage, targetColorSpace);
-
-    if (qvApp->getIsApplicationQuitting())
-        return {};
 
     QPixmap readPixmap = QPixmap::fromImage(readImage);
     QFileInfo fileInfo(fileName);
@@ -212,9 +172,6 @@ void QVImageCore::loadPixmap(const ReadData &readData)
         updateFolderInfo(currentFileDetails.fileInfo.path());
     }
 
-    // Reset mechanism to avoid stalling while loading
-    waitingOnLoad = false;
-
     if (currentFileDetails.errorData.has_value())
     {
         loadEmptyPixmap();
@@ -228,8 +185,6 @@ void QVImageCore::loadPixmap(const ReadData &readData)
     currentFileDetails.baseImageSize = readData.intrinsicSize.isValid() ? readData.intrinsicSize : loadedPixmap.size();
     currentFileDetails.loadedPixmapSize = loadedPixmap.size();
     currentFileDetails.targetColorSpace = readData.targetColorSpace;
-
-    addToCache(readData);
 
     // Animation detection
     loadedMovie.stop();
@@ -256,8 +211,6 @@ void QVImageCore::loadPixmap(const ReadData &readData)
     currentFileDetails.timeSinceLoaded.start();
 
     emit fileChanged();
-
-    requestCaching();
 }
 
 void QVImageCore::closeImage(const bool stayInDir)
@@ -402,99 +355,6 @@ void QVImageCore::updateFolderInfo(QString dirPath)
     currentFileDetails.updateLoadedIndexInFolder();
 }
 
-void QVImageCore::requestCaching()
-{
-    if (preloadingMode == Qv::PreloadMode::Disabled)
-    {
-        QVImageCore::pixmapCache.clear();
-        return;
-    }
-
-    QColorSpace targetColorSpace = getTargetColorSpace();
-
-    int preloadingDistance = preloadingMode == Qv::PreloadMode::Extended ? 4 : 1;
-
-    QStringList filesToPreload;
-    for (int i = currentFileDetails.loadedIndexInFolder-preloadingDistance; i <= currentFileDetails.loadedIndexInFolder+preloadingDistance; i++)
-    {
-        int index = i;
-
-        //keep within index range
-        if (fileEnumerator.getIsLoopFoldersEnabled())
-        {
-            if (index > currentFileDetails.folderFileInfoList.length()-1)
-                index = index-(currentFileDetails.folderFileInfoList.length());
-            else if (index < 0)
-                index = index+(currentFileDetails.folderFileInfoList.length());
-        }
-
-        //if still out of range after looping, just cancel the cache for this index
-        if (index > currentFileDetails.folderFileInfoList.length()-1 || index < 0 || currentFileDetails.folderFileInfoList.isEmpty())
-            continue;
-
-        QString filePath = currentFileDetails.folderFileInfoList[index].absoluteFilePath;
-        filesToPreload.append(filePath);
-
-        // Don't try to cache the currently loaded image
-        if (index == currentFileDetails.loadedIndexInFolder)
-            continue;
-
-        requestCachingFile(filePath, targetColorSpace);
-    }
-    lastFilesPreloaded = filesToPreload;
-}
-
-void QVImageCore::requestCachingFile(const QString &filePath, const QColorSpace &targetColorSpace)
-{
-    QFileInfo imgFile(filePath);
-    QString cacheKey = getPixmapCacheKey(filePath, imgFile.size(), targetColorSpace);
-
-    //check if image is already loaded or requested
-    if (QVImageCore::pixmapCache.contains(cacheKey) || lastFilesPreloaded.contains(filePath))
-        return;
-
-    //TODO: this is basically pointless since the cache goes by uncompressed size
-    if (imgFile.size()/1024 > QVImageCore::pixmapCache.maxCost()/2)
-        return;
-
-    preloadsInProgress.insert(filePath);
-
-    auto *cacheFutureWatcher = new QFutureWatcher<ReadData>();
-    connect(cacheFutureWatcher, &QFutureWatcher<ReadData>::finished, this, [cacheFutureWatcher, this](){
-        const ReadData readData = cacheFutureWatcher->result();
-        if (waitingOnPreloadPath == readData.absoluteFilePath)
-        {
-            loadPixmap(readData);
-            waitingOnPreloadPath = QString();
-        }
-        else
-        {
-            addToCache(readData);
-        }
-        preloadsInProgress.remove(readData.absoluteFilePath);
-        cacheFutureWatcher->deleteLater();
-    });
-
-    cacheFutureWatcher->setFuture(QtConcurrent::run(&QVImageCore::readFile, this, filePath, targetColorSpace));
-}
-
-void QVImageCore::addToCache(const ReadData &readData)
-{
-    if (readData.pixmap.isNull())
-        return;
-
-    QString cacheKey = getPixmapCacheKey(readData.absoluteFilePath, readData.fileSize, readData.targetColorSpace);
-    qint64 memoryBytes = static_cast<qint64>(readData.pixmap.width()) * readData.pixmap.height() * readData.pixmap.depth() / 8;
-
-    QVImageCore::pixmapCache.insert(cacheKey, new ReadData(readData), qMax(memoryBytes / 1024, 1LL));
-}
-
-QString QVImageCore::getPixmapCacheKey(const QString &absoluteFilePath, const qint64 &fileSize, const QColorSpace &targetColorSpace)
-{
-    QString targetColorSpaceHash = QCryptographicHash::hash(targetColorSpace.iccProfile(), QCryptographicHash::Md5).toHex();
-    return absoluteFilePath + "\n" + QString::number(fileSize) + "\n" + targetColorSpaceHash;
-}
-
 QColorSpace QVImageCore::getTargetColorSpace() const
 {
     return
@@ -596,22 +456,6 @@ void QVImageCore::settingsUpdated()
 
     //preloading mode
     preloadingMode = settingsManager.getEnum<Qv::PreloadMode>("preloadingmode");
-    //cost is in KiB
-    switch (preloadingMode) {
-    case Qv::PreloadMode::Adjacent:
-    {
-        QVImageCore::pixmapCache.setMaxCost(307200);
-        break;
-    }
-    case Qv::PreloadMode::Extended:
-    {
-        QVImageCore::pixmapCache.setMaxCost(921600);
-        break;
-    }
-    default:
-        QVImageCore::pixmapCache.setMaxCost(0);
-        break;
-    }
 
     //update folder info to reflect new settings (e.g. sort order)
     fileEnumerator.loadSettings(false);
