@@ -21,7 +21,7 @@ QVImageCore::QVImageCore(QObject *parent) : QObject(parent)
     connect(&loadedMovie, &QVMovie::updated, this, [this](QRect rect){
         QImage movieImage = loadedMovie.currentImage();
         handleColorSpaceConversion(movieImage, currentFileDetails.targetColorSpace);
-        loadedPixmap = QPixmap::fromImage(movieImage);
+        loadedPixmap = QPixmap::fromImage(std::move(movieImage));
         emit animatedFrameChanged(rect);
     });
 
@@ -79,12 +79,10 @@ void QVImageCore::loadFile(const QString &fileName, const bool isReloading, cons
     // Pause playing movie because it feels better that way
     setPaused(true);
 
-    QColorSpace targetColorSpace = getTargetColorSpace();
-
-    loadPixmap(readFile(absolutePath, targetColorSpace));
+    loadPixmap(readFile(absolutePath));
 }
 
-QVImageCore::ReadData QVImageCore::readFile(const QString &fileName, const QColorSpace &targetColorSpace)
+QVImageCore::ReadData QVImageCore::readFile(const QString &fileName)
 {
     QImageReader imageReader;
     imageReader.setAutoTransform(true);
@@ -120,22 +118,19 @@ QVImageCore::ReadData QVImageCore::readFile(const QString &fileName, const QColo
             }
         }
     }
-    handleColorSpaceConversion(readImage, targetColorSpace);
 
-    QPixmap readPixmap = QPixmap::fromImage(readImage);
     QFileInfo fileInfo(fileName);
 
     ReadData readData = {
-        readPixmap,
+        readImage,
         fileInfo.absoluteFilePath(),
         fileInfo.size(),
         isMultiFrameImage,
         intrinsicSize,
-        targetColorSpace,
         {}
     };
 
-    if (readPixmap.isNull())
+    if (readImage.isNull())
     {
         readData.errorData = {
             imageReader.error(),
@@ -178,13 +173,16 @@ void QVImageCore::loadPixmap(const ReadData &readData)
         return;
     }
 
-    loadedPixmap = readData.pixmap;
+    QImage readImage = readData.image;
+    const QColorSpace targetColorSpace = getTargetColorSpace();
+    handleColorSpaceConversion(readImage, targetColorSpace);
+    loadedPixmap = QPixmap::fromImage(std::move(readImage));
 
     // Set file details
     currentFileDetails.isPixmapLoaded = true;
     currentFileDetails.baseImageSize = readData.intrinsicSize.isValid() ? readData.intrinsicSize : loadedPixmap.size();
     currentFileDetails.loadedPixmapSize = loadedPixmap.size();
-    currentFileDetails.targetColorSpace = readData.targetColorSpace;
+    currentFileDetails.targetColorSpace = targetColorSpace;
 
     // Animation detection
     loadedMovie.stop();

@@ -44,12 +44,11 @@ public:
 
     struct ReadData
     {
-        QPixmap pixmap;
+        QImage image;
         QString absoluteFilePath;
         qint64 fileSize = 0;
         bool isMultiFrameImage = false;
         QSize intrinsicSize;
-        QColorSpace targetColorSpace;
         std::optional<ErrorData> errorData;
     };
 
@@ -92,7 +91,7 @@ signals:
     void sortParametersChanged();
 
 protected:
-    ReadData readFile(const QString &fileName, const QColorSpace &targetColorSpace);
+    ReadData readFile(const QString &fileName);
     void loadPixmap(const ReadData &readData);
     void loadEmptyPixmap();
     void updateFolderInfo(QString dirPath = QString());
