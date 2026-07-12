@@ -10,7 +10,7 @@ CONFIG -= app_bundle
 
 TEMPLATE = app
 
-SOURCES +=  tst_actionmanagertests.cpp
+SOURCES += tst_qviewtests.cpp
 
 INCLUDEPATH += ../src
 include( ../src/src.pri )

@@ -91,6 +91,7 @@ public:
 
     const QVImageCore::FileDetails& getCurrentFileDetails() const { return imageCore.getCurrentFileDetails(); }
     const QVMovie& getLoadedMovie() const { return imageCore.getLoadedMovie(); }
+    bool hasFileOrPendingLoad() const { return imageCore.hasFileOrPendingLoad(); }
     qreal getZoomLevel() const { return zoomLevel; }
 
     int getFitOverscan() const { return fitOverscan; }

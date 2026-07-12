@@ -7,6 +7,7 @@
 #include "openwith.h"
 
 #include <QMainWindow>
+#include <QFutureWatcher>
 #include <QShortcut>
 #include <QNetworkAccessManager>
 #include <QStack>
@@ -152,6 +153,8 @@ public:
     ViewportPosition getViewportPosition() const;
 
     const QVImageCore::FileDetails& getCurrentFileDetails() const { return graphicsView->getCurrentFileDetails(); }
+
+    bool hasFileOrPendingLoad() const { return graphicsView->hasFileOrPendingLoad(); }
 
     bool getIsPixmapLoaded() const { return getCurrentFileDetails().isPixmapLoaded; }
 

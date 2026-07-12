@@ -179,6 +179,10 @@ MainWindow *QVApplication::getMainWindow(bool shouldBeEmpty)
 
     for (MainWindow *window : std::as_const(activeWindows))
     {
+        // Don't reuse a window that is displaying a file or waiting for one to load.
+        if (shouldBeEmpty && window->hasFileOrPendingLoad())
+            continue;
+
         if (foundWindow && foundWindow->getLastActivatedTimestamp() >= window->getLastActivatedTimestamp())
             continue;
 

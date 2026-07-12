@@ -3,15 +3,13 @@
 
 #include "qvnamespace.h"
 #include "qvfileenumerator.h"
+#include "qvimageloader.h"
 #include "qvmovie.h"
 #include <optional>
 #include <QObject>
-#include <QImageReader>
 #include <QPixmap>
 #include <QFileInfo>
-#include <QFutureWatcher>
 #include <QTimer>
-#include <QCache>
 #include <QElapsedTimer>
 #include <QColorSpace>
 
@@ -20,11 +18,8 @@ class QVImageCore : public QObject
     Q_OBJECT
 
 public:
-    struct ErrorData
-    {
-        int errorNum;
-        QString errorString;
-    };
+    using ErrorData = QVImageLoader::ErrorData;
+    using ReadData = QVImageLoader::Result;
 
     struct FileDetails
     {
@@ -42,16 +37,6 @@ public:
         void updateLoadedIndexInFolder();
     };
 
-    struct ReadData
-    {
-        QImage image;
-        QString absoluteFilePath;
-        qint64 fileSize = 0;
-        bool isMultiFrameImage = false;
-        QSize intrinsicSize;
-        std::optional<ErrorData> errorData;
-    };
-
     struct GoToFileResult
     {
         bool reachedEnd = false;
@@ -59,7 +44,7 @@ public:
 
     explicit QVImageCore(QObject *parent = nullptr);
 
-    void loadFile(const QString &fileName, const bool isReloading = false, const QString &baseDir = "");
+    void loadFile(const QString &fileName, bool isReloading = false, const QString &baseDir = "", bool debouncePreloading = false);
     void closeImage(const bool stayInDir = false);
     GoToFileResult goToFile(const Qv::GoToFileMode mode, const int index = 0);
 
@@ -80,6 +65,7 @@ public:
     const QPixmap& getLoadedPixmap() const { return loadedPixmap; }
     const QVMovie& getLoadedMovie() const { return loadedMovie; }
     const FileDetails& getCurrentFileDetails() const { return currentFileDetails; }
+    bool hasFileOrPendingLoad() const { return fileOrLoadPending; }
 
 signals:
     void animatedFrameChanged(QRect rect);
@@ -91,16 +77,19 @@ signals:
     void sortParametersChanged();
 
 protected:
-    ReadData readFile(const QString &fileName);
     void loadPixmap(const ReadData &readData);
     void loadEmptyPixmap();
     void updateFolderInfo(QString dirPath = QString());
+    QList<QVImageLoader::DesiredImage> getDesiredImages(bool includePreloads = true) const;
+    void refreshDesiredImages(bool includePreloads = true);
     QColorSpace getTargetColorSpace() const;
     QColorSpace detectDisplayColorSpace() const;
     static void handleColorSpaceConversion(QImage &image, const QColorSpace &targetColorSpace);
 
 private:
     QVFileEnumerator fileEnumerator {this};
+    QVImageLoader imageLoader {this};
+    QTimer preloadDebounceTimer {this};
 
     QPixmap loadedPixmap;
     QVMovie loadedMovie;
@@ -111,6 +100,11 @@ private:
     Qv::ColorSpaceConversion colorSpaceConversion {Qv::ColorSpaceConversion::AutoDetect};
 
     int largestDimension {1920};
+
+    quint64 pendingLoadRequestId = 0;
+    bool loadInProgress {false};
+    bool pendingLoadDebouncesPreloading {false};
+    bool fileOrLoadPending {false};
 };
 
 #endif // QVIMAGECORE_H
