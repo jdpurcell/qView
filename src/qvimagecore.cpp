@@ -70,6 +70,7 @@ QVImageCore::QVImageCore(QObject *parent) : QObject(parent)
 
     // Connect to settings signal
     connect(&qvApp->getSettingsManager(), &SettingsManager::settingsUpdated, this, &QVImageCore::settingsUpdated);
+    connect(qvApp, &QVApplication::folderListingsInvalidated, this, &QVImageCore::markFolderInfoDirty);
     settingsUpdated();
 }
 
@@ -181,8 +182,6 @@ void QVImageCore::loadPixmap(const ReadData &readData)
         if (auto device = loadedMovie.device())
             device->close();
 
-    currentFileDetails.timeSinceLoaded.start();
-
     emit fileChanged();
 }
 
@@ -223,9 +222,7 @@ QVImageCore::GoToFileResult QVImageCore::goToFile(const Qv::GoToFileMode mode, c
 
     bool shouldRetryFolderInfoUpdate = false;
 
-    // Update folder info only after a little idle time as an optimization for when
-    // the user is rapidly navigating through files.
-    if (!currentFileDetails.timeSinceLoaded.isValid() || currentFileDetails.timeSinceLoaded.hasExpired(3000))
+    if (folderInfoDirty)
     {
         // Make sure the file still exists because if it disappears from the file listing we'll lose
         // track of our index within the folder. Use the static 'exists' method to avoid caching.
@@ -333,6 +330,7 @@ void QVImageCore::updateFolderInfo(QString dirPath)
 
     // Get file listing
     currentFileDetails.folderFileInfoList = fileEnumerator.getCompatibleFiles(dirPath);
+    folderInfoDirty = false;
 
     // Set current file index variable
     currentFileDetails.updateLoadedIndexInFolder();

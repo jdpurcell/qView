@@ -549,10 +549,10 @@ void QVGraphicsView::loadFile(const QString &fileName, const QString &baseDir)
 
 void QVGraphicsView::reloadFile()
 {
-    if (!getCurrentFileDetails().isPixmapLoaded)
-        return;
+    imageCore.markFolderInfoDirty();
 
-    imageCore.loadFile(getCurrentFileDetails().fileInfo.absoluteFilePath(), true);
+    if (getCurrentFileDetails().isPixmapLoaded)
+        imageCore.loadFile(getCurrentFileDetails().fileInfo.absoluteFilePath(), true);
 }
 
 void QVGraphicsView::beforeLoad()

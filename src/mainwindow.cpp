@@ -1118,6 +1118,7 @@ void MainWindow::deleteFile(bool permanent)
     }
 
     qvApp->getActionManager().auditRecentsList(true);
+    qvApp->invalidateFolderListings();
 
     auto afterDelete = qvApp->getSettingsManager().getEnum<Qv::AfterDelete>("afterdelete");
     if (afterDelete == Qv::AfterDelete::MoveForward)
@@ -1137,6 +1138,9 @@ void MainWindow::undoDelete()
         return;
 
     const DeletedPaths lastDeletedFile = lastDeletedFiles.pop();
+    // Update the Restore from Trash action now that its history has changed
+    disableActions();
+
     if (lastDeletedFile.pathInTrash.isEmpty() || lastDeletedFile.previousPath.isEmpty())
         return;
 
@@ -1152,10 +1156,11 @@ void MainWindow::undoDelete()
     if (!success)
     {
         QMessageBox::critical(this, tr("Error"), tr("Failed undoing deletion of %1.").arg(fileInfo.fileName()));
+        return;
     }
 
+    qvApp->invalidateFolderListings();
     openFile(lastDeletedFile.previousPath);
-    disableActions();
 }
 
 void MainWindow::copy()
@@ -1196,7 +1201,10 @@ void MainWindow::rename()
         return;
 
     auto *renameDialog = new QVRenameDialog(this, getCurrentFileDetails().fileInfo);
-    connect(renameDialog, &QVRenameDialog::newFileToOpen, this, [this](const QString &filePath) { openFile(filePath); });
+    connect(renameDialog, &QVRenameDialog::newFileToOpen, this, [this](const QString &filePath) {
+        qvApp->invalidateFolderListings();
+        openFile(filePath);
+    });
     connect(renameDialog, &QVRenameDialog::readyToRenameFile, this, [this]() {
         if (auto device = graphicsView->getLoadedMovie().device()) {
             device->close();
@@ -1332,8 +1340,10 @@ void MainWindow::saveFrameAs()
     saveDialog->setDefaultSuffix("png");
     saveDialog->setAcceptMode(QFileDialog::AcceptSave);
     saveDialog->open();
-    connect(saveDialog, &QFileDialog::fileSelected, this, [=](const QString &fileName){
-        graphicsView->getLoadedMovie().currentImage().save(fileName, nullptr, 100);
+    connect(saveDialog, &QFileDialog::fileSelected, this, [this](const QString &fileName){
+        if (!graphicsView->getLoadedMovie().currentImage().save(fileName, nullptr, 100))
+            return;
+        qvApp->invalidateFolderListings();
     });
 }
 

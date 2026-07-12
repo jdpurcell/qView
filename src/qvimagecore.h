@@ -10,7 +10,6 @@
 #include <QPixmap>
 #include <QFileInfo>
 #include <QTimer>
-#include <QElapsedTimer>
 #include <QColorSpace>
 
 class QVImageCore : public QObject
@@ -31,7 +30,6 @@ public:
         QSize baseImageSize;
         QSize loadedPixmapSize;
         QColorSpace targetColorSpace;
-        QElapsedTimer timeSinceLoaded;
         std::optional<ErrorData> errorData;
 
         void updateLoadedIndexInFolder();
@@ -47,6 +45,7 @@ public:
     void loadFile(const QString &fileName, bool isReloading = false, const QString &baseDir = "", bool debouncePreloading = false);
     void closeImage(const bool stayInDir = false);
     GoToFileResult goToFile(const Qv::GoToFileMode mode, const int index = 0);
+    void markFolderInfoDirty() { folderInfoDirty = true; }
 
     Qv::SortMode getSortMode() const { return fileEnumerator.getSortMode(); }
     void setSortMode(const Qv::SortMode mode) { fileEnumerator.setSortMode(mode); }
@@ -105,6 +104,7 @@ private:
     bool loadInProgress {false};
     bool pendingLoadDebouncesPreloading {false};
     bool fileOrLoadPending {false};
+    bool folderInfoDirty {false};
 };
 
 #endif // QVIMAGECORE_H

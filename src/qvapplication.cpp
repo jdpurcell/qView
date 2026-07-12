@@ -105,6 +105,8 @@ bool QVApplication::event(QEvent *event)
         auto *stateEvent = static_cast<QApplicationStateChangeEvent*>(event);
         if (stateEvent->applicationState() == Qt::ApplicationActive)
             settingsManager.loadSettings();
+        else if (stateEvent->applicationState() == Qt::ApplicationInactive)
+            invalidateFolderListings();
     }
     else if (event->type() == QEvent::Quit)
     {

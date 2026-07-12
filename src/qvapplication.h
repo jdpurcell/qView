@@ -58,6 +58,8 @@ public:
 
     void recentsMenuUpdated();
 
+    void invalidateFolderListings() { emit folderListingsInvalidated(); }
+
     void addToActiveWindows(MainWindow *window);
 
     void deleteFromActiveWindows(MainWindow *window);
@@ -129,6 +131,7 @@ public:
 
 signals:
     void windowOnTopChanged();
+    void folderListingsInvalidated();
 
 protected:
     SessionSaveDecision getSessionSaveDecision() const;
