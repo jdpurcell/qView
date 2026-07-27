@@ -27,7 +27,7 @@ public:
 
     static int getObscuredHeight(QWindow *window);
 
-    static void closeWindow(QWindow *window);
+    static bool startWindowDrag(QWindow *window);
 
     static void setWindowMenu(QMenu *menu);
 

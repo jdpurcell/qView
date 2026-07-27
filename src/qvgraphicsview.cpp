@@ -119,25 +119,27 @@ void QVGraphicsView::dragLeaveEvent(QDragLeaveEvent *event)
 
 void QVGraphicsView::mousePressEvent(QMouseEvent *event)
 {
-    const auto initializeDrag = [this, event](const bool delayStart = false) {
+    const auto initializeDrag = [this, event](const Qv::ViewportDragAction action, const bool delayStart = false) {
         pressedMouseButton = event->button();
         mousePressModifiers = event->modifiers();
         isDelayingDrag = delayStart;
-        if (!isDelayingDrag)
-            viewport()->setCursor(Qt::ClosedHandCursor);
+        isSystemWindowDragActive = false;
         isLastMousePosDubious = event->type() == QEvent::MouseButtonDblClick && QVApplication::isMouseEventSynthesized(event);
         lastMousePos = event->pos();
         setCursorVisible(true);
+        if (!isDelayingDrag)
+            startDragAction(action);
     };
 
     if (event->button() == Qt::LeftButton)
     {
         const bool isAltAction = event->modifiers().testFlag(Qt::ControlModifier);
-        if ((isAltAction ? altDragAction : dragAction) != Qv::ViewportDragAction::None)
+        const Qv::ViewportDragAction action = isAltAction ? altDragAction : dragAction;
+        if (action != Qv::ViewportDragAction::None)
         {
             const bool justGotFocus = lastFocusIn.isValid() && lastFocusIn.elapsed() < 100;
             const bool delayDragStart = !isAltAction && enableNavigationRegions && !justGotFocus && getNavigationRegion(event->pos()).has_value();
-            initializeDrag(delayDragStart);
+            initializeDrag(action, delayDragStart);
         }
         return;
     }
@@ -146,12 +148,16 @@ void QVGraphicsView::mousePressEvent(QMouseEvent *event)
         const bool isAltAction = event->modifiers().testFlag(Qt::ControlModifier);
         if (middleButtonMode == Qv::ClickOrDrag::Click)
         {
-            executeClickAction(isAltAction ? altMiddleClickAction : middleClickAction, event->position().toPoint());
+            const Qv::ViewportClickAction action = isAltAction ? altMiddleClickAction : middleClickAction;
+            executeClickAction(action, event->position().toPoint());
         }
-        else if (middleButtonMode == Qv::ClickOrDrag::Drag &&
-            (isAltAction ? altMiddleDragAction : middleDragAction) != Qv::ViewportDragAction::None)
+        else if (middleButtonMode == Qv::ClickOrDrag::Drag)
         {
-            initializeDrag();
+            const Qv::ViewportDragAction action = isAltAction ? altMiddleDragAction : middleDragAction;
+            if (action != Qv::ViewportDragAction::None)
+            {
+                initializeDrag(action);
+            }
         }
         return;
     }
@@ -182,6 +188,7 @@ void QVGraphicsView::mouseReleaseEvent(QMouseEvent *event)
         pressedMouseButton = Qt::NoButton;
         mousePressModifiers = Qt::NoModifier;
         isDelayingDrag = false;
+        isSystemWindowDragActive = false;
         viewport()->setCursor(Qt::ArrowCursor);
         setCursorVisible(true);
         scrollHelper->constrain();
@@ -198,6 +205,11 @@ void QVGraphicsView::mouseMoveEvent(QMouseEvent *event)
     if (pressedMouseButton != Qt::NoButton)
     {
         const QPoint delta = event->pos() - lastMousePos;
+        const bool isAltAction = mousePressModifiers.testFlag(Qt::ControlModifier);
+        const Qv::ViewportDragAction action =
+            pressedMouseButton == Qt::LeftButton ? (isAltAction ? altDragAction : dragAction) :
+            pressedMouseButton == Qt::MiddleButton ? (isAltAction ? altMiddleDragAction : middleDragAction) :
+            Qv::ViewportDragAction::None;
         if (isDelayingDrag)
         {
             if (isLastMousePosDubious)
@@ -211,15 +223,10 @@ void QVGraphicsView::mouseMoveEvent(QMouseEvent *event)
             if (qMax(qAbs(delta.x()), qAbs(delta.y())) < startDragDistance)
                 return;
             isDelayingDrag = false;
-            viewport()->setCursor(Qt::ClosedHandCursor);
+            startDragAction(action);
         }
-        const bool isAltAction = mousePressModifiers.testFlag(Qt::ControlModifier);
-        const Qv::ViewportDragAction targetAction =
-            pressedMouseButton == Qt::LeftButton ? (isAltAction ? altDragAction : dragAction) :
-            pressedMouseButton == Qt::MiddleButton ? (isAltAction ? altMiddleDragAction : middleDragAction) :
-            Qv::ViewportDragAction::None;
         bool isMovingWindow = false;
-        executeDragAction(targetAction, delta, isMovingWindow);
+        executeDragAction(action, delta, isMovingWindow);
         if (!isMovingWindow)
             lastMousePos = event->pos();
         return;
@@ -426,6 +433,27 @@ void QVGraphicsView::executeClickAction(const Qv::ViewportClickAction action, co
     }
 }
 
+void QVGraphicsView::startDragAction(const Qv::ViewportDragAction action)
+{
+    if (action == Qv::ViewportDragAction::Pan)
+    {
+        viewport()->setCursor(Qt::ClosedHandCursor);
+    }
+    else if (action == Qv::ViewportDragAction::MoveWindow)
+    {
+        // Let the window manager handle the move if possible to get window snapping support etc.
+        if (pressedMouseButton == Qt::LeftButton && !window()->windowState().testFlag(Qt::WindowFullScreen))
+        {
+#ifdef COCOA_LOADED
+            // Avoid QWindow::startSystemMove due to QTBUG-141220
+            isSystemWindowDragActive = QVCocoaFunctions::startWindowDrag(window()->windowHandle());
+#else
+            isSystemWindowDragActive = window()->windowHandle()->startSystemMove();
+#endif
+        }
+    }
+}
+
 void QVGraphicsView::executeDragAction(const Qv::ViewportDragAction action, const QPoint delta, bool &isMovingWindow)
 {
     if (action == Qv::ViewportDragAction::Pan)
@@ -437,9 +465,9 @@ void QVGraphicsView::executeDragAction(const Qv::ViewportDragAction action, cons
         const auto windowState = window()->windowState();
 #ifndef Q_OS_MACOS
         if (windowState.testFlag(Qt::WindowMaximized))
-            return;
+            window()->showNormal();
 #endif
-        if (windowState.testFlag(Qt::WindowFullScreen))
+        if (isSystemWindowDragActive || windowState.testFlag(Qt::WindowFullScreen))
             return;
         window()->move(window()->pos() + delta);
         isMovingWindow = true;

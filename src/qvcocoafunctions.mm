@@ -30,7 +30,7 @@ void QVCocoaFunctions::showMenu(QMenu *menu, const QPoint &point, QWindow *windo
     // Synthesize event to open menu
     NSPoint pointInWindow = [view convertPoint:NSMakePoint(point.x(), point.y()) toView:nil];
     NSEvent *event = [NSEvent mouseEventWithType:NSEventTypeRightMouseDown location:pointInWindow modifierFlags:0
-            timestamp:0 windowNumber:view.window.windowNumber context:nil eventNumber:0 clickCount:1 pressure:1.0];
+        timestamp:0 windowNumber:view.window.windowNumber context:nil eventNumber:0 clickCount:1 pressure:1.0];
     [NSMenu popUpContextMenu:nativeMenu withEvent:event forView:view];
 }
 
@@ -139,10 +139,16 @@ int QVCocoaFunctions::getObscuredHeight(QWindow *window)
     return totalHeight - visibleHeight;
 }
 
-void QVCocoaFunctions::closeWindow(QWindow *window)
+bool QVCocoaFunctions::startWindowDrag(QWindow *window)
 {
-    auto *view = reinterpret_cast<NSView*>(window->winId());
-    [view.window close];
+    if ((NSEvent.pressedMouseButtons & 1) == 0)
+        return false;
+    NSView *view = reinterpret_cast<NSView*>(window->winId());
+    NSPoint startPoint = view.window.mouseLocationOutsideOfEventStream;
+    NSEvent *event = [NSEvent mouseEventWithType:NSEventTypeLeftMouseDown location:startPoint modifierFlags:0
+        timestamp:0 windowNumber:view.window.windowNumber context:nil eventNumber:0 clickCount:1 pressure:1];
+    [view.window performWindowDragWithEvent:event];
+    return true;
 }
 
 void QVCocoaFunctions::setWindowMenu(QMenu *menu)

@@ -142,6 +142,8 @@ protected:
 
     void executeClickAction(const Qv::ViewportClickAction action, const QPoint mousePos);
 
+    void startDragAction(const Qv::ViewportDragAction action);
+
     void executeDragAction(const Qv::ViewportDragAction action, const QPoint delta, bool &isMovingWindow);
 
     void executeScrollAction(const Qv::ViewportScrollAction action, const QPoint delta, const QPoint mousePos, const bool hasShiftModifier);
@@ -242,6 +244,7 @@ private:
     Qt::KeyboardModifiers mousePressModifiers {Qt::KeyboardModifier::NoModifier};
     bool isDelayingDrag {false};
     bool isLastMousePosDubious {false};
+    bool isSystemWindowDragActive {false};
     QPoint lastMousePos;
     QElapsedTimer lastFocusIn;
 
