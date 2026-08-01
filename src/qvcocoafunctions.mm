@@ -27,11 +27,17 @@ void QVCocoaFunctions::showMenu(QMenu *menu, const QPoint &point, QWindow *windo
 
     hideMenuShortcuts(nativeMenu);
 
-    // Synthesize event to open menu
-    NSPoint pointInWindow = [view convertPoint:NSMakePoint(point.x(), point.y()) toView:nil];
-    NSEvent *event = [NSEvent mouseEventWithType:NSEventTypeRightMouseDown location:pointInWindow modifierFlags:0
+    // Synthesize right mouse down event to open menu
+    NSPoint downPoint = [view convertPoint:NSMakePoint(point.x(), point.y()) toView:nil];
+    NSEvent *downEvent = [NSEvent mouseEventWithType:NSEventTypeRightMouseDown location:downPoint modifierFlags:0
         timestamp:0 windowNumber:view.window.windowNumber context:nil eventNumber:0 clickCount:1 pressure:1.0];
-    [NSMenu popUpContextMenu:nativeMenu withEvent:event forView:view];
+    [NSMenu popUpContextMenu:nativeMenu withEvent:downEvent forView:view];
+
+    // Synthesize right mouse up event to avoid stuck button press
+    NSPoint upPoint = view.window.mouseLocationOutsideOfEventStream;
+    NSEvent *upEvent = [NSEvent mouseEventWithType:NSEventTypeRightMouseUp location:upPoint modifierFlags:0
+        timestamp:0 windowNumber:view.window.windowNumber context:nil eventNumber:0 clickCount:1 pressure:0];
+    [view rightMouseUp:upEvent];
 }
 
 void QVCocoaFunctions::setUserDefaults()

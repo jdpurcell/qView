@@ -131,6 +131,16 @@ void QVGraphicsView::mousePressEvent(QMouseEvent *event)
             startDragAction(action);
     };
 
+    // If a drag is in progress, ignore other button presses if the original button is still
+    // pressed, otherwise we missed the button release and can end the original drag
+    if (pressedMouseButton != Qt::NoButton)
+    {
+        if (event->button() != pressedMouseButton && event->buttons().testFlag(pressedMouseButton))
+            return;
+
+        resetDragState();
+    }
+
     if (event->button() == Qt::LeftButton)
     {
         const bool isAltAction = event->modifiers().testFlag(Qt::ControlModifier);
@@ -179,19 +189,18 @@ void QVGraphicsView::mouseReleaseEvent(QMouseEvent *event)
 {
     if (pressedMouseButton != Qt::NoButton)
     {
+        // If some other button initiated the drag, ignore this button release
+        if (event->button() != pressedMouseButton)
+            return;
+
         if (isDelayingDrag && pressedMouseButton == Qt::LeftButton)
         {
             const std::optional<Qv::GoToFileMode> navRegion = getNavigationRegion(lastMousePos);
             if (navRegion.has_value())
                 goToFile(navRegion.value());
         }
-        pressedMouseButton = Qt::NoButton;
-        mousePressModifiers = Qt::NoModifier;
-        isDelayingDrag = false;
-        isSystemWindowDragActive = false;
-        viewport()->setCursor(Qt::ArrowCursor);
-        setCursorVisible(true);
-        scrollHelper->constrain();
+
+        resetDragState();
         return;
     }
 
@@ -204,6 +213,13 @@ void QVGraphicsView::mouseMoveEvent(QMouseEvent *event)
 
     if (pressedMouseButton != Qt::NoButton)
     {
+        // If a drag is in progress and we missed the button release, cancel the drag
+        if (!event->buttons().testFlag(pressedMouseButton))
+        {
+            resetDragState();
+            return;
+        }
+
         const QPoint delta = event->pos() - lastMousePos;
         const bool isAltAction = mousePressModifiers.testFlag(Qt::ControlModifier);
         const Qv::ViewportDragAction action =
@@ -401,6 +417,16 @@ void QVGraphicsView::keyPressEvent(QKeyEvent *event)
     QGraphicsView::keyPressEvent(event);
 }
 
+void QVGraphicsView::contextMenuEvent(QContextMenuEvent *event)
+{
+    // contextMenuEvent fires regardless of whether the original mouse event was already
+    // handled, hence this special case to suppress it if a drag is in progress
+    if (pressedMouseButton != Qt::NoButton && event->reason() == QContextMenuEvent::Mouse)
+        return;
+
+    QGraphicsView::contextMenuEvent(event);
+}
+
 // Functions
 
 void QVGraphicsView::executeClickAction(const Qv::ViewportClickAction action, const QPoint mousePos)
@@ -452,6 +478,17 @@ void QVGraphicsView::startDragAction(const Qv::ViewportDragAction action)
 #endif
         }
     }
+}
+
+void QVGraphicsView::resetDragState()
+{
+    pressedMouseButton = Qt::NoButton;
+    mousePressModifiers = Qt::NoModifier;
+    isDelayingDrag = false;
+    isSystemWindowDragActive = false;
+    viewport()->setCursor(Qt::ArrowCursor);
+    setCursorVisible(true);
+    scrollHelper->constrain();
 }
 
 void QVGraphicsView::executeDragAction(const Qv::ViewportDragAction action, const QPoint delta, bool &isMovingWindow)

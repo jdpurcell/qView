@@ -110,8 +110,6 @@ signals:
     void sortParametersChanged();
 
 protected:
-    void wheelEvent(QWheelEvent *event) override;
-
     void resizeEvent(QResizeEvent *event) override;
 
     void paintEvent(QPaintEvent *event) override;
@@ -132,17 +130,23 @@ protected:
 
     void mouseDoubleClickEvent(QMouseEvent *event) override;
 
-    void keyPressEvent(QKeyEvent *event) override;
-
     bool event(QEvent *event) override;
 
     void focusInEvent(QFocusEvent *event) override;
 
     void focusOutEvent(QFocusEvent *event) override;
 
+    void wheelEvent(QWheelEvent *event) override;
+
+    void keyPressEvent(QKeyEvent *event) override;
+
+    void contextMenuEvent(QContextMenuEvent *event) override;
+
     void executeClickAction(const Qv::ViewportClickAction action, const QPoint mousePos);
 
     void startDragAction(const Qv::ViewportDragAction action);
+
+    void resetDragState();
 
     void executeDragAction(const Qv::ViewportDragAction action, const QPoint delta, bool &isMovingWindow);
 
