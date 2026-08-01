@@ -457,8 +457,16 @@ No write permission or file is read-only.</source>
 <context>
     <name>OpenWith</name>
     <message>
+        <source> (default)</source>
+        <translation>（デフォルト）</translation>
+    </message>
+    <message>
         <source>All Applications (*.app)</source>
         <translation>すべてのアプリケーション (*.app)</translation>
+    </message>
+    <message>
+        <source>Open With...</source>
+        <translation>別のアプリで開く...</translation>
     </message>
     <message>
         <source>Programs (*.exe *.pif *.com *.bat *.cmd)</source>
@@ -554,13 +562,6 @@ No write permission or file is read-only.</source>
     <message>
         <source>&amp;End Session</source>
         <translation>セッションを終了</translation>
-    </message>
-</context>
-<context>
-    <name>QVCocoaFunctions</name>
-    <message>
-        <source> (default)</source>
-        <translation> (デフォルト)</translation>
     </message>
 </context>
 <context>

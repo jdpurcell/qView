@@ -453,7 +453,15 @@ No write permission or file is read-only.</source>
 <context>
     <name>OpenWith</name>
     <message>
+        <source> (default)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>All Applications (*.app)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Open With...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -548,13 +556,6 @@ No write permission or file is read-only.</source>
     </message>
     <message>
         <source>&amp;End Session</source>
-        <translation type="unfinished"></translation>
-    </message>
-</context>
-<context>
-    <name>QVCocoaFunctions</name>
-    <message>
-        <source> (default)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

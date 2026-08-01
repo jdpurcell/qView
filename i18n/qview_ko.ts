@@ -457,8 +457,16 @@ No write permission or file is read-only.</source>
 <context>
     <name>OpenWith</name>
     <message>
+        <source> (default)</source>
+        <translation>(기본)</translation>
+    </message>
+    <message>
         <source>All Applications (*.app)</source>
         <translation>모든 애플리케이션(*.app)</translation>
+    </message>
+    <message>
+        <source>Open With...</source>
+        <translation>다음으로 열기...</translation>
     </message>
     <message>
         <source>Programs (*.exe *.pif *.com *.bat *.cmd)</source>
@@ -554,13 +562,6 @@ No write permission or file is read-only.</source>
     <message>
         <source>&amp;End Session</source>
         <translation>세션 종료</translation>
-    </message>
-</context>
-<context>
-    <name>QVCocoaFunctions</name>
-    <message>
-        <source> (default)</source>
-        <translation> (기본)</translation>
     </message>
 </context>
 <context>

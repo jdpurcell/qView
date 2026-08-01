@@ -20,6 +20,12 @@ rm qview
 
 ../linuxdeploy-$ARCH_NAME.AppImage \
     --plugin qt \
+    --appdir appdir
+
+# Translations are embedded in the executable so these aren't needed
+rm -rf appdir/usr/translations
+
+../linuxdeploy-$ARCH_NAME.AppImage \
     --appdir appdir \
     --output appimage
 

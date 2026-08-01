@@ -13,7 +13,7 @@ SettingsManager::SettingsManager(QObject *parent) : QObject(parent)
 {
     initializeSettingsLibrary();
     loadSettings();
-    loadTranslation();
+    loadTranslations();
 }
 
 QString SettingsManager::getSystemLanguage() const
@@ -43,23 +43,20 @@ QString SettingsManager::getSystemLanguage() const
     return "en";
 }
 
-bool SettingsManager::loadTranslation() const
+void SettingsManager::loadTranslations()
 {
-    QString lang = getString("language");
-    if (lang == "system")
-        lang = getSystemLanguage();
+    QString language = getString("language");
+    if (language == "system")
+        language = getSystemLanguage();
 
-    if (lang == "en")
-        return true;
+    if (language == "en")
+        return;
 
-    QTranslator *translator = new QTranslator();
-    bool success = translator->load("qview_" + lang + ".qm", QLatin1String(":/i18n"));
-    if (success)
-    {
-        qInfo() << "Loaded translation" << lang;
-        QCoreApplication::installTranslator(translator);
-    }
-    return success;
+    if (qtTranslator.load(QLocale(language), "qtbase", "_", ":/qt-translations"))
+        QCoreApplication::installTranslator(&qtTranslator);
+
+    if (appTranslator.load("qview_" + language + ".qm", ":/i18n"))
+        QCoreApplication::installTranslator(&appTranslator);
 }
 
 void SettingsManager::loadSettings()

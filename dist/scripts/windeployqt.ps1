@@ -9,7 +9,7 @@ Write-Host "Detected Qt version $qtVersion"
 $isCrossCompile = $env:buildArch -eq 'Arm64'
 $winDeployQt = $isCrossCompile ? "$env:QT_HOST_PATH\bin\windeployqt" : "windeployqt"
 $argQtPaths = $isCrossCompile ? "--qtpaths=$env:QT_ROOT_DIR\bin\qtpaths.bat" : $null
-& $winDeployQt $argQtPaths --no-compiler-runtime "bin\qView.exe"
+& $winDeployQt $argQtPaths --no-compiler-runtime --no-translations "bin\qView.exe"
 
 if ($qtVersion -ge [version]'6.8.1') {
     # Copy font so windows11 style can work on Windows 10

@@ -1,6 +1,7 @@
 #ifndef SETTINGSMANAGER_H
 #define SETTINGSMANAGER_H
 
+#include <QTranslator>
 #include <QVariant>
 
 class SettingsManager : public QObject
@@ -13,10 +14,6 @@ public:
     };
 
     explicit SettingsManager(QObject *parent = nullptr);
-
-    QString getSystemLanguage() const;
-
-    bool loadTranslation() const;
 
     void loadSettings();
 
@@ -51,6 +48,12 @@ protected:
     void initializeSettingsLibrary();
 
 private:
+    QString getSystemLanguage() const;
+
+    void loadTranslations();
+
+    QTranslator qtTranslator;
+    QTranslator appTranslator;
     QHash<QString, SSetting> settingsLibrary;
 };
 

@@ -194,7 +194,7 @@ void QVCocoaFunctions::setDockRecents(const QStringList &recentPathsList)
     });
 }
 
-QList<OpenWith::OpenWithItem> QVCocoaFunctions::getOpenWithItems(const QString &filePath, const bool loadIcons)
+QList<OpenWith::OpenWithItem> QVCocoaFunctions::getOpenWithItems(const QString &filePath, const bool loadIcons, const QString &defaultSuffix)
 {
     auto fileUrl = QUrl(filePath);
     fileUrl.setScheme("file");
@@ -241,7 +241,7 @@ QList<OpenWith::OpenWithItem> QVCocoaFunctions::getOpenWithItems(const QString &
         if ([appId isEqualToString:defaultApplication])
         {
             openWithItem.isDefault = true;
-            openWithItem.name += QT_TR_NOOP(" (default)");
+            openWithItem.name += defaultSuffix;
         }
 
         listOfOpenWithItems.append(openWithItem);

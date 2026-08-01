@@ -35,7 +35,7 @@ public:
 
     static void setDockRecents(const QStringList &recentPathsList);
 
-    static QList<OpenWith::OpenWithItem> getOpenWithItems(const QString &filePath, const bool loadIcons);
+    static QList<OpenWith::OpenWithItem> getOpenWithItems(const QString &filePath, const bool loadIcons, const QString &defaultSuffix);
 
     static QByteArray getIccProfileForWindow(const QWindow *window);
 };

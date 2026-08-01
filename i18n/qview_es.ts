@@ -457,8 +457,16 @@ No tiene permiso de escritura o el archivo es de solo lectura.</translation>
 <context>
     <name>OpenWith</name>
     <message>
+        <source> (default)</source>
+        <translation> (por omisión)</translation>
+    </message>
+    <message>
         <source>All Applications (*.app)</source>
         <translation>Todas las aplicaciones (*.app)</translation>
+    </message>
+    <message>
+        <source>Open With...</source>
+        <translation>Abrir con...</translation>
     </message>
     <message>
         <source>Programs (*.exe *.pif *.com *.bat *.cmd)</source>
@@ -554,13 +562,6 @@ No tiene permiso de escritura o el archivo es de solo lectura.</translation>
     <message>
         <source>&amp;End Session</source>
         <translation>Finalizar sesión</translation>
-    </message>
-</context>
-<context>
-    <name>QVCocoaFunctions</name>
-    <message>
-        <source> (default)</source>
-        <translation> (por defecto)</translation>
     </message>
 </context>
 <context>

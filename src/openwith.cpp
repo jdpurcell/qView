@@ -22,7 +22,7 @@ const QList<OpenWith::OpenWithItem> OpenWith::getOpenWithItems(const QString &fi
         return listOfOpenWithItems;
 
 #if defined Q_OS_MACOS && defined COCOA_LOADED
-    listOfOpenWithItems = QVCocoaFunctions::getOpenWithItems(filePath, qvApp->getShowSubmenuIcons());
+    listOfOpenWithItems = QVCocoaFunctions::getOpenWithItems(filePath, qvApp->getShowSubmenuIcons(), tr(" (default)"));
 #elif defined Q_OS_WIN
 #ifdef WIN32_LOADED
     listOfOpenWithItems = QVWin32Functions::getOpenWithItems(filePath, qvApp->getShowSubmenuIcons());
@@ -159,7 +159,7 @@ void OpenWith::showOpenWithDialog(QWidget *parent)
     QString filePath = mainWindow->getCurrentFileDetails().fileInfo.absoluteFilePath();
 #ifdef Q_OS_MACOS
     auto openWithDialog = new QFileDialog(parent);
-    openWithDialog->setNameFilters({QT_TR_NOOP("All Applications (*.app)")});
+    openWithDialog->setNameFilters({tr("All Applications (*.app)")});
     openWithDialog->setDirectory("/Applications");
     openWithDialog->open();
     connect(openWithDialog, &QFileDialog::fileSelected, [filePath](const QString &executablePath){
@@ -170,8 +170,8 @@ void OpenWith::showOpenWithDialog(QWidget *parent)
     QVWin32Functions::showOpenWithDialog(filePath, mainWindow->windowHandle());
 #else
     auto openWithDialog = new QFileDialog(parent);
-    openWithDialog->setWindowTitle("Open with...");
-    openWithDialog->setNameFilters({QT_TR_NOOP("Programs (*.exe *.pif *.com *.bat *.cmd)"), QT_TR_NOOP("All Files (*)")});
+    openWithDialog->setWindowTitle(tr("Open With..."));
+    openWithDialog->setNameFilters({tr("Programs (*.exe *.pif *.com *.bat *.cmd)"), tr("All Files (*)")});
     openWithDialog->setDirectory(QProcessEnvironment::systemEnvironment().value("PROGRAMFILES", "C:\\"));
     openWithDialog->open();
     connect(openWithDialog, &QFileDialog::fileSelected, [filePath](const QString &executablePath){

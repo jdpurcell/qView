@@ -136,5 +136,17 @@ lupdate_only {
     TRANSLATIONS += i18n/template.ts
 }
 
+qtbase_translations.files = \
+    $$[QT_INSTALL_TRANSLATIONS]/qtbase_de.qm \
+    $$[QT_INSTALL_TRANSLATIONS]/qtbase_es.qm \
+    $$[QT_INSTALL_TRANSLATIONS]/qtbase_fr.qm \
+    $$[QT_INSTALL_TRANSLATIONS]/qtbase_ja.qm \
+    $$[QT_INSTALL_TRANSLATIONS]/qtbase_ko.qm \
+    $$[QT_INSTALL_TRANSLATIONS]/qtbase_ru.qm \
+    $$[QT_INSTALL_TRANSLATIONS]/qtbase_zh_CN.qm
+qtbase_translations.base = $$[QT_INSTALL_TRANSLATIONS]
+qtbase_translations.prefix = /qt-translations
+
 RESOURCES += \
-    resources/resources.qrc
+    resources/resources.qrc \
+    qtbase_translations

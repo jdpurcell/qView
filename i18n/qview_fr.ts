@@ -457,8 +457,16 @@ Pas d&apos;autorisation d&apos;écriture ou le fichier est en lecture seule.</tr
 <context>
     <name>OpenWith</name>
     <message>
+        <source> (default)</source>
+        <translation> (par défaut)</translation>
+    </message>
+    <message>
         <source>All Applications (*.app)</source>
         <translation>Toutes les applications (*.app)</translation>
+    </message>
+    <message>
+        <source>Open With...</source>
+        <translation>Ouvrir avec...</translation>
     </message>
     <message>
         <source>Programs (*.exe *.pif *.com *.bat *.cmd)</source>
@@ -554,13 +562,6 @@ Pas d&apos;autorisation d&apos;écriture ou le fichier est en lecture seule.</tr
     <message>
         <source>&amp;End Session</source>
         <translation>Terminer la session</translation>
-    </message>
-</context>
-<context>
-    <name>QVCocoaFunctions</name>
-    <message>
-        <source> (default)</source>
-        <translation> (par défaut)</translation>
     </message>
 </context>
 <context>

@@ -456,8 +456,16 @@ No write permission or file is read-only.</source>
 <context>
     <name>OpenWith</name>
     <message>
+        <source> (default)</source>
+        <translation>（默认）</translation>
+    </message>
+    <message>
         <source>All Applications (*.app)</source>
         <translation>应用(*.app)</translation>
+    </message>
+    <message>
+        <source>Open With...</source>
+        <translation>打开方式...</translation>
     </message>
     <message>
         <source>Programs (*.exe *.pif *.com *.bat *.cmd)</source>
@@ -553,13 +561,6 @@ No write permission or file is read-only.</source>
     <message>
         <source>&amp;End Session</source>
         <translation>结束会话</translation>
-    </message>
-</context>
-<context>
-    <name>QVCocoaFunctions</name>
-    <message>
-        <source> (default)</source>
-        <translation> (默认)</translation>
     </message>
 </context>
 <context>

@@ -457,8 +457,16 @@ Keine Schreibberechtigung oder Datei ist schreibgeschützt.</translation>
 <context>
     <name>OpenWith</name>
     <message>
+        <source> (default)</source>
+        <translation> (Standard)</translation>
+    </message>
+    <message>
         <source>All Applications (*.app)</source>
         <translation>Alle Anwendungen (*.app)</translation>
+    </message>
+    <message>
+        <source>Open With...</source>
+        <translation>Öffnen mit ...</translation>
     </message>
     <message>
         <source>Programs (*.exe *.pif *.com *.bat *.cmd)</source>
@@ -554,13 +562,6 @@ Keine Schreibberechtigung oder Datei ist schreibgeschützt.</translation>
     <message>
         <source>&amp;End Session</source>
         <translation>Sitzung beenden</translation>
-    </message>
-</context>
-<context>
-    <name>QVCocoaFunctions</name>
-    <message>
-        <source> (default)</source>
-        <translation> (Standard)</translation>
     </message>
 </context>
 <context>

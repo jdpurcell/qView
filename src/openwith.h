@@ -64,18 +64,20 @@ private:
 
     QStandardItemModel *model;
 
-    const QList<Category> categories = {{"Development", QT_TR_NOOP("Development"), "applications-development"},
-                                        {"Education", QT_TR_NOOP("Education"), "applications-education"},
-                                        {"Game", QT_TR_NOOP("Games"), "applications-games"},
-                                        {"Graphics", QT_TR_NOOP("Graphics"), "applications-graphics"},
-                                        {"Network", QT_TR_NOOP("Internet"), "applications-internet"},
-                                        {"AudioVideo", QT_TR_NOOP("Multimedia"), "applications-multimedia"},
-                                        {"Office", QT_TR_NOOP("Office"), "applications-office"},
-                                        {"Science", QT_TR_NOOP("Science"), "applications-science"},
-                                        {"Settings", QT_TR_NOOP("Settings"), "preferences-system"},
-                                        {"System", QT_TR_NOOP("System"), "applications-system"},
-                                        {"Utility", QT_TR_NOOP("Utilities"), "applications-utilities"},
-                                        {"", QT_TR_NOOP("Other"), "applications-other"}};
+    const QList<Category> categories = {
+        {"Development", tr("Development"), "applications-development"},
+        {"Education", tr("Education"), "applications-education"},
+        {"Game", tr("Games"), "applications-games"},
+        {"Graphics", tr("Graphics"), "applications-graphics"},
+        {"Network", tr("Internet"), "applications-internet"},
+        {"AudioVideo", tr("Multimedia"), "applications-multimedia"},
+        {"Office", tr("Office"), "applications-office"},
+        {"Science", tr("Science"), "applications-science"},
+        {"Settings", tr("Settings"), "preferences-system"},
+        {"System", tr("System"), "applications-system"},
+        {"Utility", tr("Utilities"), "applications-utilities"},
+        {"", tr("Other"), "applications-other"}
+    };
 };
 
 #endif // OPENWITH_H

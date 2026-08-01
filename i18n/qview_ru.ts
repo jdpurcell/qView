@@ -457,8 +457,16 @@ No write permission or file is read-only.</source>
 <context>
     <name>OpenWith</name>
     <message>
+        <source> (default)</source>
+        <translation> (по умолчанию)</translation>
+    </message>
+    <message>
         <source>All Applications (*.app)</source>
         <translation>Все приложения (*.app)</translation>
+    </message>
+    <message>
+        <source>Open With...</source>
+        <translation>Открыть с помощью...</translation>
     </message>
     <message>
         <source>Programs (*.exe *.pif *.com *.bat *.cmd)</source>
@@ -554,13 +562,6 @@ No write permission or file is read-only.</source>
     <message>
         <source>&amp;End Session</source>
         <translation>Завершить сеанс</translation>
-    </message>
-</context>
-<context>
-    <name>QVCocoaFunctions</name>
-    <message>
-        <source> (default)</source>
-        <translation> (по умолчанию)</translation>
     </message>
 </context>
 <context>
