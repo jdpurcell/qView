@@ -540,13 +540,8 @@ void QVGraphicsView::executeScrollAction(const Qv::ViewportScrollAction action, 
         if (!getCurrentFileDetails().isPixmapLoaded)
             return;
 
-        const int uniAxisDelta = getUniAxisDelta();
-        const qreal fractionalWheelSteps = qFabs(uniAxisDelta) / deltaPerWheelStep;
-        const qreal zoomAmountPerWheelStep = zoomMultiplier - 1.0;
-        qreal zoomFactor = 1.0 + (fractionalWheelSteps * zoomAmountPerWheelStep);
-
-        if (uniAxisDelta < 0)
-            zoomFactor = qPow(zoomFactor, -1);
+        const qreal fractionalWheelSteps = static_cast<qreal>(getUniAxisDelta()) / deltaPerWheelStep;
+        const qreal zoomFactor = qPow(zoomMultiplier, fractionalWheelSteps);
 
         if (isCursorVisible)
             setCursorVisible(true);
