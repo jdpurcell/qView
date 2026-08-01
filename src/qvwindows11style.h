@@ -7,9 +7,19 @@
 class QvWindows11Style : public QProxyStyle
 {
 public:
-    using QProxyStyle::QProxyStyle;
+    explicit QvWindows11Style(QStyle *style = nullptr);
 
     QSize sizeFromContents(ContentsType type, const QStyleOption *option, const QSize &size, const QWidget *widget) const override;
+
+    void polish(QApplication *application) override;
+
+    void unpolish(QApplication *application) override;
+
+protected:
+    bool eventFilter(QObject *object, QEvent *event) override;
+
+private:
+    const bool needsFullScreenRoundedCornerWorkaround;
 };
 #endif
 
