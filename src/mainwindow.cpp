@@ -300,8 +300,8 @@ void MainWindow::paintEvent(QPaintEvent *event)
         if (checkerboardBackground && getIsPixmapLoaded())
         {
             const int gridSize = 16;
-            const QColor darkColor = QColorConstants::DarkGray;
-            const QColor lightColor = QColorConstants::LightGray;
+            const QColor darkColor = QColor(204, 204, 204);
+            const QColor lightColor = QColorConstants::White;
             const int numHorizontalSquares = (viewportRect.width() + (gridSize - 1)) / gridSize;
             const int numVerticalSquares = (viewportRect.height() + (gridSize - 1)) / gridSize;
             for (int iY = 0; iY < numVerticalSquares; iY++)
