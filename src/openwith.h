@@ -21,7 +21,7 @@ public:
         void *winAssocHandler = nullptr;
     };
 
-    static const QList<OpenWithItem> getOpenWithItems(const QString &filePath);
+    static QList<OpenWithItem> getOpenWithItems(const QString &filePath);
 
     static void showOpenWithDialog(QWidget *parent);
 

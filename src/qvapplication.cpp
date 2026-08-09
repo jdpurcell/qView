@@ -447,7 +447,7 @@ bool QVApplication::isMouseEventSynthesized(const QMouseEvent *event)
 
 bool QVApplication::supportsSessionPersistence()
 {
-#if defined(Q_OS_MACOS)
+#ifdef COCOA_LOADED
     return true;
 #else
     return false;

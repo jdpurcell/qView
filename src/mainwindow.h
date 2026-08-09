@@ -38,7 +38,7 @@ public:
 
     void requestPopulateOpenWithMenu();
 
-    void populateOpenWithMenu(const QList<OpenWith::OpenWithItem> openWithItems);
+    void populateOpenWithMenu(const QList<OpenWith::OpenWithItem> &openWithItems);
 
     void refreshProperties();
 

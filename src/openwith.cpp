@@ -15,14 +15,18 @@
 
 #include <QDebug>
 
-const QList<OpenWith::OpenWithItem> OpenWith::getOpenWithItems(const QString &filePath)
+QList<OpenWith::OpenWithItem> OpenWith::getOpenWithItems(const QString &filePath)
 {
     QList<OpenWithItem> listOfOpenWithItems;
+
+    // If a path was passed, make sure it exists (null path lists all applications on supported platforms)
     if (!filePath.isNull() && !QFileInfo::exists(filePath))
         return listOfOpenWithItems;
 
-#if defined Q_OS_MACOS && defined COCOA_LOADED
+#if defined Q_OS_MACOS
+#ifdef COCOA_LOADED
     listOfOpenWithItems = QVCocoaFunctions::getOpenWithItems(filePath, qvApp->getShowSubmenuIcons(), tr(" (default)"));
+#endif
 #elif defined Q_OS_WIN
 #ifdef WIN32_LOADED
     listOfOpenWithItems = QVWin32Functions::getOpenWithItems(filePath, qvApp->getShowSubmenuIcons());
@@ -34,12 +38,11 @@ const QList<OpenWith::OpenWithItem> OpenWith::getOpenWithItems(const QString &fi
     // Natural/alphabetic sort
     QCollator collator;
     collator.setNumericMode(true);
-    std::sort(listOfOpenWithItems.begin(),
-              listOfOpenWithItems.end(),
-              [&collator](const OpenWith::OpenWithItem &item0, const OpenWith::OpenWithItem &item1)
-    {
-            return collator.compare(item0.name, item1.name) < 0;
-    });
+    std::sort(
+        listOfOpenWithItems.begin(), listOfOpenWithItems.end(),
+        [&collator](const OpenWith::OpenWithItem &item1, const OpenWith::OpenWithItem &item2) {
+            return collator.compare(item1.name, item2.name) < 0;
+        });
 
     // Move default item to beginning
     for (int i = 0; i < listOfOpenWithItems.length(); i++)
@@ -90,7 +93,8 @@ QList<OpenWith::OpenWithItem> OpenWith::getOpenWithItemsFromDesktopFiles(const Q
             bool noDisplay = false;
 
             QFile file(fileInfo.absoluteFilePath());
-            file.open(QIODevice::ReadOnly);
+            if (!file.open(QIODevice::ReadOnly))
+                continue;
             QTextStream in(&file);
             QString line;
             while (in.readLineInto(&line))

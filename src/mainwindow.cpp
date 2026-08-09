@@ -545,13 +545,16 @@ void MainWindow::disableActions()
 
 void MainWindow::requestPopulateOpenWithMenu()
 {
-    openWithFutureWatcher.setFuture(QtConcurrent::run([&]{
-        const auto &curFilePath = getCurrentFileDetails().fileInfo.absoluteFilePath();
-        return OpenWith::getOpenWithItems(curFilePath);
-    }));
+    const QString filePath = getCurrentFileDetails().fileInfo.absoluteFilePath();
+    openWithFutureWatcher.setFuture(QtConcurrent::run(
+        [filePath]() -> QList<OpenWith::OpenWithItem> {
+            if (filePath.isEmpty()) return {};
+            return OpenWith::getOpenWithItems(filePath);
+        }
+    ));
 }
 
-void MainWindow::populateOpenWithMenu(const QList<OpenWith::OpenWithItem> openWithItems)
+void MainWindow::populateOpenWithMenu(const QList<OpenWith::OpenWithItem> &openWithItems)
 {
     for (int i = 0; i < qvApp->getActionManager().getOpenWithMaxLength(); i++)
     {
