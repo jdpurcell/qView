@@ -145,11 +145,11 @@ void QVGraphicsView::mousePressEvent(QMouseEvent *event)
     {
         const bool isAltAction = event->modifiers().testFlag(Qt::ControlModifier);
         const Qv::ViewportDragAction action = isAltAction ? altDragAction : dragAction;
-        if (action != Qv::ViewportDragAction::None)
+        const bool justGotFocus = lastFocusIn.isValid() && lastFocusIn.elapsed() < 100;
+        const bool isNavRegionPress = !isAltAction && enableNavigationRegions && !justGotFocus && getNavigationRegion(event->pos()).has_value();
+        if (action != Qv::ViewportDragAction::None || isNavRegionPress)
         {
-            const bool justGotFocus = lastFocusIn.isValid() && lastFocusIn.elapsed() < 100;
-            const bool delayDragStart = !isAltAction && enableNavigationRegions && !justGotFocus && getNavigationRegion(event->pos()).has_value();
-            initializeDrag(action, delayDragStart);
+            initializeDrag(action, isNavRegionPress);
         }
         return;
     }
