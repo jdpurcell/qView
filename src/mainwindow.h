@@ -16,6 +16,10 @@ namespace Ui {
 class MainWindow;
 }
 
+class QLabel;
+class QGraphicsOpacityEffect;
+class QPropertyAnimation;
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -196,6 +200,8 @@ protected:
 
     void changeEvent(QEvent *event) override;
 
+    void resizeEvent(QResizeEvent *event) override;
+
     void paintEvent(QPaintEvent *event) override;
 
     void fullscreenChanged();
@@ -207,8 +213,17 @@ protected slots:
     void shortcutsUpdated();
 
 private:
+    void updateTitlebarBubbleText();
+
+    void revealTitlebarBubble();
+
     Ui::MainWindow *ui;
     QVGraphicsView *graphicsView;
+
+    QLabel *titlebarBubble;
+    QGraphicsOpacityEffect *titlebarBubbleOpacityEffect;
+    QTimer *titlebarBubbleHideTimer;
+    QPropertyAnimation *titlebarBubbleHideAnimation;
 
     QMenu *contextMenu;
     QMenu *virtualMenu;

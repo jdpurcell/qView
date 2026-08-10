@@ -34,6 +34,31 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QTemporaryFile>
+#include <QLabel>
+#include <QGraphicsOpacityEffect>
+#include <QPropertyAnimation>
+
+namespace
+{
+class TitlebarBubble : public QLabel
+{
+public:
+    using QLabel::QLabel;
+
+protected:
+    void paintEvent(QPaintEvent *event) override
+    {
+        QPainter painter(this);
+        painter.setRenderHint(QPainter::Antialiasing);
+        painter.setPen(Qt::NoPen);
+        painter.setBrush(palette().brush(QPalette::Base));
+        painter.drawRoundedRect(rect(), 8, 8);
+        painter.end();
+
+        QLabel::paintEvent(event);
+    }
+};
+}
 
 MainWindow::MainWindow(QWidget *parent, const QJsonObject &windowSessionState) :
     QMainWindow(parent),
@@ -55,6 +80,29 @@ MainWindow::MainWindow(QWidget *parent, const QJsonObject &windowSessionState) :
     // Initialize graphicsviewkDefaultBufferAlignment
     graphicsView = new QVGraphicsView(this);
     centralWidget()->layout()->addWidget(graphicsView);
+
+    titlebarBubble = new TitlebarBubble(graphicsView);
+    titlebarBubble->move(12, 4);
+    titlebarBubble->setContentsMargins(8, 4, 8, 4);
+    titlebarBubble->setForegroundRole(QPalette::Text);
+    titlebarBubble->setAttribute(Qt::WA_TransparentForMouseEvents);
+    titlebarBubbleOpacityEffect = new QGraphicsOpacityEffect(titlebarBubble);
+    titlebarBubble->setGraphicsEffect(titlebarBubbleOpacityEffect);
+    titlebarBubble->hide();
+
+    titlebarBubbleHideTimer = new QTimer(this);
+    titlebarBubbleHideTimer->setSingleShot(true);
+    titlebarBubbleHideTimer->setInterval(3000);
+
+    titlebarBubbleHideAnimation = new QPropertyAnimation(titlebarBubbleOpacityEffect, "opacity", this);
+    titlebarBubbleHideAnimation->setDuration(250);
+    titlebarBubbleHideAnimation->setStartValue(0.5);
+    titlebarBubbleHideAnimation->setEndValue(0.0);
+
+    connect(titlebarBubbleHideTimer, &QTimer::timeout, titlebarBubbleHideAnimation, [this]() {
+        titlebarBubbleHideAnimation->start();
+    });
+    connect(titlebarBubbleHideAnimation, &QPropertyAnimation::finished, titlebarBubble, &QLabel::hide);
 
     // Hide fullscreen label by default
     ui->fullscreenLabel->hide();
@@ -277,6 +325,12 @@ void MainWindow::changeEvent(QEvent *event)
     }
 
     QMainWindow::changeEvent(event);
+}
+
+void MainWindow::resizeEvent(QResizeEvent *event)
+{
+    QMainWindow::resizeEvent(event);
+    updateTitlebarBubbleText();
 }
 
 void MainWindow::paintEvent(QPaintEvent *event)
@@ -661,10 +715,14 @@ void MainWindow::buildWindowTitle()
         }
     }
 
+    const bool titleChanged = newString != windowTitle();
     setWindowTitle(newString);
 
     // Update fullscreen label to titlebar text as well
     ui->fullscreenLabel->setText(newString);
+
+    if (titleChanged)
+        revealTitlebarBubble();
 }
 
 void MainWindow::updateWindowFilePath()
@@ -687,6 +745,33 @@ void MainWindow::updateMenuBarVisible()
 #endif
     const auto isImmersive = [&]() { return getTitlebarHidden() || windowState().testFlag(Qt::WindowFullScreen); };
     menuBar()->setVisible(alwaysVisible || (menuBarEnabled && !(hideWhenImmersive && isImmersive())));
+}
+
+void MainWindow::updateTitlebarBubbleText()
+{
+    const int horizontalMargin = titlebarBubble->pos().x() * 2;
+    const int horizontalPadding = titlebarBubble->contentsMargins().left() + titlebarBubble->contentsMargins().right();
+    const int availableTextWidth = qMax(graphicsView->width() - horizontalMargin - horizontalPadding, 0);
+    titlebarBubble->setText(titlebarBubble->fontMetrics().elidedText(windowTitle(), Qt::ElideRight, availableTextWidth));
+    titlebarBubble->adjustSize();
+}
+
+void MainWindow::revealTitlebarBubble()
+{
+    titlebarBubbleHideTimer->stop();
+    titlebarBubbleHideAnimation->stop();
+
+    const bool shouldShow = !windowTitle().isEmpty() && !slideshowTimer->isActive() && getTitlebarHidden();
+    if (!shouldShow)
+    {
+        titlebarBubble->hide();
+        return;
+    }
+
+    updateTitlebarBubbleText();
+    titlebarBubbleOpacityEffect->setOpacity(titlebarBubbleHideAnimation->startValue().toDouble());
+    titlebarBubble->show();
+    titlebarBubbleHideTimer->start();
 }
 
 bool MainWindow::getWindowOnTop() const
@@ -733,6 +818,7 @@ void MainWindow::setTitlebarHidden(const bool shouldHide)
 
     updateWindowFilePath();
     updateMenuBarVisible();
+    revealTitlebarBubble();
     update();
     graphicsView->fitOrConstrainImage();
 }
