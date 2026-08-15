@@ -210,7 +210,7 @@ QByteArray QVWin32Functions::getIccProfileForWindow(const QWindow *window)
                         file.close();
                     }
                 }
-                ReleaseDC(hWnd, hDC);
+                DeleteDC(hDC);
             }
         }
     }
