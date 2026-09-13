@@ -291,7 +291,9 @@ bool QVGraphicsView::event(QEvent *event)
         const ActionManager &actionManager = qvApp->getActionManager();
         if (actionManager.wouldTriggerAction(keyEvent, "previousfile") ||
             actionManager.wouldTriggerAction(keyEvent, "nextfile") ||
-            actionManager.wouldTriggerAction(keyEvent, "randomfile"))
+            actionManager.wouldTriggerAction(keyEvent, "randomfile") ||
+            actionManager.wouldTriggerAction(keyEvent, "jumpback") ||
+            actionManager.wouldTriggerAction(keyEvent, "jumpforward"))
         {
             // Accept event to override shortcut and deliver as key press instead
             event->accept();
@@ -304,7 +306,9 @@ bool QVGraphicsView::event(QEvent *event)
         if (!keyEvent->isAutoRepeat() &&
             (ActionManager::wouldTriggerAction(keyEvent, navPrevShortcuts) ||
              ActionManager::wouldTriggerAction(keyEvent, navNextShortcuts) ||
-             ActionManager::wouldTriggerAction(keyEvent, navRandomShortcuts)))
+             ActionManager::wouldTriggerAction(keyEvent, navRandomShortcuts) ||
+             ActionManager::wouldTriggerAction(keyEvent, navJumpBackShortcuts) ||
+             ActionManager::wouldTriggerAction(keyEvent, navJumpForwardShortcuts)))
         {
             cancelTurboNav();
         }
@@ -361,7 +365,9 @@ void QVGraphicsView::keyPressEvent(QKeyEvent *event)
     {
         if (ActionManager::wouldTriggerAction(event, navPrevShortcuts) ||
             ActionManager::wouldTriggerAction(event, navNextShortcuts) ||
-            ActionManager::wouldTriggerAction(event, navRandomShortcuts))
+            ActionManager::wouldTriggerAction(event, navRandomShortcuts) ||
+            ActionManager::wouldTriggerAction(event, navJumpBackShortcuts) ||
+            ActionManager::wouldTriggerAction(event, navJumpForwardShortcuts))
         {
             lastTurboNavKeyPress.start();
             return;
@@ -374,6 +380,8 @@ void QVGraphicsView::keyPressEvent(QKeyEvent *event)
             actionManager.wouldTriggerAction(event, "previousfile") ? Qv::GoToFileMode::Previous :
             actionManager.wouldTriggerAction(event, "nextfile") ? Qv::GoToFileMode::Next :
             actionManager.wouldTriggerAction(event, "randomfile") ? Qv::GoToFileMode::Random :
+            actionManager.wouldTriggerAction(event, "jumpback") ? Qv::GoToFileMode::JumpBack :
+            actionManager.wouldTriggerAction(event, "jumpforward") ? Qv::GoToFileMode::JumpForward :
             std::optional<Qv::GoToFileMode>();
         if (triggeredNavMode.has_value())
         {
@@ -389,9 +397,13 @@ void QVGraphicsView::keyPressEvent(QKeyEvent *event)
                 navPrevShortcuts = actionManager.getAction("previousfile")->shortcuts();
                 navNextShortcuts = actionManager.getAction("nextfile")->shortcuts();
                 navRandomShortcuts = actionManager.getAction("randomfile")->shortcuts();
+                navJumpBackShortcuts = actionManager.getAction("jumpback")->shortcuts();
+                navJumpForwardShortcuts = actionManager.getAction("jumpforward")->shortcuts();
                 actionManager.setActionShortcuts("previousfile", {});
                 actionManager.setActionShortcuts("nextfile", {});
                 actionManager.setActionShortcuts("randomfile", {});
+                actionManager.setActionShortcuts("jumpback", {});
+                actionManager.setActionShortcuts("jumpforward", {});
             }
             goToFile(triggeredNavMode.value());
             return;
@@ -1174,9 +1186,13 @@ void QVGraphicsView::cancelTurboNav()
     actionManager.setActionShortcuts("previousfile", navPrevShortcuts);
     actionManager.setActionShortcuts("nextfile", navNextShortcuts);
     actionManager.setActionShortcuts("randomfile", navRandomShortcuts);
+    actionManager.setActionShortcuts("jumpback", navJumpBackShortcuts);
+    actionManager.setActionShortcuts("jumpforward", navJumpForwardShortcuts);
     navPrevShortcuts = {};
     navNextShortcuts = {};
     navRandomShortcuts = {};
+    navJumpBackShortcuts = {};
+    navJumpForwardShortcuts = {};
 }
 
 MainWindow* QVGraphicsView::getMainWindow() const

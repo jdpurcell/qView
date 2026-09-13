@@ -13,6 +13,7 @@
 * Ability to drag window via its viewport (Ctrl/Cmd + drag by default; customizable).
 * Ability to change file sorting temporarily per-window (in context menu).
 * Random file navigation (Go -> Random File, or "r" keyboard shortcut) to browse randomly without changing sort mode.
+* Jump navigation to go back/forward backward by a configurable number of images (Go -> Jump Back / Jump Forward, or Alt+Left / Alt+Right).
 * Navigate between images when scrolling sideways (e.g. two finger swipe), or optionally, when clicking the left/right sides of the viewport.
 * Customizable mouse actions (e.g. change what double clicking or middle clicking does).
 * Option to ignore certain file extensions when navigating through a folder.

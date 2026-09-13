@@ -232,6 +232,14 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Jump &amp;Back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump F&amp;orward</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Previous Fi&amp;le</source>
         <translation type="unfinished"></translation>
     </message>
@@ -878,6 +886,10 @@ No write permission or file is read-only.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Jump distance:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Navigation speed:</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1385,11 +1397,19 @@ No write permission or file is read-only.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Jump Back</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Previous File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Next File</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Jump Forward</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

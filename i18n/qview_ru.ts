@@ -232,6 +232,14 @@
         <translation>Первый файл</translation>
     </message>
     <message>
+        <source>Jump &amp;Back</source>
+        <translation>Перейти назад</translation>
+    </message>
+    <message>
+        <source>Jump F&amp;orward</source>
+        <translation>Перейти вперёд</translation>
+    </message>
+    <message>
         <source>Previous Fi&amp;le</source>
         <translation>Предыдущий файл</translation>
     </message>
@@ -889,6 +897,10 @@ No write permission or file is read-only.</source>
         <translation>Предварительная загрузка:</translation>
     </message>
     <message>
+        <source>Jump distance:</source>
+        <translation>Шаг перехода:</translation>
+    </message>
+    <message>
         <source>Navigation speed:</source>
         <translation>Скорость навигации:</translation>
     </message>
@@ -1398,12 +1410,20 @@ No write permission or file is read-only.</source>
         <translation>Первый файл</translation>
     </message>
     <message>
+        <source>Jump Back</source>
+        <translation>Перейти назад</translation>
+    </message>
+    <message>
         <source>Previous File</source>
         <translation>Предыдущий файл</translation>
     </message>
     <message>
         <source>Next File</source>
         <translation>Следующий файл</translation>
+    </message>
+    <message>
+        <source>Jump Forward</source>
+        <translation>Перейти вперёд</translation>
     </message>
     <message>
         <source>Last File</source>

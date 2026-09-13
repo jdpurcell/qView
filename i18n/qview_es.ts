@@ -232,6 +232,14 @@
         <translation>Primer archivo</translation>
     </message>
     <message>
+        <source>Jump &amp;Back</source>
+        <translation>Saltar hacia atrás</translation>
+    </message>
+    <message>
+        <source>Jump F&amp;orward</source>
+        <translation>Saltar hacia delante</translation>
+    </message>
+    <message>
         <source>Previous Fi&amp;le</source>
         <translation>Archivo anterior</translation>
     </message>
@@ -889,6 +897,10 @@ No tiene permiso de escritura o el archivo es de solo lectura.</translation>
         <translation>Precarga:</translation>
     </message>
     <message>
+        <source>Jump distance:</source>
+        <translation>Distancia de salto:</translation>
+    </message>
+    <message>
         <source>Navigation speed:</source>
         <translation>Velocidad de navegación:</translation>
     </message>
@@ -1398,12 +1410,20 @@ No tiene permiso de escritura o el archivo es de solo lectura.</translation>
         <translation>Primer archivo</translation>
     </message>
     <message>
+        <source>Jump Back</source>
+        <translation>Saltar hacia atrás</translation>
+    </message>
+    <message>
         <source>Previous File</source>
         <translation>Archivo anterior</translation>
     </message>
     <message>
         <source>Next File</source>
         <translation>Archivo siguiente</translation>
+    </message>
+    <message>
+        <source>Jump Forward</source>
+        <translation>Saltar hacia delante</translation>
     </message>
     <message>
         <source>Last File</source>

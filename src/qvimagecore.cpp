@@ -256,6 +256,24 @@ QVImageCore::GoToFileResult QVImageCore::goToFile(const Qv::GoToFileMode mode, c
         searchDirection = 1;
         break;
     }
+    case Qv::GoToFileMode::JumpBack:
+    case Qv::GoToFileMode::JumpForward:
+    {
+        const int distance = qBound(5, qvApp->getSettingsManager().getInteger("jumpdistance"), 250);
+        searchDirection = mode == Qv::GoToFileMode::JumpBack ? -1 : 1;
+        const int lastIndex = static_cast<int>(fileList.size()) - 1;
+        const bool atBoundary = searchDirection < 0 ? newIndex == 0 : newIndex == lastIndex;
+        if (atBoundary)
+        {
+            if (fileEnumerator.getIsLoopFoldersEnabled())
+                newIndex = searchDirection < 0 ? lastIndex : 0;
+            else
+                result.reachedEnd = true;
+        }
+        else
+            newIndex = qBound(0, newIndex + searchDirection * distance, lastIndex);
+        break;
+    }
     case Qv::GoToFileMode::Previous:
     {
         if (newIndex == 0)
@@ -315,7 +333,11 @@ QVImageCore::GoToFileResult QVImageCore::goToFile(const Qv::GoToFileMode mode, c
     if (shouldRetryFolderInfoUpdate)
         updateFolderInfo();
 
-    loadFile(nextImageFilePath, false, {}, mode == Qv::GoToFileMode::Random);
+    const bool debouncePreloading =
+        mode == Qv::GoToFileMode::Random ||
+        mode == Qv::GoToFileMode::JumpBack ||
+        mode == Qv::GoToFileMode::JumpForward;
+    loadFile(nextImageFilePath, false, {}, debouncePreloading);
 
     return result;
 }

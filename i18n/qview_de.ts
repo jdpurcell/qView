@@ -232,6 +232,14 @@
         <translation>Erste Datei</translation>
     </message>
     <message>
+        <source>Jump &amp;Back</source>
+        <translation>Zurückspringen</translation>
+    </message>
+    <message>
+        <source>Jump F&amp;orward</source>
+        <translation>Vorwärtsspringen</translation>
+    </message>
+    <message>
         <source>Previous Fi&amp;le</source>
         <translation>Vorherige Datei</translation>
     </message>
@@ -889,6 +897,10 @@ Keine Schreibberechtigung oder Datei ist schreibgeschützt.</translation>
         <translation>Im Voraus laden:</translation>
     </message>
     <message>
+        <source>Jump distance:</source>
+        <translation>Sprungweite:</translation>
+    </message>
+    <message>
         <source>Navigation speed:</source>
         <translation>Navigationsgeschwindigkeit:</translation>
     </message>
@@ -1398,12 +1410,20 @@ Keine Schreibberechtigung oder Datei ist schreibgeschützt.</translation>
         <translation>Erste Datei</translation>
     </message>
     <message>
+        <source>Jump Back</source>
+        <translation>Zurückspringen</translation>
+    </message>
+    <message>
         <source>Previous File</source>
         <translation>Vorherige Datei</translation>
     </message>
     <message>
         <source>Next File</source>
         <translation>Nächste Datei</translation>
+    </message>
+    <message>
+        <source>Jump Forward</source>
+        <translation>Vorwärtsspringen</translation>
     </message>
     <message>
         <source>Last File</source>

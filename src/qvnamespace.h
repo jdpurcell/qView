@@ -131,8 +131,10 @@ namespace Qv
     {
         Constant,
         First,
+        JumpBack,
         Previous,
         Next,
+        JumpForward,
         Last,
         Random
     };
@@ -163,6 +165,8 @@ namespace Qv
         Image = 0xE3F4,
         Info = 0xE88E,
         Keyboard = 0xE312,
+        KeyboardDoubleArrowLeft = 0xEAC3,
+        KeyboardDoubleArrowRight = 0xEAC9,
         KeyboardDoubleArrowUp = 0xEACF,
         LastPage = 0xE5DD,
         Launch = 0xE895,

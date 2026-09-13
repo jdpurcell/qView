@@ -124,9 +124,13 @@ public:
 
     void firstFile();
 
+    void jumpBack();
+
     void previousFile();
 
     void nextFile();
+
+    void jumpForward();
 
     void lastFile();
 

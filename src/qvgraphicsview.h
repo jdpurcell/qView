@@ -256,6 +256,8 @@ private:
     QList<QKeySequence> navPrevShortcuts;
     QList<QKeySequence> navNextShortcuts;
     QList<QKeySequence> navRandomShortcuts;
+    QList<QKeySequence> navJumpBackShortcuts;
+    QList<QKeySequence> navJumpForwardShortcuts;
     QElapsedTimer lastTurboNav;
     QElapsedTimer lastTurboNavKeyPress;
     int turboNavInterval {0};

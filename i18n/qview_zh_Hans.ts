@@ -232,6 +232,14 @@
         <translation>第一张图片</translation>
     </message>
     <message>
+        <source>Jump &amp;Back</source>
+        <translation>向后跳转</translation>
+    </message>
+    <message>
+        <source>Jump F&amp;orward</source>
+        <translation>向前跳转</translation>
+    </message>
+    <message>
         <source>Previous Fi&amp;le</source>
         <translation>上一张图片</translation>
     </message>
@@ -888,6 +896,10 @@ No write permission or file is read-only.</source>
         <translation>预加载:</translation>
     </message>
     <message>
+        <source>Jump distance:</source>
+        <translation>跳转间隔：</translation>
+    </message>
+    <message>
         <source>Navigation speed:</source>
         <translation>导航速度：</translation>
     </message>
@@ -1397,12 +1409,20 @@ No write permission or file is read-only.</source>
         <translation>第一张图片</translation>
     </message>
     <message>
+        <source>Jump Back</source>
+        <translation>向后跳转</translation>
+    </message>
+    <message>
         <source>Previous File</source>
         <translation>上一张图片</translation>
     </message>
     <message>
         <source>Next File</source>
         <translation>下一张图片</translation>
+    </message>
+    <message>
+        <source>Jump Forward</source>
+        <translation>向前跳转</translation>
     </message>
     <message>
         <source>Last File</source>

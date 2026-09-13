@@ -247,6 +247,7 @@ void SettingsManager::initializeSettingsLibrary()
     settingsLibrary.insert("sortmode", {static_cast<int>(Qv::SortMode::Name), {}});
     settingsLibrary.insert("sortdescending", {false, {}});
     settingsLibrary.insert("preloadingmode", {static_cast<int>(Qv::PreloadMode::Adjacent), {}});
+    settingsLibrary.insert("jumpdistance", {15, {}});
     settingsLibrary.insert("navspeed", {50, {}});
     settingsLibrary.insert("loopfoldersenabled", {true, {}});
     settingsLibrary.insert("slideshowdirection", {static_cast<int>(Qv::SlideshowDirection::Forward), {}});

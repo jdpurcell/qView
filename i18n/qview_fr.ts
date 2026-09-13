@@ -232,6 +232,14 @@
         <translation>Premier fichier</translation>
     </message>
     <message>
+        <source>Jump &amp;Back</source>
+        <translation>Sauter en arrière</translation>
+    </message>
+    <message>
+        <source>Jump F&amp;orward</source>
+        <translation>Sauter en avant</translation>
+    </message>
+    <message>
         <source>Previous Fi&amp;le</source>
         <translation>Fichier précédent</translation>
     </message>
@@ -889,6 +897,10 @@ Pas d&apos;autorisation d&apos;écriture ou le fichier est en lecture seule.</tr
         <translation>Préchargement :</translation>
     </message>
     <message>
+        <source>Jump distance:</source>
+        <translation>Distance du saut :</translation>
+    </message>
+    <message>
         <source>Navigation speed:</source>
         <translation>Vitesse de navigation :</translation>
     </message>
@@ -1398,12 +1410,20 @@ Pas d&apos;autorisation d&apos;écriture ou le fichier est en lecture seule.</tr
         <translation>Premier fichier</translation>
     </message>
     <message>
+        <source>Jump Back</source>
+        <translation>Sauter en arrière</translation>
+    </message>
+    <message>
         <source>Previous File</source>
         <translation>Fichier précédent</translation>
     </message>
     <message>
         <source>Next File</source>
         <translation>Fichier suivant</translation>
+    </message>
+    <message>
+        <source>Jump Forward</source>
+        <translation>Sauter en avant</translation>
     </message>
     <message>
         <source>Last File</source>

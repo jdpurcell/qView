@@ -243,8 +243,10 @@ QMenuBar *ActionManager::buildMenuBar(QWidget *parent)
     auto *goMenu = new QVMenu(tr("&Go"), menuBar);
 
     addCloneOfAction(goMenu, "firstfile");
+    addCloneOfAction(goMenu, "jumpback");
     addCloneOfAction(goMenu, "previousfile");
     addCloneOfAction(goMenu, "nextfile");
+    addCloneOfAction(goMenu, "jumpforward");
     addCloneOfAction(goMenu, "lastfile");
     addCloneOfAction(goMenu, "randomfile");
 
@@ -733,6 +735,10 @@ void ActionManager::actionTriggered(QAction *triggeredAction, MainWindow *releva
         relevantWindow->toggleFullScreen();
     } else if (key == "firstfile") {
         relevantWindow->firstFile();
+    } else if (key == "jumpback") {
+        relevantWindow->jumpBack();
+    } else if (key == "jumpforward") {
+        relevantWindow->jumpForward();
     } else if (key == "previousfile") {
         relevantWindow->previousFile();
     } else if (key == "nextfile") {
@@ -916,6 +922,14 @@ void ActionManager::initializeActionLibrary()
     auto *firstFileAction = new QAction(qvApp->iconFromFont(Qv::MaterialIcon::FirstPage), tr("&First File"));
     firstFileAction->setData({"folderdisable"});
     actionLibrary.insert("firstfile", firstFileAction);
+
+    auto *jumpBackAction = new QAction(qvApp->iconFromFont(Qv::MaterialIcon::KeyboardDoubleArrowLeft), tr("Jump &Back"));
+    jumpBackAction->setData({"folderdisable"});
+    actionLibrary.insert("jumpback", jumpBackAction);
+
+    auto *jumpForwardAction = new QAction(qvApp->iconFromFont(Qv::MaterialIcon::KeyboardDoubleArrowRight), tr("Jump F&orward"));
+    jumpForwardAction->setData({"folderdisable"});
+    actionLibrary.insert("jumpforward", jumpForwardAction);
 
     auto *previousFileAction = new QAction(qvApp->iconFromFont(Qv::MaterialIcon::NavigateBefore), tr("Previous Fi&le"));
     previousFileAction->setData({"folderdisable"});

@@ -1410,6 +1410,16 @@ void MainWindow::firstFile()
     graphicsView->goToFile(Qv::GoToFileMode::First);
 }
 
+void MainWindow::jumpBack()
+{
+    graphicsView->goToFile(Qv::GoToFileMode::JumpBack);
+}
+
+void MainWindow::jumpForward()
+{
+    graphicsView->goToFile(Qv::GoToFileMode::JumpForward);
+}
+
 void MainWindow::previousFile()
 {
     graphicsView->goToFile(Qv::GoToFileMode::Previous);

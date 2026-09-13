@@ -232,6 +232,14 @@
         <translation>最初のファイル</translation>
     </message>
     <message>
+        <source>Jump &amp;Back</source>
+        <translation>後方へジャンプ</translation>
+    </message>
+    <message>
+        <source>Jump F&amp;orward</source>
+        <translation>前方へジャンプ</translation>
+    </message>
+    <message>
         <source>Previous Fi&amp;le</source>
         <translation>前のファイル</translation>
     </message>
@@ -889,6 +897,10 @@ No write permission or file is read-only.</source>
         <translation>画像プリロード:</translation>
     </message>
     <message>
+        <source>Jump distance:</source>
+        <translation>ジャンプする画像数:</translation>
+    </message>
+    <message>
         <source>Navigation speed:</source>
         <translation>ナビゲーション速度:</translation>
     </message>
@@ -1398,12 +1410,20 @@ No write permission or file is read-only.</source>
         <translation>最初のファイル</translation>
     </message>
     <message>
+        <source>Jump Back</source>
+        <translation>後方へジャンプ</translation>
+    </message>
+    <message>
         <source>Previous File</source>
         <translation>前のファイル</translation>
     </message>
     <message>
         <source>Next File</source>
         <translation>次のファイル</translation>
+    </message>
+    <message>
+        <source>Jump Forward</source>
+        <translation>前方へジャンプ</translation>
     </message>
     <message>
         <source>Last File</source>

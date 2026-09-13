@@ -270,6 +270,8 @@ void QVOptionsDialog::syncSettings(bool defaults, bool makeConnections)
     syncRadioButtons({ui->descendingRadioButton0, ui->descendingRadioButton1}, "sortdescending", defaults, makeConnections);
     // preloadingmode
     syncComboBox(ui->preloadingComboBox, "preloadingmode", defaults, makeConnections);
+    // jumpdistance
+    syncSpinBox(ui->jumpDistanceSpinBox, "jumpdistance", defaults, makeConnections);
     // navspeed
     syncSpinBox(ui->navSpeedSpinBox, "navspeed", defaults, makeConnections);
     // loopfolders

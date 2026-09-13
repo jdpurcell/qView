@@ -232,6 +232,14 @@
         <translation>처음 파일</translation>
     </message>
     <message>
+        <source>Jump &amp;Back</source>
+        <translation>뒤로 건너뛰기</translation>
+    </message>
+    <message>
+        <source>Jump F&amp;orward</source>
+        <translation>앞으로 건너뛰기</translation>
+    </message>
+    <message>
         <source>Previous Fi&amp;le</source>
         <translation>이전 파일</translation>
     </message>
@@ -889,6 +897,10 @@ No write permission or file is read-only.</source>
         <translation>사전 로드:</translation>
     </message>
     <message>
+        <source>Jump distance:</source>
+        <translation>이동할 이미지 수:</translation>
+    </message>
+    <message>
         <source>Navigation speed:</source>
         <translation>탐색 속도:</translation>
     </message>
@@ -1398,12 +1410,20 @@ No write permission or file is read-only.</source>
         <translation>처음 파일</translation>
     </message>
     <message>
+        <source>Jump Back</source>
+        <translation>뒤로 건너뛰기</translation>
+    </message>
+    <message>
         <source>Previous File</source>
         <translation>이전 파일</translation>
     </message>
     <message>
         <source>Next File</source>
         <translation>다음 파일</translation>
+    </message>
+    <message>
+        <source>Jump Forward</source>
+        <translation>앞으로 건너뛰기</translation>
     </message>
     <message>
         <source>Last File</source>

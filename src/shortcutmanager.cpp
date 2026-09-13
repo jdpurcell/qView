@@ -75,8 +75,10 @@ void ShortcutManager::initializeShortcutsList()
     shortcutsList.last().defaultShortcuts.prepend(QKeySequence(Qt::CTRL | Qt::ALT | Qt::Key_Backspace).toString());
 #endif
     shortcutsList.append({tr("First File"), "firstfile", QStringList(QKeySequence(Qt::Key_Home).toString()), {}});
+    shortcutsList.append({tr("Jump Back"), "jumpback", QStringList(QKeySequence(Qt::ALT | Qt::Key_Left).toString()), {}});
     shortcutsList.append({tr("Previous File"), "previousfile", QStringList(QKeySequence(Qt::Key_Left).toString()), {}});
     shortcutsList.append({tr("Next File"), "nextfile", QStringList(QKeySequence(Qt::Key_Right).toString()), {}});
+    shortcutsList.append({tr("Jump Forward"), "jumpforward", QStringList(QKeySequence(Qt::ALT | Qt::Key_Right).toString()), {}});
     shortcutsList.append({tr("Last File"), "lastfile", QStringList(QKeySequence(Qt::Key_End).toString()), {}});
     shortcutsList.append({tr("Random File"), "randomfile", QStringList(QKeySequence(Qt::Key_R).toString()), {}});
     shortcutsList.append({tr("Zoom In"), "zoomin", keyBindingsToStringList(QKeySequence::ZoomIn), {}});
