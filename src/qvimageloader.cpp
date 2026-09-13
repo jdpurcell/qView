@@ -147,8 +147,9 @@ QVImageLoader::Result QVImageLoader::readFile(const QString &absoluteFilePath, c
         image = imageReader.read();
     }
 
-    // Only ICOs choose the best representation; other paged images start at page zero.
-    if (isMultiFrameImage && imageReader.format() == "ico" && !useRequestedFrameNumber)
+    // For formats that commonly contain multiple resolutions of the same image, choose the best quality frame.
+    if (isMultiFrameImage && !useRequestedFrameNumber &&
+        (imageReader.format() == "ico" || imageReader.format() == "icns" || imageReader.format() == "cur"))
     {
         qsizetype bestSize = image.sizeInBytes();
         int candidateFrameNumber = 0;
