@@ -74,7 +74,7 @@ QVImageCore::QVImageCore(QObject *parent) : QObject(parent)
     settingsUpdated();
 }
 
-void QVImageCore::loadFile(const QString &fileName, const bool isReloading, const QString &baseDir, const bool debouncePreloading)
+void QVImageCore::loadFile(const QString &fileName, const bool isReloading, const QString &baseDir, const bool debouncePreloading, const std::optional<int> initialFrameNumber)
 {
     QString adjustedFileName = fileName;
 
@@ -114,7 +114,7 @@ void QVImageCore::loadFile(const QString &fileName, const bool isReloading, cons
     preloadDebounceTimer.stop();
     loadInProgress = true;
     pendingLoadDebouncesPreloading = debouncePreloading;
-    pendingLoadRequestId = imageLoader.requestImage(absolutePath, isReloading);
+    pendingLoadRequestId = imageLoader.requestImage(absolutePath, isReloading, initialFrameNumber);
 }
 
 void QVImageCore::loadPixmap(const ReadData &readData)
@@ -159,6 +159,10 @@ void QVImageCore::loadPixmap(const ReadData &readData)
     currentFileDetails.baseImageSize = readData.intrinsicSize.isValid() ? readData.intrinsicSize : loadedPixmap.size();
     currentFileDetails.loadedPixmapSize = loadedPixmap.size();
     currentFileDetails.targetColorSpace = targetColorSpace;
+
+    currentFileDetails.isMultiFrameImage = readData.isMultiFrameImage;
+    currentFileDetails.frameCount = readData.frameCount;
+    currentFileDetails.frameNumber = readData.frameNumber;
 
     // Animation detection
     loadedMovie.stop();
@@ -432,25 +436,43 @@ void QVImageCore::handleColorSpaceConversion(QImage &image, const QColorSpace &t
         image.convertToColorSpace(targetColorSpace);
 }
 
-void QVImageCore::jumpToNextFrame()
+void QVImageCore::jumpToImageFrame(const int direction)
 {
-    if (!currentFileDetails.isMovieLoaded)
+    if (loadInProgress)
         return;
 
-    loadedMovie.setPaused(true);
-    loadedMovie.jumpToNextFrame();
+    const int count = currentFileDetails.frameCount;
+    const int frame = (currentFileDetails.frameNumber + direction + count) % count;
+    loadFile(currentFileDetails.fileInfo.absoluteFilePath(), false, {}, false, frame);
+}
+
+void QVImageCore::jumpToNextFrame()
+{
+    if (currentFileDetails.isMovieLoaded)
+    {
+        loadedMovie.setPaused(true);
+        loadedMovie.jumpToNextFrame();
+    }
+    else if (currentFileDetails.isMultiFrameImage)
+    {
+        jumpToImageFrame(1);
+    }
 }
 
 void QVImageCore::jumpToPreviousFrame()
 {
-    if (!currentFileDetails.isMovieLoaded)
-        return;
-
-    loadedMovie.setPaused(true);
-    int frameNumber = loadedMovie.currentFrameNumber() - 1;
-    if (frameNumber < 0)
-        frameNumber = loadedMovie.frameCount() - 1;
-    loadedMovie.jumpToFrame(frameNumber);
+    if (currentFileDetails.isMovieLoaded)
+    {
+        loadedMovie.setPaused(true);
+        int frameNumber = loadedMovie.currentFrameNumber() - 1;
+        if (frameNumber < 0)
+            frameNumber = loadedMovie.frameCount() - 1;
+        loadedMovie.jumpToFrame(frameNumber);
+    }
+    else if (currentFileDetails.isMultiFrameImage)
+    {
+        jumpToImageFrame(-1);
+    }
 }
 
 void QVImageCore::setPaused(bool desiredState)
@@ -500,9 +522,14 @@ void QVImageCore::settingsUpdated()
     colorSpaceConversion = settingsManager.getEnum<Qv::ColorSpaceConversion>("colorspaceconversion");
 
     if (colorSpaceConversion != oldColorSpaceConversion && currentFileDetails.isPixmapLoaded && !loadInProgress)
-        loadFile(currentFileDetails.fileInfo.absoluteFilePath());
+    {
+        const auto initialFrameNumber = currentFileDetails.isMultiFrameImage ? std::optional(currentFileDetails.frameNumber) : std::nullopt;
+        loadFile(currentFileDetails.fileInfo.absoluteFilePath(), false, {}, false, initialFrameNumber);
+    }
     else
+    {
         refreshDesiredImages(!preloadDebounceTimer.isActive());
+    }
 }
 
 void QVImageCore::FileDetails::updateLoadedIndexInFolder()

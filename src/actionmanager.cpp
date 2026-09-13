@@ -942,11 +942,11 @@ void ActionManager::initializeActionLibrary()
     actionLibrary.insert("pause", pauseAction);
 
     auto *nextFrameAction = new QAction(qvApp->iconFromFont(Qv::MaterialIcon::SkipNext), tr("&Next Frame"));
-    nextFrameAction->setData({"gifdisable"});
+    nextFrameAction->setData({"framedisable"});
     actionLibrary.insert("nextframe", nextFrameAction);
 
     auto *previousFrameAction = new QAction(qvApp->iconFromFont(Qv::MaterialIcon::SkipPrevious), tr("&Previous Frame"));
-    previousFrameAction->setData({"gifdisable"});
+    previousFrameAction->setData({"framedisable"});
     actionLibrary.insert("previousframe", previousFrameAction);
 
     auto *decreaseSpeedAction = new QAction(qvApp->iconFromFont(Qv::MaterialIcon::FastRewind), tr("&Decrease Speed"));

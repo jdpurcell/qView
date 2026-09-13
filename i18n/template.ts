@@ -598,7 +598,7 @@ No write permission or file is read-only.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Frames:</source>
+        <source>Frame:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

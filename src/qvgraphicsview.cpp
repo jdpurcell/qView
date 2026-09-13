@@ -602,9 +602,9 @@ void QVGraphicsView::loadMimeData(const QMimeData *mimeData)
     }
 }
 
-void QVGraphicsView::loadFile(const QString &fileName, const QString &baseDir)
+void QVGraphicsView::loadFile(const QString &fileName, const QString &baseDir, const std::optional<int> initialFrameNumber)
 {
-    imageCore.loadFile(fileName, false, baseDir);
+    imageCore.loadFile(fileName, false, baseDir, false, initialFrameNumber);
 }
 
 void QVGraphicsView::reloadFile()

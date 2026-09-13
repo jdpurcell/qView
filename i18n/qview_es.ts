@@ -603,8 +603,8 @@ No tiene permiso de escritura o el archivo es de solo lectura.</translation>
         <translation>Relación de aspecto:</translation>
     </message>
     <message>
-        <source>Frames:</source>
-        <translation>Fotogramas:</translation>
+        <source>Frame:</source>
+        <translation>Fotograma:</translation>
     </message>
     <message>
         <source>Refresh</source>

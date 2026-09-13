@@ -169,7 +169,7 @@ public:
     bool getIsClosing() const { return isClosing; }
 
 public slots:
-    void openFile(const QString &fileName, const QString &baseDir = "");
+    void openFile(const QString &fileName, const QString &baseDir = "", std::optional<int> initialFrameNumber = {});
 
     void toggleSlideshow();
 
@@ -177,7 +177,7 @@ public slots:
 
     void cancelSlideshow();
 
-    void fileChanged(const bool isRestoringState);
+    void fileChanged(bool isRestoringState);
 
     void zoomLevelChanged();
 

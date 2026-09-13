@@ -603,8 +603,8 @@ Keine Schreibberechtigung oder Datei ist schreibgeschützt.</translation>
         <translation>Seitenverhältnis:</translation>
     </message>
     <message>
-        <source>Frames:</source>
-        <translation>Frames:</translation>
+        <source>Frame:</source>
+        <translation>Frame:</translation>
     </message>
     <message>
         <source>Refresh</source>

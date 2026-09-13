@@ -17,7 +17,8 @@ public:
     explicit QVInfoDialog(QWidget *parent = nullptr);
     ~QVInfoDialog();
 
-    void setInfo(const QFileInfo fileInfo, const QSize imageSize, const int frameCount);
+    void setInfo(const QFileInfo fileInfo, const QSize imageSize, const int frameCount, const int frameNumber);
+    void setFrameInfo(int frameCount, int frameNumber);
 
     void updateInfo();
 
@@ -30,6 +31,7 @@ private:
     QFileInfo fileInfo;
     QSize imageSize;
     int frameCount {0};
+    int frameNumber {0};
 
 public:
     static QString formatBytes(qint64 bytes)

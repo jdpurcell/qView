@@ -20,7 +20,7 @@ void QVImageLoader::setLargestDimension(const int value)
     largestDimension = value;
 }
 
-quint64 QVImageLoader::requestImage(const QString &absoluteFilePath, const bool forceReload)
+quint64 QVImageLoader::requestImage(const QString &absoluteFilePath, const bool forceReload, const std::optional<int> requestedFrameNumber)
 {
     const QString normalizedPath = normalizePath(absoluteFilePath);
     const FileIdentity identity = getFileIdentity(normalizedPath);
@@ -52,11 +52,13 @@ quint64 QVImageLoader::requestImage(const QString &absoluteFilePath, const bool 
     }
 
     Entry &targetEntry = targetEntryIt.value();
+    targetEntry.requestedFrameNumber = requestedFrameNumber;
     const bool retryCachedError =
         targetEntry.state == State::Cached &&
         targetEntry.result.has_value() &&
         targetEntry.result->errorData.has_value();
-    if (forceReload || retryCachedError)
+    const bool differentCachedFrame = targetEntry.state == State::Cached && targetEntry.startedFrameNumber != requestedFrameNumber;
+    if (forceReload || retryCachedError || differentCachedFrame)
     {
         if (targetEntry.state == State::Loading)
         {
@@ -119,37 +121,46 @@ QVImageLoader::FileIdentity QVImageLoader::getFileIdentity(const Result &result)
     return {result.fileSize, result.lastModified};
 }
 
-QVImageLoader::Result QVImageLoader::readFile(const QString &absoluteFilePath, const int largestDimension)
+QVImageLoader::Result QVImageLoader::readFile(const QString &absoluteFilePath, const int largestDimension, const std::optional<int> requestedFrameNumber)
 {
     QImageReader imageReader(absoluteFilePath);
     imageReader.setAutoTransform(true);
 
+    // Counting animation frames can require scanning the entire stream. Leave that to QVMovie.
+    const int frameCount = imageReader.supportsOption(QImageIOHandler::Animation) ? 0 : imageReader.imageCount();
+    // Explicit selection only applies to non-animated multi-frame images. Invalid
+    // selections use the normal starting image, including ICO's best representation.
+    const bool useRequestedFrameNumber = frameCount > 1 && requestedFrameNumber.has_value() &&
+        requestedFrameNumber.value() >= 0 && requestedFrameNumber.value() < frameCount;
+    int frameNumber = useRequestedFrameNumber ? requestedFrameNumber.value() : 0;
     bool isMultiFrameImage = false;
     QSize intrinsicSize;
     QImage image;
-    if ((imageReader.format() == "svg" || imageReader.format() == "svgz") && !imageReader.size().isEmpty())
+    if (frameNumber == 0 || imageReader.jumpToImage(frameNumber))
     {
-        intrinsicSize = imageReader.size();
-        imageReader.setScaledSize(intrinsicSize.scaled(largestDimension, largestDimension, Qt::KeepAspectRatio));
-        image = imageReader.read();
-    }
-    else
-    {
-        isMultiFrameImage = !imageReader.supportsOption(QImageIOHandler::Animation) && imageReader.imageCount() > 1;
+        if ((imageReader.format() == "svg" || imageReader.format() == "svgz") && !imageReader.size().isEmpty())
+        {
+            intrinsicSize = imageReader.size();
+            imageReader.setScaledSize(intrinsicSize.scaled(largestDimension, largestDimension, Qt::KeepAspectRatio));
+        }
+        isMultiFrameImage = frameCount > 1;
         image = imageReader.read();
     }
 
-    // Handle cases like icons containing multiple resolutions
-    if (isMultiFrameImage)
+    // Only ICOs choose the best representation; other paged images start at page zero.
+    if (isMultiFrameImage && imageReader.format() == "ico" && !useRequestedFrameNumber)
     {
         qsizetype bestSize = image.sizeInBytes();
+        int candidateFrameNumber = 0;
         while (imageReader.jumpToNextImage())
         {
+            ++candidateFrameNumber;
             QImage candidateImage = imageReader.read();
             if (!candidateImage.isNull() && candidateImage.sizeInBytes() > bestSize)
             {
                 bestSize = candidateImage.sizeInBytes();
                 image = std::move(candidateImage);
+                frameNumber = candidateFrameNumber;
             }
         }
     }
@@ -163,6 +174,8 @@ QVImageLoader::Result QVImageLoader::readFile(const QString &absoluteFilePath, c
         fileInfo.lastModified(),
         isMultiFrameImage,
         intrinsicSize,
+        frameCount,
+        frameNumber,
         {}
     };
 
@@ -338,10 +351,12 @@ void QVImageLoader::startJob(const QString &absoluteFilePath)
 
     entryIt->state = State::Loading;
     entryIt->startedIdentity = entryIt->expectedIdentity;
+    entryIt->startedFrameNumber = entryIt->requestedFrameNumber;
     entryIt->reloadAfterFinish = false;
     const quint64 generation = ++entryIt->generation;
     const int priority = entryIt->priority;
     const int targetLargestDimension = largestDimension;
+    const auto requestedFrameNumber = entryIt->startedFrameNumber;
     emit loadStarted(absoluteFilePath, priority);
 
     QVImageLoader *loader = this;
@@ -354,9 +369,10 @@ void QVImageLoader::startJob(const QString &absoluteFilePath)
             dispatchContext,
             absoluteFilePath,
             generation,
-            targetLargestDimension
+            targetLargestDimension,
+            requestedFrameNumber
         ]() {
-            Result result = readFile(absoluteFilePath, targetLargestDimension);
+            Result result = readFile(absoluteFilePath, targetLargestDimension, requestedFrameNumber);
             QMetaObject::invokeMethod(
                 dispatchContext,
                 [
@@ -391,7 +407,8 @@ void QVImageLoader::jobFinished(const QString &absoluteFilePath, const quint64 g
     }
 
     const FileIdentity currentIdentity = getFileIdentity(absoluteFilePath);
-    if (entryIt->reloadAfterFinish || getFileIdentity(result) != currentIdentity)
+    if (entryIt->reloadAfterFinish || getFileIdentity(result) != currentIdentity ||
+        entryIt->startedFrameNumber != entryIt->requestedFrameNumber)
     {
         entryIt->state = State::Queued;
         entryIt->reloadAfterFinish = false;

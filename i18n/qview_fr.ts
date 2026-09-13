@@ -603,8 +603,8 @@ Pas d&apos;autorisation d&apos;écriture ou le fichier est en lecture seule.</tr
         <translation>Rapport d&apos;aspect :</translation>
     </message>
     <message>
-        <source>Frames:</source>
-        <translation>Trames :</translation>
+        <source>Frame:</source>
+        <translation>Image :</translation>
     </message>
     <message>
         <source>Refresh</source>

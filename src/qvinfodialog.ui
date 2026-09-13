@@ -190,7 +190,7 @@
    <item row="7" column="0">
     <widget class="QLabel" name="framesLabel2">
      <property name="text">
-      <string>Frames:</string>
+      <string>Frame:</string>
      </property>
     </widget>
    </item>

@@ -27,6 +27,8 @@ public:
         QDateTime lastModified;
         bool isMultiFrameImage = false;
         QSize intrinsicSize;
+        int frameCount = 1;
+        int frameNumber = 0;
         std::optional<ErrorData> errorData;
     };
 
@@ -41,7 +43,7 @@ public:
 
     void setLargestDimension(int value);
 
-    quint64 requestImage(const QString &absoluteFilePath, bool forceReload = false);
+    quint64 requestImage(const QString &absoluteFilePath, bool forceReload = false, std::optional<int> requestedFrameNumber = {});
     void setDesiredImages(const QList<DesiredImage> &desiredImages);
     void clear();
 
@@ -74,6 +76,8 @@ private:
         State state = State::Queued;
         FileIdentity expectedIdentity;
         FileIdentity startedIdentity;
+        std::optional<int> requestedFrameNumber;
+        std::optional<int> startedFrameNumber;
         quint64 generation = 0;
         std::optional<Result> result;
     };
@@ -87,7 +91,7 @@ private:
     static QString normalizePath(const QString &path);
     static FileIdentity getFileIdentity(const QString &absoluteFilePath);
     static FileIdentity getFileIdentity(const Result &result);
-    static Result readFile(const QString &absoluteFilePath, int largestDimension);
+    static Result readFile(const QString &absoluteFilePath, int largestDimension, std::optional<int> requestedFrameNumber = {});
 
     bool isWanted(const QString &absoluteFilePath, const Entry &entry) const;
     void queueCachedDelivery(quint64 requestId, const QString &absoluteFilePath);

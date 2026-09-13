@@ -603,8 +603,8 @@ No write permission or file is read-only.</source>
         <translation>Соотношение сторон:</translation>
     </message>
     <message>
-        <source>Frames:</source>
-        <translation>Кадры:</translation>
+        <source>Frame:</source>
+        <translation>Кадр:</translation>
     </message>
     <message>
         <source>Refresh</source>

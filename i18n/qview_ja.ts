@@ -603,7 +603,7 @@ No write permission or file is read-only.</source>
         <translation>アスペクト比:</translation>
     </message>
     <message>
-        <source>Frames:</source>
+        <source>Frame:</source>
         <translation>フレーム:</translation>
     </message>
     <message>

@@ -27,6 +27,10 @@ public:
         int loadedIndexInFolder = -1;
         bool isPixmapLoaded = false;
         bool isMovieLoaded = false;
+        int frameCount = 1;
+        int frameNumber = 0;
+        bool isMultiFrameImage = false;
+        // Invalid QSize() when no image is loaded, including load errors.
         QSize baseImageSize;
         QSize loadedPixmapSize;
         QColorSpace targetColorSpace;
@@ -42,7 +46,7 @@ public:
 
     explicit QVImageCore(QObject *parent = nullptr);
 
-    void loadFile(const QString &fileName, bool isReloading = false, const QString &baseDir = "", bool debouncePreloading = false);
+    void loadFile(const QString &fileName, bool isReloading = false, const QString &baseDir = "", bool debouncePreloading = false, std::optional<int> initialFrameNumber = {});
     void closeImage(const bool stayInDir = false);
     GoToFileResult goToFile(const Qv::GoToFileMode mode, const int index = 0);
     void markFolderInfoDirty() { folderInfoDirty = true; }
@@ -86,6 +90,8 @@ protected:
     static void handleColorSpaceConversion(QImage &image, const QColorSpace &targetColorSpace);
 
 private:
+    void jumpToImageFrame(int direction);
+
     QVFileEnumerator fileEnumerator {this};
     QVImageLoader imageLoader {this};
     QTimer preloadDebounceTimer {this};

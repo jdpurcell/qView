@@ -108,6 +108,10 @@ MainWindow::MainWindow(QWidget *parent, const QJsonObject &windowSessionState) :
 
     // Connect graphicsview signals
     connect(graphicsView, &QVGraphicsView::fileChanged, this, &MainWindow::fileChanged);
+    connect(&graphicsView->getLoadedMovie(), &QVMovie::frameChanged, this, [this](const int frameNumber) {
+        if (info->isVisible())
+            info->setFrameInfo(graphicsView->getLoadedMovie().frameCount(), frameNumber);
+    });
     connect(graphicsView, &QVGraphicsView::zoomLevelChanged, this, &MainWindow::zoomLevelChanged);
     connect(graphicsView, &QVGraphicsView::calculatedZoomModeChanged, this, &MainWindow::syncCalculatedZoomMode);
     connect(graphicsView, &QVGraphicsView::navigationResetsZoomChanged, this, &MainWindow::syncNavigationResetsZoom);
@@ -432,9 +436,9 @@ void MainWindow::pauseChanged()
     }
 }
 
-void MainWindow::openFile(const QString &fileName, const QString &baseDir)
+void MainWindow::openFile(const QString &fileName, const QString &baseDir, const std::optional<int> initialFrameNumber)
 {
-    graphicsView->loadFile(fileName, baseDir);
+    graphicsView->loadFile(fileName, baseDir, initialFrameNumber);
     cancelSlideshow();
 }
 
@@ -565,6 +569,10 @@ void MainWindow::disableActions()
                 {
                     clone->setEnabled(getIsPixmapLoaded());
                 }
+                else if (cloneData.last() == "framedisable")
+                {
+                    clone->setEnabled(getIsMovieLoaded() || getCurrentFileDetails().isMultiFrameImage);
+                }
                 else if (cloneData.last() == "gifdisable")
                 {
                     clone->setEnabled(getIsMovieLoaded());
@@ -656,7 +664,8 @@ void MainWindow::refreshProperties()
     info->setInfo(
         fileDetails.fileInfo,
         fileDetails.baseImageSize,
-        fileDetails.isMovieLoaded ? graphicsView->getLoadedMovie().frameCount() : 0
+        fileDetails.isMovieLoaded ? graphicsView->getLoadedMovie().frameCount() : fileDetails.frameCount,
+        fileDetails.isMovieLoaded ? graphicsView->getLoadedMovie().currentFrameNumber() : fileDetails.frameNumber
     );
 }
 
@@ -967,6 +976,9 @@ const QJsonObject MainWindow::getSessionState() const
 
         if (getCurrentFileDetails().folderFileInfoList.getIsRecursive())
             state["baseDir"] = getCurrentFileDetails().folderFileInfoList.getBaseDir();
+
+        if (getCurrentFileDetails().isMultiFrameImage)
+            state["frameNumber"] = getCurrentFileDetails().frameNumber;
     }
 
     state["graphicsView"] = graphicsView->getSessionState();
@@ -995,8 +1007,9 @@ void MainWindow::loadSessionState(const QJsonObject &state, const bool isInitial
     const QString baseDir = state.contains("baseDir") ? state["baseDir"].toString() : "";
     if (!path.isEmpty())
     {
+        const auto initialFrameNumber = state.contains("frameNumber") ? std::optional(state["frameNumber"].toInt()) : std::nullopt;
         graphicsView->setLoadIsFromSessionRestore(true);
-        openFile(path, baseDir);
+        openFile(path, baseDir, initialFrameNumber);
     }
 }
 

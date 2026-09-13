@@ -23,11 +23,12 @@ QVInfoDialog::~QVInfoDialog()
     delete ui;
 }
 
-void QVInfoDialog::setInfo(const QFileInfo fileInfo, const QSize imageSize, const int frameCount)
+void QVInfoDialog::setInfo(const QFileInfo fileInfo, const QSize imageSize, const int frameCount, const int frameNumber)
 {
     this->fileInfo = fileInfo;
     this->imageSize = imageSize;
     this->frameCount = frameCount;
+    this->frameNumber = frameNumber;
 
     // If the dialog is visible, it means we've just navigated to a new image. Instead of running
     // updateInfo immediately, add it to the event queue. This is a workaround for a (Windows-specific?)
@@ -49,30 +50,43 @@ void QVInfoDialog::updateInfo()
     const QLocale locale = QLocale::system();
     const QMimeDatabase mimeDb;
     const QMimeType mime = mimeDb.mimeTypeForFile(fileInfo.absoluteFilePath(), QMimeDatabase::MatchContent);
-    const int width = imageSize.width();
-    const int height = imageSize.height();
-    const qreal megapixels = (width * height) / 1000000.0;
-    const int gcd = getGcd(width, height);
     ui->nameLabel->setText(fileInfo.fileName());
     ui->typeLabel->setText(mime.name());
     ui->locationLabel->setText(fileInfo.path());
     ui->sizeLabel->setText(tr("%1 (%2 bytes)").arg(formatBytes(fileInfo.size()), locale.toString(fileInfo.size())));
     ui->modifiedLabel->setText(fileInfo.lastModified().toString(locale.dateTimeFormat()));
-    ui->dimensionsLabel->setText(tr("%1 x %2 (%3 MP)").arg(QString::number(width), QString::number(height), QString::number(megapixels, 'f', 1)));
-    if (gcd != 0)
+    const bool hasDimensions = !imageSize.isEmpty();
+    ui->label_2->setVisible(hasDimensions);
+    ui->dimensionsLabel->setVisible(hasDimensions);
+    ui->label_3->setVisible(hasDimensions);
+    ui->ratioLabel->setVisible(hasDimensions);
+    if (hasDimensions)
+    {
+        const int width = imageSize.width();
+        const int height = imageSize.height();
+        const qreal megapixels = (width * height) / 1000000.0;
+        const int gcd = getGcd(width, height);
+        ui->dimensionsLabel->setText(tr("%1 x %2 (%3 MP)").arg(QString::number(width), QString::number(height), QString::number(megapixels, 'f', 1)));
         ui->ratioLabel->setText(QString::number(width / gcd) + ":" + QString::number(height / gcd));
-    if (frameCount != 0)
-    {
-        ui->framesLabel2->show();
-        ui->framesLabel->show();
-        ui->framesLabel->setText(QString::number(frameCount));
     }
-    else
-    {
-        ui->framesLabel2->hide();
-        ui->framesLabel->hide();
-    }
+    setFrameInfo(frameCount, frameNumber);
     window()->adjustSize();
+}
+
+void QVInfoDialog::setFrameInfo(const int frameCount, const int frameNumber)
+{
+    this->frameCount = frameCount;
+    this->frameNumber = frameNumber;
+    const bool hasMultipleFrames = frameCount > 1;
+    ui->framesLabel2->setVisible(hasMultipleFrames);
+    ui->framesLabel->setVisible(hasMultipleFrames);
+    if (hasMultipleFrames)
+    {
+        // Reserve room for the counter so playback doesn't resize the dialog.
+        ui->framesLabel->setMinimumWidth(ui->framesLabel->fontMetrics().horizontalAdvance(
+            QStringLiteral("%1 / %1").arg(frameCount)));
+        ui->framesLabel->setText(QStringLiteral("%1 / %2").arg(frameNumber + 1).arg(frameCount));
+    }
 }
 
 void QVInfoDialog::keyPressEvent(QKeyEvent *event)

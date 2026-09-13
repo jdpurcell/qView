@@ -603,7 +603,7 @@ No write permission or file is read-only.</source>
         <translation>종횡비:</translation>
     </message>
     <message>
-        <source>Frames:</source>
+        <source>Frame:</source>
         <translation>프레임:</translation>
     </message>
     <message>

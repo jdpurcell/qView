@@ -602,8 +602,8 @@ No write permission or file is read-only.</source>
         <translation>纵横比:</translation>
     </message>
     <message>
-        <source>Frames:</source>
-        <translation>框架:</translation>
+        <source>Frame:</source>
+        <translation>帧:</translation>
     </message>
     <message>
         <source>Refresh</source>
