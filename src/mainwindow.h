@@ -106,7 +106,7 @@ public:
 
     void setFillWindow(const bool value);
 
-    void setNavigationResetsZoom(const bool value);
+    void setStickyZoom(const bool value);
 
     void setSortMode(const Qv::SortMode mode);
 
@@ -183,7 +183,7 @@ public slots:
 
     void syncCalculatedZoomMode();
 
-    void syncNavigationResetsZoom();
+    void syncStickyZoom();
 
     void syncSortParameters();
 

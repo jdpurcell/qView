@@ -641,7 +641,7 @@ void QVGraphicsView::postLoad()
 
     if (!loadIsFromSessionRestore)
     {
-        if (navigationResetsZoom && calculatedZoomMode != defaultCalculatedZoomMode)
+        if (!stickyZoom && calculatedZoomMode != defaultCalculatedZoomMode)
             setCalculatedZoomMode(defaultCalculatedZoomMode, true);
         else
             fitOrConstrainImage();
@@ -772,14 +772,14 @@ void QVGraphicsView::setCalculatedZoomMode(const std::optional<Qv::CalculatedZoo
     emit calculatedZoomModeChanged();
 }
 
-void QVGraphicsView::setNavigationResetsZoom(const bool value)
+void QVGraphicsView::setStickyZoom(const bool value)
 {
-    if (navigationResetsZoom == value)
+    if (stickyZoom == value)
         return;
 
-    navigationResetsZoom = value;
+    stickyZoom = value;
 
-    emit navigationResetsZoomChanged();
+    emit stickyZoomChanged();
 }
 
 void QVGraphicsView::applyExpensiveScaling()
@@ -958,7 +958,7 @@ const QJsonObject QVGraphicsView::getSessionState() const
     state["hScroll"] = horizontalScrollBar()->value();
     state["vScroll"] = verticalScrollBar()->value();
 
-    state["navResetsZoom"] = navigationResetsZoom;
+    state["stickyZoom"] = stickyZoom;
 
     if (calculatedZoomMode.has_value())
         state["calcZoomMode"] = static_cast<int>(calculatedZoomMode.value());
@@ -987,7 +987,7 @@ void QVGraphicsView::loadSessionState(const QJsonObject &state)
     horizontalScrollBar()->setValue(state["hScroll"].toInt());
     verticalScrollBar()->setValue(state["vScroll"].toInt());
 
-    setNavigationResetsZoom(state["navResetsZoom"].toBool());
+    setStickyZoom(state["stickyZoom"].toBool());
 
     calculatedZoomMode = state.contains("calcZoomMode") ? std::optional(static_cast<Qv::CalculatedZoomMode>(state["calcZoomMode"].toInt())) : std::nullopt;
     emit calculatedZoomModeChanged();
@@ -1188,11 +1188,11 @@ void QVGraphicsView::settingsUpdated(const bool isInitialLoad)
 {
     auto &settingsManager = qvApp->getSettingsManager();
 
-    if (isInitialLoad || globalNavigationResetsZoom != settingsManager.getBoolean("navresetszoom"))
+    if (isInitialLoad || globalStickyZoom != settingsManager.getBoolean("stickyzoom"))
     {
-        //nav resets zoom
-        globalNavigationResetsZoom = settingsManager.getBoolean("navresetszoom");
-        setNavigationResetsZoom(globalNavigationResetsZoom);
+        //sticky zoom
+        globalStickyZoom = settingsManager.getBoolean("stickyzoom");
+        setStickyZoom(globalStickyZoom);
     }
 
     //smooth scaling

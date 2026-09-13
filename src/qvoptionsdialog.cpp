@@ -251,8 +251,8 @@ void QVOptionsDialog::syncSettings(bool defaults, bool makeConnections)
     syncSpinBox(ui->fitZoomLimitSpinBox, "fitzoomlimitpercent", defaults, makeConnections);
     // fitoverscan
     syncSpinBox(ui->fitOverscanSpinBox, "fitoverscan", defaults, makeConnections);
-    // navresetszoom
-    syncCheckbox(ui->navResetsZoomCheckbox, "navresetszoom", defaults, makeConnections);
+    // stickyzoom
+    syncCheckbox(ui->stickyZoomCheckbox, "stickyzoom", defaults, makeConnections);
     // constrainimageposition
     syncCheckbox(ui->constrainImagePositionCheckbox, "constrainimageposition", defaults, makeConnections);
     constrainImagePositionCheckboxCheckStateChanged(ui->constrainImagePositionCheckbox->checkState());

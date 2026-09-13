@@ -284,7 +284,7 @@ QMenu *ActionManager::buildViewMenu(QWidget *parent)
     addCloneOfAction(viewMenu, "originalsize");
     addCloneOfAction(viewMenu, "zoomtofit");
     addCloneOfAction(viewMenu, "fillwindow");
-    addCloneOfAction(viewMenu, "navresetszoom");
+    addCloneOfAction(viewMenu, "stickyzoom");
     viewMenu->addSeparator();
     addCloneOfAction(viewMenu, "rotateright");
     addCloneOfAction(viewMenu, "rotateleft");
@@ -711,8 +711,8 @@ void ActionManager::actionTriggered(QAction *triggeredAction, MainWindow *releva
         relevantWindow->setZoomToFit(triggeredAction->isChecked());
     } else if (key == "fillwindow") {
         relevantWindow->setFillWindow(triggeredAction->isChecked());
-    } else if (key == "navresetszoom") {
-        relevantWindow->setNavigationResetsZoom(triggeredAction->isChecked());
+    } else if (key == "stickyzoom") {
+        relevantWindow->setStickyZoom(triggeredAction->isChecked());
     } else if (key == "rotateright") {
         relevantWindow->rotateRight();
     } else if (key == "rotateleft") {
@@ -870,10 +870,10 @@ void ActionManager::initializeActionLibrary()
     fillWindowAction->setCheckable(true);
     actionLibrary.insert("fillwindow", fillWindowAction);
 
-    auto *navigationResetsZoomAction = new QAction(qvApp->iconFromFont(Qv::MaterialIcon::Deselect), tr("&Navigation Resets Zoom"));
-    navigationResetsZoomAction->setData({"disable"});
-    navigationResetsZoomAction->setCheckable(true);
-    actionLibrary.insert("navresetszoom", navigationResetsZoomAction);
+    auto *stickyZoomAction = new QAction(qvApp->iconFromFont(Qv::MaterialIcon::PushPin), tr("&Sticky Zoom"));
+    stickyZoomAction->setData({"disable"});
+    stickyZoomAction->setCheckable(true);
+    actionLibrary.insert("stickyzoom", stickyZoomAction);
 
     auto *rotateRightAction = new QAction(qvApp->iconFromFont(Qv::MaterialIcon::RotateRight), tr("Rotate &Right"));
     rotateRightAction->setData({"disable"});

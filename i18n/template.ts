@@ -188,7 +188,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>&amp;Navigation Resets Zoom</source>
+        <source>&amp;Sticky Zoom</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -834,7 +834,7 @@ No write permission or file is read-only.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Navigation resets zoom</source>
+        <source>Sticky zoom</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1425,7 +1425,7 @@ No write permission or file is read-only.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Navigation Resets Zoom</source>
+        <source>Sticky Zoom</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

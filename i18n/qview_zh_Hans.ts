@@ -188,8 +188,8 @@
         <translation>填充窗口</translation>
     </message>
     <message>
-        <source>&amp;Navigation Resets Zoom</source>
-        <translation>导航重置缩放</translation>
+        <source>&amp;Sticky Zoom</source>
+        <translation>保留缩放比例</translation>
     </message>
     <message>
         <source>Rotate &amp;Right</source>
@@ -844,8 +844,8 @@ No write permission or file is read-only.</source>
         <translation> 像素超扫描</translation>
     </message>
     <message>
-        <source>Navigation resets zoom</source>
-        <translation>导航重置缩放</translation>
+        <source>Sticky zoom</source>
+        <translation>保留缩放比例</translation>
     </message>
     <message>
         <source>&amp;Constrain image position</source>
@@ -1437,8 +1437,8 @@ No write permission or file is read-only.</source>
         <translation>填充窗口</translation>
     </message>
     <message>
-        <source>Navigation Resets Zoom</source>
-        <translation>导航重置缩放</translation>
+        <source>Sticky Zoom</source>
+        <translation>保留缩放比例</translation>
     </message>
     <message>
         <source>Rotate Right</source>

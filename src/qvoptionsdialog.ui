@@ -603,9 +603,9 @@
            </widget>
           </item>
           <item row="11" column="1">
-           <widget class="QCheckBox" name="navResetsZoomCheckbox">
+           <widget class="QCheckBox" name="stickyZoomCheckbox">
             <property name="text">
-             <string>Navigation resets zoom</string>
+             <string>Sticky zoom</string>
             </property>
            </widget>
           </item>

@@ -188,8 +188,8 @@
         <translation>Fenster ausfüllen</translation>
     </message>
     <message>
-        <source>&amp;Navigation Resets Zoom</source>
-        <translation>Navigation setzt Zoom zurück</translation>
+        <source>&amp;Sticky Zoom</source>
+        <translation>Zoom beibehalten</translation>
     </message>
     <message>
         <source>Rotate &amp;Right</source>
@@ -845,8 +845,8 @@ Keine Schreibberechtigung oder Datei ist schreibgeschützt.</translation>
         <translation> Pixel Overscan</translation>
     </message>
     <message>
-        <source>Navigation resets zoom</source>
-        <translation>Navigation setzt Zoom zurück</translation>
+        <source>Sticky zoom</source>
+        <translation>Zoom beibehalten</translation>
     </message>
     <message>
         <source>&amp;Constrain image position</source>
@@ -1438,8 +1438,8 @@ Keine Schreibberechtigung oder Datei ist schreibgeschützt.</translation>
         <translation>Fenster ausfüllen</translation>
     </message>
     <message>
-        <source>Navigation Resets Zoom</source>
-        <translation>Navigation setzt Zoom zurück</translation>
+        <source>Sticky Zoom</source>
+        <translation>Zoom beibehalten</translation>
     </message>
     <message>
         <source>Rotate Right</source>

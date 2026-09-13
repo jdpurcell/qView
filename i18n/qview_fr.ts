@@ -188,8 +188,8 @@
         <translation>Remplir la fenêtre</translation>
     </message>
     <message>
-        <source>&amp;Navigation Resets Zoom</source>
-        <translation>La navigation réinitialise le zoom</translation>
+        <source>&amp;Sticky Zoom</source>
+        <translation>Zoom persistant</translation>
     </message>
     <message>
         <source>Rotate &amp;Right</source>
@@ -845,8 +845,8 @@ Pas d&apos;autorisation d&apos;écriture ou le fichier est en lecture seule.</tr
         <translation> pixel de surbalayage</translation>
     </message>
     <message>
-        <source>Navigation resets zoom</source>
-        <translation>La navigation réinitialise le zoom</translation>
+        <source>Sticky zoom</source>
+        <translation>Zoom persistant</translation>
     </message>
     <message>
         <source>&amp;Constrain image position</source>
@@ -1438,8 +1438,8 @@ Pas d&apos;autorisation d&apos;écriture ou le fichier est en lecture seule.</tr
         <translation>Remplir la fenêtre</translation>
     </message>
     <message>
-        <source>Navigation Resets Zoom</source>
-        <translation>La navigation réinitialise le zoom</translation>
+        <source>Sticky Zoom</source>
+        <translation>Zoom persistant</translation>
     </message>
     <message>
         <source>Rotate Right</source>

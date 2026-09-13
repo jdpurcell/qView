@@ -188,8 +188,8 @@
         <translation>Rellenar ventana</translation>
     </message>
     <message>
-        <source>&amp;Navigation Resets Zoom</source>
-        <translation>La navegación restablece el zoom</translation>
+        <source>&amp;Sticky Zoom</source>
+        <translation>Zoom persistente</translation>
     </message>
     <message>
         <source>Rotate &amp;Right</source>
@@ -845,8 +845,8 @@ No tiene permiso de escritura o el archivo es de solo lectura.</translation>
         <translation> píxeles de sobreexploración</translation>
     </message>
     <message>
-        <source>Navigation resets zoom</source>
-        <translation>La navegación restablece el zoom</translation>
+        <source>Sticky zoom</source>
+        <translation>Zoom persistente</translation>
     </message>
     <message>
         <source>&amp;Constrain image position</source>
@@ -1438,8 +1438,8 @@ No tiene permiso de escritura o el archivo es de solo lectura.</translation>
         <translation>Rellenar ventana</translation>
     </message>
     <message>
-        <source>Navigation Resets Zoom</source>
-        <translation>La navegación restablece el zoom</translation>
+        <source>Sticky Zoom</source>
+        <translation>Zoom persistente</translation>
     </message>
     <message>
         <source>Rotate Right</source>

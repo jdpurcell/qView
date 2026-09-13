@@ -148,6 +148,12 @@ void SettingsManager::migrateOldSettings()
         copyFromOfficial();
 
     QSettings settings;
+
+    if (!settings.contains("shortcuts/stickyzoom") && settings.contains("shortcuts/navresetszoom"))
+    {
+        settings.setValue("shortcuts/stickyzoom", settings.value("shortcuts/navresetszoom"));
+    }
+
     settings.beginGroup("options");
 
     if (!settings.contains("smoothscalingmode") && settings.contains("filteringenabled"))
@@ -157,6 +163,11 @@ void SettingsManager::migrateOldSettings()
             settings.value("filteringenabled").toBool() ? Qv::SmoothScalingMode::Bilinear :
             Qv::SmoothScalingMode::Disabled;
         settings.setValue("smoothscalingmode", static_cast<int>(value));
+    }
+
+    if (!settings.contains("stickyzoom") && settings.contains("navresetszoom"))
+    {
+        settings.setValue("stickyzoom", !settings.value("navresetszoom").toBool());
     }
 }
 
@@ -215,7 +226,7 @@ void SettingsManager::initializeSettingsLibrary()
     settingsLibrary.insert("smoothscalinglimitpercent", {400, {}});
     settingsLibrary.insert("scalefactor", {25, {}});
     settingsLibrary.insert("cursorzoom", {true, {}});
-    settingsLibrary.insert("navresetszoom", {true, {}});
+    settingsLibrary.insert("stickyzoom", {false, {}});
 #ifdef Q_OS_MACOS
     // Usually not desired due to the way macOS does DPI scaling
     settingsLibrary.insert("onetoonepixelsizing", {false, {}});

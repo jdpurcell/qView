@@ -188,8 +188,8 @@
         <translation>Заполнить окно</translation>
     </message>
     <message>
-        <source>&amp;Navigation Resets Zoom</source>
-        <translation>Сброс масштаба при навигации</translation>
+        <source>&amp;Sticky Zoom</source>
+        <translation>Сохранять масштаб</translation>
     </message>
     <message>
         <source>Rotate &amp;Right</source>
@@ -845,8 +845,8 @@ No write permission or file is read-only.</source>
         <translation> пкс кромки экрана</translation>
     </message>
     <message>
-        <source>Navigation resets zoom</source>
-        <translation>Сброс масштаба при навигации</translation>
+        <source>Sticky zoom</source>
+        <translation>Сохранять масштаб</translation>
     </message>
     <message>
         <source>&amp;Constrain image position</source>
@@ -1438,8 +1438,8 @@ No write permission or file is read-only.</source>
         <translation>Заполнить окно</translation>
     </message>
     <message>
-        <source>Navigation Resets Zoom</source>
-        <translation>Сброс масштаба при навигации</translation>
+        <source>Sticky Zoom</source>
+        <translation>Сохранять масштаб</translation>
     </message>
     <message>
         <source>Rotate Right</source>

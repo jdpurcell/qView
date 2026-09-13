@@ -188,8 +188,8 @@
         <translation>ウィンドウいっぱいに表示</translation>
     </message>
     <message>
-        <source>&amp;Navigation Resets Zoom</source>
-        <translation>ナビゲーションでズームをリセット</translation>
+        <source>&amp;Sticky Zoom</source>
+        <translation>ズームを維持</translation>
     </message>
     <message>
         <source>Rotate &amp;Right</source>
@@ -845,8 +845,8 @@ No write permission or file is read-only.</source>
         <translation> ピクセルオーバースキャン</translation>
     </message>
     <message>
-        <source>Navigation resets zoom</source>
-        <translation>ナビゲーションでズームをリセット</translation>
+        <source>Sticky zoom</source>
+        <translation>ズームを維持</translation>
     </message>
     <message>
         <source>&amp;Constrain image position</source>
@@ -1438,8 +1438,8 @@ No write permission or file is read-only.</source>
         <translation>ウィンドウいっぱいに表示</translation>
     </message>
     <message>
-        <source>Navigation Resets Zoom</source>
-        <translation>ナビゲーションでズームをリセット</translation>
+        <source>Sticky Zoom</source>
+        <translation>ズームを維持</translation>
     </message>
     <message>
         <source>Rotate Right</source>

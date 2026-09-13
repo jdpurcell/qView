@@ -668,13 +668,13 @@ void ActionManagerTests::testMultiFrameView()
     for (auto *action : qvApp->getActionManager().getAllClonesOfAction("pause", &window))
         QVERIFY(!action->isEnabled());
 
-    view->setNavigationResetsZoom(true);
+    view->setStickyZoom(false);
     view->zoomAbsolute(2.0);
     QVERIFY(!view->getCalculatedZoomMode().has_value());
     view->jumpToNextFrame();
     QTRY_COMPARE(files.size(), 2);
     QVERIFY(view->getCalculatedZoomMode() == initialZoomMode);
-    view->setNavigationResetsZoom(false);
+    view->setStickyZoom(true);
     view->zoomAbsolute(3.0);
     view->jumpToPreviousFrame();
     QTRY_COMPARE(files.size(), 3);

@@ -46,8 +46,8 @@ public:
     const std::optional<Qv::CalculatedZoomMode> &getCalculatedZoomMode() const;
     void setCalculatedZoomMode(const std::optional<Qv::CalculatedZoomMode> &value, const bool isNavigating = false, const std::optional<QPoint> &mousePos = {});
 
-    bool getNavigationResetsZoom() const { return navigationResetsZoom; }
-    void setNavigationResetsZoom(const bool value);
+    bool getStickyZoom() const { return stickyZoom; }
+    void setStickyZoom(const bool value);
 
     Qv::SortMode getSortMode() const { return imageCore.getSortMode(); }
     void setSortMode(const Qv::SortMode mode) { imageCore.setSortMode(mode); }
@@ -105,7 +105,7 @@ signals:
 
     void calculatedZoomModeChanged();
 
-    void navigationResetsZoomChanged();
+    void stickyZoomChanged();
 
     void sortParametersChanged();
 
@@ -224,8 +224,8 @@ private:
     bool scrollActionCooldown {false};
 
     std::optional<Qv::CalculatedZoomMode> calculatedZoomMode;
-    bool globalNavigationResetsZoom {true};
-    bool navigationResetsZoom {true};
+    bool globalStickyZoom {false};
+    bool stickyZoom {false};
     bool loadIsFromSessionRestore {false};
     qreal zoomLevel {1.0};
     qreal appliedDpiAdjustment {1.0};

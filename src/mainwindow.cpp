@@ -114,7 +114,7 @@ MainWindow::MainWindow(QWidget *parent, const QJsonObject &windowSessionState) :
     });
     connect(graphicsView, &QVGraphicsView::zoomLevelChanged, this, &MainWindow::zoomLevelChanged);
     connect(graphicsView, &QVGraphicsView::calculatedZoomModeChanged, this, &MainWindow::syncCalculatedZoomMode);
-    connect(graphicsView, &QVGraphicsView::navigationResetsZoomChanged, this, &MainWindow::syncNavigationResetsZoom);
+    connect(graphicsView, &QVGraphicsView::stickyZoomChanged, this, &MainWindow::syncStickyZoom);
     connect(graphicsView, &QVGraphicsView::sortParametersChanged, this, &MainWindow::syncSortParameters);
     connect(graphicsView, &QVGraphicsView::cancelSlideshow, this, &MainWindow::cancelSlideshow);
 
@@ -281,7 +281,7 @@ void MainWindow::showEvent(QShowEvent *event)
     }
 
     syncCalculatedZoomMode();
-    syncNavigationResetsZoom();
+    syncStickyZoom();
     syncSortParameters();
 
     if (!sessionStateToLoad.isEmpty())
@@ -533,10 +533,10 @@ void MainWindow::syncCalculatedZoomMode()
         action->setChecked(isFillWindow);
 }
 
-void MainWindow::syncNavigationResetsZoom()
+void MainWindow::syncStickyZoom()
 {
-    const bool value = graphicsView->getNavigationResetsZoom();
-    for (const auto &action : qvApp->getActionManager().getAllClonesOfAction("navresetszoom", this))
+    const bool value = graphicsView->getStickyZoom();
+    for (const auto &action : qvApp->getActionManager().getAllClonesOfAction("stickyzoom", this))
         action->setChecked(value);
 }
 
@@ -881,7 +881,7 @@ void MainWindow::setWindowSize(const bool isReapplying, const bool isExplicitReq
     const QSize screenSize = currentScreen->size();
     const QSize minWindowSize = (screenSize * minWindowResizedPercentage).boundedTo(hardLimitSize);
     const QSize maxWindowSize = (screenSize * qMax(maxWindowResizedPercentage, minWindowResizedPercentage)).boundedTo(hardLimitSize);
-    const bool isZoomFixed = (!graphicsView->getNavigationResetsZoom() || isReapplying) && !graphicsView->getCalculatedZoomMode().has_value();
+    const bool isZoomFixed = (graphicsView->getStickyZoom() || isReapplying) && !graphicsView->getCalculatedZoomMode().has_value();
     const QSizeF imageSize = graphicsView->getEffectiveOriginalSize() * (isZoomFixed ? graphicsView->getZoomLevel() : 1.0);
     const int fitOverscan = graphicsView->getFitOverscan();
     const QSize fitOverscanSize = QSize(fitOverscan * 2, fitOverscan * 2);
@@ -1357,9 +1357,9 @@ void MainWindow::setFillWindow(const bool value)
     graphicsView->setCalculatedZoomMode(value ? std::optional(Qv::CalculatedZoomMode::FillWindow) : std::nullopt);
 }
 
-void MainWindow::setNavigationResetsZoom(const bool value)
+void MainWindow::setStickyZoom(const bool value)
 {
-    graphicsView->setNavigationResetsZoom(value);
+    graphicsView->setStickyZoom(value);
 }
 
 void MainWindow::setSortMode(const Qv::SortMode mode)

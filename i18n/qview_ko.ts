@@ -188,8 +188,8 @@
         <translation>화면 가득 채우기</translation>
     </message>
     <message>
-        <source>&amp;Navigation Resets Zoom</source>
-        <translation>탐색 시 확대/축소 초기화</translation>
+        <source>&amp;Sticky Zoom</source>
+        <translation>줌 유지</translation>
     </message>
     <message>
         <source>Rotate &amp;Right</source>
@@ -845,8 +845,8 @@ No write permission or file is read-only.</source>
         <translation> 픽셀 오버스캔</translation>
     </message>
     <message>
-        <source>Navigation resets zoom</source>
-        <translation>탐색 시 확대/축소 초기화</translation>
+        <source>Sticky zoom</source>
+        <translation>줌 유지</translation>
     </message>
     <message>
         <source>&amp;Constrain image position</source>
@@ -1438,8 +1438,8 @@ No write permission or file is read-only.</source>
         <translation>화면 가득 채우기</translation>
     </message>
     <message>
-        <source>Navigation Resets Zoom</source>
-        <translation>탐색 시 확대/축소 초기화</translation>
+        <source>Sticky Zoom</source>
+        <translation>줌 유지</translation>
     </message>
     <message>
         <source>Rotate Right</source>
