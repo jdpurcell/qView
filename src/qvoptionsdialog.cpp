@@ -2,6 +2,9 @@
 #include "ui_qvoptionsdialog.h"
 #include "qvapplication.h"
 #include "qvshortcutdialog.h"
+#if defined COCOA_LOADED && QT_VERSION >= QT_VERSION_CHECK(6, 11, 2) && QT_VERSION < QT_VERSION_CHECK(6, 12, 1)
+#include "qvcocoafunctions.h"
+#endif
 #include <QColorDialog>
 #include <QPalette>
 #include <QScreen>
@@ -633,6 +636,24 @@ void QVOptionsDialog::customizePalette()
         palette.setColor(QPalette::Highlight, Qv::getPerceivedBrightness(textColor) > 0.5 ? QColor(0, 65, 127) : QColor(75, 166, 255));
         ui->categoryList->setPalette(palette);
     }
+
+#if defined COCOA_LOADED && QT_VERSION >= QT_VERSION_CHECK(6, 11, 2) && QT_VERSION < QT_VERSION_CHECK(6, 12, 1)
+    // Workaround for QTBUG-149290
+    if (QOperatingSystemVersion::current() >= QOperatingSystemVersion(QOperatingSystemVersion::MacOS, 26))
+    {
+        const QColor baseColor = QVCocoaFunctions::getTextBackgroundColorSRGB();
+        const auto setBaseColor = [&baseColor](QWidget *widget) {
+            QPalette palette = widget->palette();
+            palette.setColor(QPalette::Base, baseColor);
+            widget->setPalette(palette);
+        };
+
+        for (QLineEdit *lineEdit : findChildren<QLineEdit *>())
+            setBaseColor(lineEdit);
+        for (QAbstractSpinBox *spinBox : findChildren<QAbstractSpinBox *>())
+            setBaseColor(spinBox);
+    }
+#endif
 }
 
 void QVOptionsDialog::populateCategories(int selectedRow)
