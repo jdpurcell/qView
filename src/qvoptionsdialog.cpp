@@ -7,8 +7,6 @@
 #include <QScreen>
 #include <QMessageBox>
 #include <QSettings>
-#include <QStyle>
-#include <QStyleFactory>
 #include <QWindow>
 
 #include <QDebug>
@@ -23,26 +21,6 @@ QVOptionsDialog::QVOptionsDialog(QWidget *parent) :
     setWindowFlags(windowFlags() & (~Qt::WindowContextHelpButtonHint | Qt::CustomizeWindowHint));
 
     resize(650, 550);
-
-    // Center fixed-height checkboxes beside taller form fields
-    ui->windowLayout->setAlignment(ui->bgColorCheckbox, Qt::AlignVCenter);
-    ui->imageLayout->setAlignment(ui->smoothScalingLimitCheckbox, Qt::AlignVCenter);
-    ui->imageLayout->setAlignment(ui->fitZoomLimitCheckbox, Qt::AlignVCenter);
-    ui->cursorLayout->setAlignment(ui->cursorAutoHideFullscreenCheckbox, Qt::AlignVCenter);
-
-#ifdef Q_OS_MACOS
-    // Workaround for QTBUG-150017
-    if (QOperatingSystemVersion::current() >= QOperatingSystemVersion(QOperatingSystemVersion::MacOS, 27))
-    {
-        if (QStyle *fusionStyle = QStyleFactory::create("fusion"))
-        {
-            fusionStyle->setParent(ui->formatsTable);
-            ui->formatsTable->setStyle(fusionStyle);
-            for (QWidget *child : ui->formatsTable->findChildren<QWidget *>())
-                child->setStyle(fusionStyle);
-        }
-    }
-#endif
 
     connect(ui->categoryList, &QListWidget::currentRowChanged, this, [this](int currentRow) { ui->stackedWidget->setCurrentIndex(currentRow); });
     connect(ui->buttonBox, &QDialogButtonBox::clicked, this, &QVOptionsDialog::buttonBoxClicked);
