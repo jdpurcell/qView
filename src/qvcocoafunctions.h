@@ -3,7 +3,6 @@
 
 #include "openwith.h"
 
-#include <QColor>
 #include <QWindow>
 #include <QMenu>
 
@@ -27,10 +26,6 @@ public:
     static void setVibrancy(bool alwaysDark, QWindow *window);
 
     static int getObscuredHeight(QWindow *window);
-
-#if QT_VERSION >= QT_VERSION_CHECK(6, 11, 2) && QT_VERSION < QT_VERSION_CHECK(6, 12, 1)
-    static QColor getTextBackgroundColorSRGB();
-#endif
 
 #if defined COCOA_LOADED && QT_VERSION < QT_VERSION_CHECK(6, 11, 3)
     static bool startWindowDrag(QWindow *window);

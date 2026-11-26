@@ -148,24 +148,6 @@ int QVCocoaFunctions::getObscuredHeight(QWindow *window)
     return totalHeight - visibleHeight;
 }
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 11, 2) && QT_VERSION < QT_VERSION_CHECK(6, 12, 1)
-QColor QVCocoaFunctions::getTextBackgroundColorSRGB()
-{
-    __block CGFloat red;
-    __block CGFloat green;
-    __block CGFloat blue;
-    __block CGFloat alpha;
-    [NSApp.effectiveAppearance performAsCurrentDrawingAppearance:^{
-        NSColor *color = [NSColor.textBackgroundColor colorUsingColorSpace:NSColorSpace.sRGBColorSpace];
-        red = color.redComponent;
-        green = color.greenComponent;
-        blue = color.blueComponent;
-        alpha = color.alphaComponent;
-    }];
-    return QColor::fromRgbF(red, green, blue, alpha);
-}
-#endif
-
 #if defined COCOA_LOADED && QT_VERSION < QT_VERSION_CHECK(6, 11, 3)
 bool QVCocoaFunctions::startWindowDrag(QWindow *window)
 {
