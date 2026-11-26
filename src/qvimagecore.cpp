@@ -166,19 +166,25 @@ void QVImageCore::loadPixmap(const ReadData &readData)
 
     // Animation detection
     loadedMovie.stop();
+    loadedMovie.setFileName("");
     loadedMovie.setFormat("");
     loadedMovie.setCacheMode(QVMovie::CacheAll);
-    loadedMovie.setFileName(currentFileDetails.fileInfo.absoluteFilePath());
-
-    // APNG workaround
-    if (loadedMovie.format() == "png")
+    const QString suffix = currentFileDetails.fileInfo.suffix().toLower();
+    const bool disableAnimation = suffix == "svg" || suffix == "svgz";
+    if (!disableAnimation)
     {
-        loadedMovie.setFormat("apng");
         loadedMovie.setFileName(currentFileDetails.fileInfo.absoluteFilePath());
-    }
 
-    if (!readData.isMultiFrameImage && loadedMovie.isValid() && loadedMovie.frameCount() != 1)
-        loadedMovie.start();
+        // APNG workaround
+        if (loadedMovie.format() == "png")
+        {
+            loadedMovie.setFormat("apng");
+            loadedMovie.setFileName(currentFileDetails.fileInfo.absoluteFilePath());
+        }
+
+        if (!readData.isMultiFrameImage && loadedMovie.isValid() && loadedMovie.frameCount() != 1)
+            loadedMovie.start();
+    }
 
     currentFileDetails.isMovieLoaded = loadedMovie.state() == QVMovie::Running;
 
