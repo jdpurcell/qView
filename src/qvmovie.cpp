@@ -338,12 +338,18 @@ void QVMoviePrivate::_q_loadNextFrame(bool starting)
             emit q->error(reader->error());
         }
 
-        // Graceful finish
-        if (movieState != QVMovie::Paused) {
-            nextFrameNumber = 0;
-            nextLoadTime = std::nullopt;
-            isFirstIteration = true;
-            playCounter = -1;
+        // A paused movie keeps its state so it can resume later.
+        if (movieState == QVMovie::Paused)
+            return;
+
+        nextFrameNumber = 0;
+        nextLoadTime = std::nullopt;
+        isFirstIteration = true;
+        playCounter = -1;
+
+        // Only report a graceful finish when the movie was actually running;
+        // a failed start() played nothing and must not emit finished().
+        if (movieState == QVMovie::Running) {
             enterState(QVMovie::NotRunning);
             emit q->finished();
         }
