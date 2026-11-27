@@ -13,6 +13,23 @@
 #include <QGuiApplication>
 #include <QScreen>
 
+static int findFileIndex(const QVFileEnumerator::CompatibleFileList &files, const QFileInfo &fileInfo)
+{
+    const QString targetPath = fileInfo.absoluteFilePath().normalized(QString::NormalizationForm_D);
+    for (int i = 0; i < files.length(); i++)
+    {
+        // Compare absoluteFilePath first because it's way faster, but double-check with
+        // QFileInfo::operator== because it respects file system case sensitivity rules
+        const QString candidatePath = files[i].absoluteFilePath.normalized(QString::NormalizationForm_D);
+        if (candidatePath.compare(targetPath, Qt::CaseInsensitive) == 0 &&
+            QFileInfo(files[i].absoluteFilePath) == fileInfo)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
 QVImageCore::QVImageCore(QObject *parent) : QObject(parent)
 {
     QImageReader::setAllocationLimit(8192); // 8 GiB
@@ -115,6 +132,8 @@ void QVImageCore::loadFile(const QString &fileName, const bool isReloading, cons
     loadInProgress = true;
     pendingLoadDebouncesPreloading = debouncePreloading;
     pendingLoadRequestId = imageLoader.requestImage(absolutePath, isReloading, initialFrameNumber);
+    if (debouncePreloading)
+        imageLoader.setDesiredImages({{absolutePath, 0}});
 }
 
 void QVImageCore::loadPixmap(const ReadData &readData)
@@ -345,6 +364,16 @@ QVImageCore::GoToFileResult QVImageCore::goToFile(const Qv::GoToFileMode mode, c
         mode == Qv::GoToFileMode::JumpForward;
     loadFile(nextImageFilePath, false, {}, debouncePreloading);
 
+    // Replenish lookahead immediately, while the requested image is loading
+    // or being delivered from cache. Keep displayed-file details unchanged.
+    if (!debouncePreloading)
+    {
+        if (shouldRetryFolderInfoUpdate)
+            newIndex = findFileIndex(fileList, QFileInfo(nextImageFilePath));
+
+        imageLoader.setDesiredImages(getDesiredImages(nextImageFilePath, newIndex, true));
+    }
+
     return result;
 }
 
@@ -368,17 +397,12 @@ void QVImageCore::updateFolderInfo(QString dirPath)
     currentFileDetails.updateLoadedIndexInFolder();
 }
 
-QList<QVImageLoader::DesiredImage> QVImageCore::getDesiredImages(const bool includePreloads) const
+QList<QVImageLoader::DesiredImage> QVImageCore::getDesiredImages(const QString &targetPath, const int loadedIndex, const bool includePreloads) const
 {
-    const QString absoluteTargetPath = currentFileDetails.fileInfo.absoluteFilePath();
-    QList<QVImageLoader::DesiredImage> desiredImages {{absoluteTargetPath, 0}};
+    QList<QVImageLoader::DesiredImage> desiredImages {{targetPath, 0}};
 
     const auto &fileList = currentFileDetails.folderFileInfoList;
-    if (!includePreloads || fileList.isEmpty() || preloadingMode == Qv::PreloadMode::Disabled)
-        return desiredImages;
-
-    const int loadedIndex = currentFileDetails.loadedIndexInFolder;
-    if (loadedIndex == -1)
+    if (!includePreloads || loadedIndex == -1 || preloadingMode == Qv::PreloadMode::Disabled)
         return desiredImages;
 
     const int preloadDistance = preloadingMode == Qv::PreloadMode::Extended ? 3 : 1;
@@ -418,7 +442,7 @@ void QVImageCore::refreshDesiredImages(const bool includePreloads)
         return;
     }
 
-    imageLoader.setDesiredImages(getDesiredImages(includePreloads));
+    imageLoader.setDesiredImages(getDesiredImages(targetFilePath, currentFileDetails.loadedIndexInFolder, includePreloads));
 }
 
 QColorSpace QVImageCore::getTargetColorSpace() const
@@ -562,18 +586,5 @@ void QVImageCore::settingsUpdated()
 
 void QVImageCore::FileDetails::updateLoadedIndexInFolder()
 {
-    const QString targetPath = fileInfo.absoluteFilePath().normalized(QString::NormalizationForm_D);
-    for (int i = 0; i < folderFileInfoList.length(); i++)
-    {
-        // Compare absoluteFilePath first because it's way faster, but double-check with
-        // QFileInfo::operator== because it respects file system case sensitivity rules
-        QString candidatePath = folderFileInfoList[i].absoluteFilePath.normalized(QString::NormalizationForm_D);
-        if (candidatePath.compare(targetPath, Qt::CaseInsensitive) == 0 &&
-            QFileInfo(folderFileInfoList[i].absoluteFilePath) == fileInfo)
-        {
-            loadedIndexInFolder = i;
-            return;
-        }
-    }
-    loadedIndexInFolder = -1;
+    loadedIndexInFolder = findFileIndex(folderFileInfoList, fileInfo);
 }

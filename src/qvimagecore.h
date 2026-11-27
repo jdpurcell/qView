@@ -83,7 +83,7 @@ protected:
     void loadPixmap(const ReadData &readData);
     void loadEmptyPixmap();
     void updateFolderInfo(QString dirPath = QString());
-    QList<QVImageLoader::DesiredImage> getDesiredImages(bool includePreloads = true) const;
+    QList<QVImageLoader::DesiredImage> getDesiredImages(const QString &targetPath, int loadedIndex, bool includePreloads) const;
     void refreshDesiredImages(bool includePreloads = true);
     QColorSpace getTargetColorSpace() const;
     QColorSpace detectDisplayColorSpace() const;

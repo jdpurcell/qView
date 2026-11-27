@@ -7,6 +7,7 @@
 #include <QSettings>
 #include <QTemporaryDir>
 #include <QThreadPool>
+#include <QScopeGuard>
 
 #include "qvapplication.h"
 #include "qvimageloader.h"
@@ -24,6 +25,10 @@ private slots:
     void testMultiFrameReplacement();
     void testSampleTiff();
     void testImageLoaderPriorities();
+    void testNavigationAdvancesPreloadWindow();
+    void testJumpRetiresQueuedPreloads();
+    void testImageLoaderWorkConserving();
+    void testImageLoaderForegroundBypassesBudget();
     void testImageLoaderCacheAndAttachment();
     void testImageLoaderRetainedDuringDelivery();
     void testImageLoaderForegroundRequestPreservesCache();
@@ -304,14 +309,16 @@ void ImageLoaderTests::testMultiFrameCore()
     QCOMPARE(core.getCurrentFileDetails().frameNumber, 1);
     QCOMPARE(core.getCurrentFileDetails().baseImageSize, QSize(32, 24));
     QCOMPARE(core.getCurrentFileDetails().loadedPixmapSize, QSize(32, 24));
-    QImageReader reader(path);
-    reader.setAutoTransform(true);
-    QVERIFY(reader.jumpToImage(1));
-    QImage expected = reader.read();
-    QVERIFY(expected.colorSpace().isValid());
-    if (core.getCurrentFileDetails().targetColorSpace.isValid())
-        expected.convertToColorSpace(core.getCurrentFileDetails().targetColorSpace);
-    QCOMPARE(core.getLoadedPixmap().toImage().pixelColor(0, 0), expected.pixelColor(0, 0));
+    { // Release the reader's file handle before testing deletion on Windows.
+        QImageReader reader(path);
+        reader.setAutoTransform(true);
+        QVERIFY(reader.jumpToImage(1));
+        QImage expected = reader.read();
+        QVERIFY(expected.colorSpace().isValid());
+        if (core.getCurrentFileDetails().targetColorSpace.isValid())
+            expected.convertToColorSpace(core.getCurrentFileDetails().targetColorSpace);
+        QCOMPARE(core.getLoadedPixmap().toImage().pixelColor(0, 0), expected.pixelColor(0, 0));
+    }
     core.jumpToNextFrame();
     QTRY_COMPARE(files.size(), 3);
     QCOMPARE(core.getCurrentFileDetails().frameNumber, 0);
@@ -416,6 +423,136 @@ void ImageLoaderTests::testSampleTiff()
     QVERIFY(!core.getCurrentFileDetails().isMovieLoaded);
 }
 
+void ImageLoaderTests::testNavigationAdvancesPreloadWindow()
+{
+    auto &settings = qvApp->getSettingsManager();
+    const int previousMode = settings.getInteger("preloadingmode");
+    QSettings().setValue("options/preloadingmode", static_cast<int>(Qv::PreloadMode::Extended));
+    settings.loadSettings();
+    const auto restore = qScopeGuard([&settings, previousMode] {
+        QThreadPool::globalInstance()->waitForDone();
+        QSettings().setValue("options/preloadingmode", previousMode);
+        settings.loadSettings();
+    });
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    QStringList paths;
+    for (int i = 0; i < 10; ++i)
+        paths.append(createTestImage(dir, QString::number(i), Qt::red));
+    QVImageCore core;
+    core.setSortMode(Qv::SortMode::Name);
+    core.setSortDescending(false);
+    auto *loader = core.findChild<QVImageLoader *>();
+    QVERIFY(loader);
+    QSignalSpy started(loader, &QVImageLoader::loadStarted);
+    QSignalSpy changed(&core, &QVImageCore::fileChanged);
+    core.loadFile(paths[4]);
+    QTRY_COMPARE(changed.size(), 1);
+    QTRY_COMPARE(started.size(), 7);
+    QThreadPool::globalInstance()->waitForDone();
+    QCoreApplication::processEvents();
+
+    started.clear();
+    core.goToFile(Qv::GoToFileMode::Next);
+    // The far edge must start before the cached foreground result is delivered.
+    QCOMPARE(core.getCurrentFileDetails().fileInfo.absoluteFilePath(), paths[4]);
+    QCOMPARE(started.size(), 1);
+    QCOMPARE(started.at(0).at(0).toString(), paths[8]);
+    QCOMPARE(started.at(0).at(1).toInt(), 3);
+    QTRY_COMPARE(changed.size(), 2);
+    QCOMPARE(core.getCurrentFileDetails().fileInfo.absoluteFilePath(), paths[5]);
+
+    QThreadPool::globalInstance()->waitForDone();
+    QCoreApplication::processEvents();
+    started.clear();
+    core.goToFile(Qv::GoToFileMode::Previous);
+    QCOMPARE(started.size(), 1);
+    QCOMPARE(started.at(0).at(0).toString(), paths[1]);
+    QTRY_COMPARE(changed.size(), 3);
+
+    // Reaching the last file, then wrapping, must use the requested index.
+    QThreadPool::globalInstance()->waitForDone();
+    QCoreApplication::processEvents();
+    core.goToFile(Qv::GoToFileMode::Last);
+    QTRY_COMPARE(changed.size(), 4);
+    QThreadPool::globalInstance()->waitForDone();
+    QCoreApplication::processEvents();
+    started.clear();
+    core.goToFile(Qv::GoToFileMode::Next);
+    QCOMPARE(started.size(), 1);
+    QCOMPARE(started.at(0).at(0).toString(), paths[3]);
+    QTRY_COMPARE(changed.size(), 5);
+    QCOMPARE(core.getCurrentFileDetails().fileInfo.absoluteFilePath(), paths[0]);
+
+    // Removing the displayed file shifts the requested index in the refreshed listing.
+    QThreadPool::globalInstance()->waitForDone();
+    QCoreApplication::processEvents();
+    QVERIFY(QFile::remove(paths[0]));
+    core.markFolderInfoDirty();
+    started.clear();
+    core.goToFile(Qv::GoToFileMode::Next);
+    QCOMPARE(started.size(), 1);
+    QCOMPARE(started.at(0).at(0).toString(), paths[4]);
+    QTRY_COMPARE(changed.size(), 6);
+    QCOMPARE(core.getCurrentFileDetails().fileInfo.absoluteFilePath(), paths[1]);
+
+    // Early reconciliation must not introduce speculative loads in disabled mode.
+    QThreadPool::globalInstance()->waitForDone();
+    QCoreApplication::processEvents();
+    QSettings().setValue("options/preloadingmode", static_cast<int>(Qv::PreloadMode::Disabled));
+    settings.loadSettings();
+    started.clear();
+    core.goToFile(Qv::GoToFileMode::Next);
+    QCOMPARE(started.size(), 1);
+    QCOMPARE(started.at(0).at(0).toString(), paths[2]);
+    QTRY_COMPARE(changed.size(), 7);
+    QThreadPool::globalInstance()->waitForDone();
+    QCoreApplication::processEvents();
+    QCOMPARE(started.size(), 1);
+}
+
+void ImageLoaderTests::testJumpRetiresQueuedPreloads()
+{
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    QStringList paths;
+    for (int i = 0; i < 10; ++i)
+        paths.append(createTestImage(dir, QString::number(i), Qt::red));
+
+    auto *pool = QThreadPool::globalInstance();
+    const int previousLimit = pool->maxThreadCount();
+    pool->setMaxThreadCount(2);
+    const auto restore = qScopeGuard([pool, previousLimit] {
+        pool->waitForDone();
+        pool->setMaxThreadCount(previousLimit);
+    });
+    QVImageCore core;
+    core.setSortMode(Qv::SortMode::Name);
+    core.setSortDescending(false);
+    auto *loader = core.findChild<QVImageLoader *>();
+    QVERIFY(loader);
+    QSignalSpy started(loader, &QVImageLoader::loadStarted);
+    QSignalSpy changed(&core, &QVImageCore::fileChanged);
+    core.loadFile(paths[4]);
+    pool->waitForDone();
+    QCoreApplication::sendPostedEvents(qApp, QEvent::MetaCall);
+    QCOMPARE(changed.size(), 1);
+    QCOMPARE(started.size(), 2); // One neighbor started, the other is still queued.
+
+    started.clear();
+    pool->setMaxThreadCount(4); // Make a slot available before the jump.
+    core.goToFile(Qv::GoToFileMode::JumpForward);
+    QCOMPARE(started.size(), 1);
+    QCOMPARE(started.at(0).at(0).toString(), paths[9]);
+    pool->waitForDone();
+    QCoreApplication::sendPostedEvents(qApp, QEvent::MetaCall);
+    QCOMPARE(changed.size(), 2);
+    QCOMPARE(started.size(), 1);
+    QTRY_COMPARE(started.size(), 3);
+    QCOMPARE(started.at(1).at(0).toString(), paths[0]);
+    QCOMPARE(started.at(2).at(0).toString(), paths[8]);
+}
+
 void ImageLoaderTests::testImageLoaderPriorities()
 {
     QTemporaryDir dir;
@@ -432,6 +569,13 @@ void ImageLoaderTests::testImageLoaderPriorities()
     QVERIFY(!extendedBefore.isEmpty());
     QVERIFY(!extendedAfter.isEmpty());
 
+    auto *pool = QThreadPool::globalInstance();
+    const int previousLimit = pool->maxThreadCount();
+    pool->setMaxThreadCount(6);
+    const auto restore = qScopeGuard([pool, previousLimit] {
+        pool->waitForDone();
+        pool->setMaxThreadCount(previousLimit);
+    });
     QVImageLoader loader;
     QSignalSpy startedSpy(&loader, &QVImageLoader::loadStarted);
     QSignalSpy readySpy(&loader, &QVImageLoader::imageReady);
@@ -447,7 +591,7 @@ void ImageLoaderTests::testImageLoaderPriorities()
         {extendedAfter, 2}
     });
 
-    QCOMPARE(startedSpy.size(), 1);
+    QCOMPARE(startedSpy.size(), 5);
     QCOMPARE(startedSpy.at(0).at(0).toString(), target);
     QCOMPARE(startedSpy.at(0).at(1).toInt(), 0);
 
@@ -461,6 +605,67 @@ void ImageLoaderTests::testImageLoaderPriorities()
     const QList<int> expectedPriorities {0, 1, 1, 2, 2};
     for (int i = 0; i < expectedPriorities.size(); ++i)
         QCOMPARE(startedSpy.at(i).at(1).toInt(), expectedPriorities.at(i));
+}
+
+void ImageLoaderTests::testImageLoaderWorkConserving()
+{
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString near = createTestImage(dir, "near", Qt::red);
+    const QString farther = createTestImage(dir, "farther", Qt::green);
+    const QString obsolete = createTestImage(dir, "obsolete", Qt::blue);
+    auto *pool = QThreadPool::globalInstance();
+    pool->waitForDone();
+    const int previousLimit = pool->maxThreadCount();
+    pool->setMaxThreadCount(3);
+    const auto restore = qScopeGuard([pool, previousLimit] {
+        pool->waitForDone();
+        pool->setMaxThreadCount(previousLimit);
+    });
+    QVImageLoader loader;
+    QSignalSpy started(&loader, &QVImageLoader::loadStarted);
+    loader.setDesiredImages({{near, 1}, {farther, 2}, {obsolete, 3}});
+    QCOMPARE(started.size(), 2);
+    QCOMPARE(started.at(0).at(0).toString(), near);
+    QCOMPARE(started.at(1).at(0).toString(), farther);
+    loader.setDesiredImages({{near, 1}, {farther, 2}});
+    pool->waitForDone();
+    QCoreApplication::processEvents();
+    QCOMPARE(started.size(), 2);
+}
+
+void ImageLoaderTests::testImageLoaderForegroundBypassesBudget()
+{
+    QTemporaryDir dir;
+    QVERIFY(dir.isValid());
+    const QString obsolete = createTestImage(dir, "obsolete", Qt::red);
+    const QString queued = createTestImage(dir, "queued", Qt::green);
+    const QString foreground = createTestImage(dir, "foreground", Qt::blue);
+    auto *pool = QThreadPool::globalInstance();
+    pool->waitForDone();
+    const int previousLimit = pool->maxThreadCount();
+    pool->setMaxThreadCount(2);
+    const auto restore = qScopeGuard([pool, previousLimit] {
+        pool->waitForDone();
+        pool->setMaxThreadCount(previousLimit);
+    });
+    QVImageLoader loader;
+    QSignalSpy started(&loader, &QVImageLoader::loadStarted);
+    QSignalSpy ready(&loader, &QVImageLoader::imageReady);
+    loader.setDesiredImages({{obsolete, 1}});
+    QCOMPARE(started.size(), 1);
+    loader.setDesiredImages({{queued, 1}});
+    QCOMPARE(started.size(), 1); // Obsolete decode still occupies the budget.
+    const quint64 id = loader.requestImage(foreground);
+    QCOMPARE(started.size(), 2); // Foreground is not blocked by the budget.
+    QCOMPARE(started.at(1).at(0).toString(), foreground);
+    QCOMPARE(started.at(1).at(1).toInt(), 0);
+    QTRY_COMPARE(ready.size(), 1);
+    QCOMPARE(ready.at(0).at(0).toULongLong(), id);
+    QTRY_COMPARE(started.size(), 3); // Completion refills the freed slot.
+    QCOMPARE(started.at(2).at(0).toString(), queued);
+    pool->waitForDone();
+    QCoreApplication::processEvents();
 }
 
 void ImageLoaderTests::testImageLoaderCacheAndAttachment()
@@ -627,6 +832,13 @@ void ImageLoaderTests::testImageLoaderDestructionDuringLoad()
     QVERIFY(!target.isEmpty());
     QVERIFY(!queuedPreload.isEmpty());
 
+    auto *pool = QThreadPool::globalInstance();
+    const int previousLimit = pool->maxThreadCount();
+    pool->setMaxThreadCount(1);
+    const auto restore = qScopeGuard([pool, previousLimit] {
+        pool->waitForDone();
+        pool->setMaxThreadCount(previousLimit);
+    });
     QStringList startedPaths;
     auto *loader = new QVImageLoader;
     connect(loader, &QVImageLoader::loadStarted, this,

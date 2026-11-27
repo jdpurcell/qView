@@ -1,4 +1,5 @@
 #include "qvimageloader.h"
+#include <algorithm>
 
 #include <QCoreApplication>
 #include <QFileInfo>
@@ -76,8 +77,9 @@ quint64 QVImageLoader::requestImage(const QString &absoluteFilePath, const bool 
 
     if (targetEntry.state == State::Cached)
         queueCachedDelivery(requestId, normalizedPath);
+    else if (targetEntry.state == State::Queued)
+        startJob(normalizedPath);
 
-    startReadyJobs();
     return requestId;
 }
 
@@ -303,41 +305,40 @@ void QVImageLoader::deliverResult(const quint64 requestId, const QString &absolu
 
 void QVImageLoader::startReadyJobs()
 {
-    std::optional<int> nextPriority;
-    for (auto it = entries.constBegin(); it != entries.constEnd(); ++it)
+    // Start foreground requests first, then allow spare capacity to keep
+    // preloading while the foreground decode is outstanding.
+    if (pendingRequest.has_value())
     {
-        if (!isWanted(it.key(), it.value()) || it->state != State::Queued)
-            continue;
-        if (!nextPriority.has_value() || it->priority < nextPriority.value())
-            nextPriority = it->priority;
+        const auto it = entries.constFind(pendingRequest->absoluteFilePath);
+        if (it != entries.constEnd() && it->state == State::Queued)
+            startJob(pendingRequest->absoluteFilePath);
     }
 
-    if (!nextPriority.has_value())
-        return;
-
-    for (auto it = entries.constBegin(); it != entries.constEnd(); ++it)
-    {
-        if (isWanted(it.key(), it.value()) &&
-            it->state == State::Loading &&
-            it->priority < nextPriority.value())
-        {
-            return;
-        }
-    }
-
+    // Reserve capacity for foreground work. Count obsolete decodes too, since
+    // they still consume resources until they finish.
+    const int limit = qBound(1, QThreadPool::globalInstance()->maxThreadCount() - 1, 6);
+    int loading = 0;
     QStringList pathsToStart;
     for (auto it = entries.constBegin(); it != entries.constEnd(); ++it)
     {
-        if (isWanted(it.key(), it.value()) &&
-            it->state == State::Queued &&
-            it->priority == nextPriority.value())
-        {
+        if (it->state == State::Loading)
+            ++loading;
+        else if (isWanted(it.key(), it.value()) && it->state == State::Queued)
             pathsToStart.append(it.key());
-        }
     }
-
+    // Proximity determines start order, rather than completion barriers.
+    std::sort(pathsToStart.begin(), pathsToStart.end(), [this](const QString &a, const QString &b) {
+        const int ap = entries.value(a).priority;
+        const int bp = entries.value(b).priority;
+        return ap == bp ? a < b : ap < bp;
+    });
     for (const QString &absoluteFilePath : std::as_const(pathsToStart))
+    {
+        if (loading >= limit)
+            break;
         startJob(absoluteFilePath);
+        ++loading;
+    }
 }
 
 void QVImageLoader::startJob(const QString &absoluteFilePath)
