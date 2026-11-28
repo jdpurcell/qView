@@ -13,6 +13,10 @@
 #include <QApplication>
 #include <QRegularExpression>
 
+#ifdef Q_OS_WIN
+class QWinEventNotifier;
+#endif
+
 #if defined(qvApp)
 #undef qvApp
 #endif
@@ -142,6 +146,13 @@ protected slots:
     void onAboutToQuit();
 
 private:
+#ifdef Q_OS_WIN
+    QWinEventNotifier *settingsReloadNotifier {nullptr};
+#endif
+#ifdef COCOA_LOADED
+    int settingsReloadNotificationToken {-1};
+#endif
+
     std::atomic<bool> isApplicationQuitting {false};
     std::atomic<bool> isQuitSystemInitiated {false};
 

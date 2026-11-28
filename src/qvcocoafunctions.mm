@@ -8,6 +8,7 @@
 #include <QCollator>
 
 #import <Cocoa/Cocoa.h>
+#include <notify.h>
 
 static void hideMenuShortcuts(NSMenu *nativeMenu)
 {
@@ -55,6 +56,25 @@ void QVCocoaFunctions::registerWillPowerOffObserver()
             if (qvApp)
                 qvApp->onSystemInitiatedQuit();
         }];
+}
+
+int QVCocoaFunctions::registerSettingsReloadNotification()
+{
+    int token = -1;
+    const uint32_t status = notify_register_dispatch(
+        "com.interversehq.qView.ReloadSettings", &token, dispatch_get_main_queue(), ^(int) {
+            // Inactive processes pick up external changes when activated instead.
+            if (qvApp && !qvApp->getIsApplicationQuitting() &&
+                qvApp->applicationState() == Qt::ApplicationActive)
+                qvApp->getSettingsManager().loadSettings();
+        });
+    return status == NOTIFY_STATUS_OK ? token : -1;
+}
+
+void QVCocoaFunctions::unregisterSettingsReloadNotification(int token)
+{
+    if (token != -1)
+        notify_cancel(token);
 }
 
 void QVCocoaFunctions::setFullSizeContentView(QWidget *window, const bool enable)

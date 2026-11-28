@@ -15,6 +15,10 @@ public:
 
     static void registerWillPowerOffObserver();
 
+    static int registerSettingsReloadNotification();
+
+    static void unregisterSettingsReloadNotification(int token);
+
     static void setFullSizeContentView(QWidget *window, const bool enable);
 
     static bool getTitlebarHidden(const QWidget *window);

@@ -13,6 +13,11 @@
 #include <QFontDatabase>
 #include <QStyleHints>
 
+#ifdef Q_OS_WIN
+#include <QWinEventNotifier>
+#include <qt_windows.h>
+#endif
+
 QVApplication::QVApplication(int &argc, char **argv) : QApplication(argc, argv)
 {
 #if defined Q_OS_UNIX && !defined Q_OS_MACOS
@@ -38,6 +43,24 @@ QVApplication::QVApplication(int &argc, char **argv) : QApplication(argc, argv)
     connect(&updateChecker, &UpdateChecker::checkedUpdates, this, &QVApplication::checkedUpdates);
 
     settingsUpdated();
+
+#ifdef Q_OS_WIN
+    // Scripts can signal this manual-reset event after changing settings externally.
+    if (HANDLE handle = CreateEventW(nullptr, TRUE, FALSE, L"Local\\qView.ReloadSettings"))
+    {
+        settingsReloadNotifier = new QWinEventNotifier(handle, this);
+        settingsReloadNotifier->setEnabled(applicationState() == Qt::ApplicationActive);
+        connect(settingsReloadNotifier, &QWinEventNotifier::activated, this, [this, handle] {
+            if (applicationState() != Qt::ApplicationActive)
+            {
+                settingsReloadNotifier->setEnabled(false);
+                return;
+            }
+            ResetEvent(handle);
+            settingsManager.loadSettings();
+        });
+    }
+#endif
 
     // Check for updates
     // TODO: move this to after first window show event
@@ -81,6 +104,7 @@ QVApplication::QVApplication(int &argc, char **argv) : QApplication(argc, argv)
 #ifdef COCOA_LOADED
     QVCocoaFunctions::setUserDefaults();
     QVCocoaFunctions::registerWillPowerOffObserver();
+    settingsReloadNotificationToken = QVCocoaFunctions::registerSettingsReloadNotification();
 #endif
 
     hideIncompatibleActions();
@@ -88,6 +112,17 @@ QVApplication::QVApplication(int &argc, char **argv) : QApplication(argc, argv)
 
 QVApplication::~QVApplication()
 {
+#ifdef COCOA_LOADED
+    QVCocoaFunctions::unregisterSettingsReloadNotification(settingsReloadNotificationToken);
+#endif
+#ifdef Q_OS_WIN
+    if (settingsReloadNotifier)
+    {
+        HANDLE handle = settingsReloadNotifier->handle();
+        delete settingsReloadNotifier;
+        CloseHandle(handle);
+    }
+#endif
     dockMenu->deleteLater();
     menuBar->deleteLater();
 }
@@ -104,9 +139,25 @@ bool QVApplication::event(QEvent *event)
     {
         auto *stateEvent = static_cast<QApplicationStateChangeEvent*>(event);
         if (stateEvent->applicationState() == Qt::ApplicationActive)
+        {
+#ifdef Q_OS_WIN
+            // Clear before reading so a notification during the reload is preserved.
+            if (settingsReloadNotifier)
+                ResetEvent(settingsReloadNotifier->handle());
+#endif
             settingsManager.loadSettings();
+#ifdef Q_OS_WIN
+            if (settingsReloadNotifier)
+                settingsReloadNotifier->setEnabled(true);
+#endif
+        }
         else if (stateEvent->applicationState() == Qt::ApplicationInactive)
             invalidateFolderListings();
+#ifdef Q_OS_WIN
+        // Inactive processes reload on activation; don't repeatedly handle a set event.
+        if (stateEvent->applicationState() != Qt::ApplicationActive && settingsReloadNotifier)
+            settingsReloadNotifier->setEnabled(false);
+#endif
     }
     else if (event->type() == QEvent::Quit)
     {
