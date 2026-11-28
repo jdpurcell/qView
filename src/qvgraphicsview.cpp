@@ -796,20 +796,23 @@ void QVGraphicsView::setStickyZoom(const bool value)
 
 void QVGraphicsView::applyExpensiveScaling()
 {
+    // Handle pending DPI adjustment change if any
+    handleDpiAdjustmentChange();
+
     if (!isExpensiveScalingRequested())
         return;
 
     // Calculate scaled resolution
-    const qreal dpiAdjustment = getDpiAdjustment();
-    const QSizeF mappedSize = QSizeF(getCurrentFileDetails().loadedPixmapSize) * zoomLevel * dpiAdjustment * devicePixelRatioF();
+    const QSizeF mappedSizeF = QSizeF(getCurrentFileDetails().loadedPixmapSize) * zoomLevel * appliedDpiAdjustment * devicePixelRatioF();
+    const QSize mappedSize = mappedSizeF.toSize().expandedTo(QSize(1, 1));
 
     // Set image to scaled version
-    loadedPixmapItem->setPixmap(imageCore.scaleExpensively(mappedSize));
+    if (loadedPixmapItem->pixmap().size() != mappedSize)
+        loadedPixmapItem->setPixmap(imageCore.scaleExpensively(mappedSize));
 
     // Set appropriate scale factor
     const qreal newTransformScale = 1.0 / devicePixelRatioF();
     setTransformScale(newTransformScale);
-    appliedDpiAdjustment = dpiAdjustment;
     appliedExpensiveScaleZoomLevel = zoomLevel;
 }
 
@@ -828,14 +831,10 @@ void QVGraphicsView::removeExpensiveScaling()
 
 void QVGraphicsView::pixmapChanged()
 {
+    loadedPixmapItem->setPixmap(imageCore.getLoadedPixmap());
+
     if (isExpensiveScalingRequested())
-    {
         applyExpensiveScaling();
-    }
-    else
-    {
-        loadedPixmapItem->setPixmap(imageCore.getLoadedPixmap());
-    }
 }
 
 void QVGraphicsView::recalculateZoom()
@@ -1153,9 +1152,7 @@ void QVGraphicsView::handleDpiAdjustmentChange()
         return;
 
     removeExpensiveScaling();
-
     fitOrConstrainImage();
-
     expensiveScaleTimer->start();
 }
 

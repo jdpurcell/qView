@@ -558,21 +558,13 @@ void QVImageCore::setSpeed(int desiredSpeed)
         loadedMovie.setSpeed(std::clamp(desiredSpeed, 0, 1000));
 }
 
-QPixmap QVImageCore::scaleExpensively(const QSizeF desiredSize)
+QPixmap QVImageCore::scaleExpensively(const QSize size)
 {
     if (!currentFileDetails.isPixmapLoaded)
         return QPixmap();
 
-    // If we are really close to the original size, just return the original
-    if (abs(desiredSize.width() - loadedPixmap.width()) < 1 &&
-        abs(desiredSize.height() - loadedPixmap.height()) < 1)
-    {
+    if (loadedPixmap.size() == size)
         return loadedPixmap;
-    }
-
-    QSize size = desiredSize.toSize();
-    size.rwidth() = qMax(size.width(), 1);
-    size.rheight() = qMax(size.height(), 1);
 
     return loadedPixmap.scaled(size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 }

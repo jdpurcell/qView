@@ -64,7 +64,7 @@ public:
     void setPaused(bool desiredState);
     void setSpeed(int desiredSpeed);
 
-    QPixmap scaleExpensively(const QSizeF desiredSize);
+    QPixmap scaleExpensively(const QSize size);
 
     const QImage& getSourceImage() const { return sourceImage; }
     const QPixmap& getLoadedPixmap() const { return loadedPixmap; }

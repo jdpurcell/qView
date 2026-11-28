@@ -44,6 +44,7 @@ class ActionManagerTests : public QObject
 
 private slots:
     void testMultiFrameView();
+    void testPixmapChangeAcrossDpi();
     void testClonedActionsUntracked();
 };
 
@@ -917,6 +918,57 @@ void ActionManagerTests::testMultiFrameView()
     for (auto *action : qvApp->getActionManager().getAllClonesOfAction("zoomin", &window))
         QVERIFY(action->isEnabled());
     window.close();
+}
+
+void ActionManagerTests::testPixmapChangeAcrossDpi()
+{
+    class TestView : public QVGraphicsView
+    {
+    public:
+        using QVGraphicsView::QVGraphicsView;
+        int pixelRatio = 1;
+
+        int metric(PaintDeviceMetric metric) const override
+        {
+            if (metric == PdmDevicePixelRatioScaled)
+                return pixelRatio * devicePixelRatioFScale();
+            if (metric == PdmDevicePixelRatio)
+                return pixelRatio;
+            return QVGraphicsView::metric(metric);
+        }
+    };
+
+    auto &settings = qvApp->getSettingsManager();
+    const bool previousSizing = settings.getBoolean("onetoonepixelsizing");
+    QSettings().setValue("options/onetoonepixelsizing", true);
+    settings.loadSettings();
+    const auto restore = qScopeGuard([&settings, previousSizing] {
+        QSettings().setValue("options/onetoonepixelsizing", previousSizing);
+        settings.loadSettings();
+    });
+
+    QTemporaryDir dir;
+    MainWindow window;
+    TestView view(&window);
+    view.resize(200, 160);
+    window.show();
+    const auto closeWindow = qScopeGuard([&window] { window.close(); });
+    QSignalSpy files(&view, &QVGraphicsView::fileChanged);
+    view.loadFile(createTestImage(dir, "dpi", Qt::red));
+    QTRY_COMPARE(files.size(), 1);
+    view.setCalculatedZoomMode(Qv::CalculatedZoomMode::ZoomToFit);
+    const qreal originalZoom = view.getZoomLevel();
+
+    // Deliver the display-profile refresh before the next paint sees the new DPI.
+    view.pixelRatio = 2;
+    auto *core = view.findChild<QVImageCore *>();
+    QVERIFY(core);
+    core->pixmapChanged();
+    const qreal refreshedZoom = view.getZoomLevel();
+    QVERIFY(refreshedZoom > originalZoom);
+    QCOMPARE(view.transform().m11(), 1.0 / view.pixelRatio); // Scaled pixmap is already displayed.
+    view.recalculateZoom();
+    QCOMPARE(view.getZoomLevel(), refreshedZoom);
 }
 
 void ActionManagerTests::testClonedActionsUntracked()
