@@ -376,6 +376,10 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Error saving temporary file: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Downloading image...</source>
         <translation type="unfinished"></translation>
     </message>
@@ -385,14 +389,6 @@
     </message>
     <message>
         <source>Open URL...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Error </source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Error: Invalid image</source>
         <translation type="unfinished"></translation>
     </message>
     <message>

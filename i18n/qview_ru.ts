@@ -378,6 +378,10 @@
         <translation>Ошибка: неверная URL-ссылка</translation>
     </message>
     <message>
+        <source>Error saving temporary file: %1</source>
+        <translation>Ошибка при сохранении временного файла: %1</translation>
+    </message>
+    <message>
         <source>Downloading image...</source>
         <translation>Загрузка изображения...</translation>
     </message>
@@ -388,14 +392,6 @@
     <message>
         <source>Open URL...</source>
         <translation>Открыть URL-ссылку...</translation>
-    </message>
-    <message>
-        <source>Error </source>
-        <translation>Ошибка </translation>
-    </message>
-    <message>
-        <source>Error: Invalid image</source>
-        <translation>Ошибка: неверное изображение</translation>
     </message>
     <message>
         <source>URL of a supported image file:</source>

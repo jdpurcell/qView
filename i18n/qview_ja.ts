@@ -378,6 +378,10 @@
         <translation>エラー: URLが無効です</translation>
     </message>
     <message>
+        <source>Error saving temporary file: %1</source>
+        <translation>一時ファイルの保存中にエラーが発生しました: %1</translation>
+    </message>
+    <message>
         <source>Downloading image...</source>
         <translation>画像をダウンロードしています...</translation>
     </message>
@@ -388,14 +392,6 @@
     <message>
         <source>Open URL...</source>
         <translation>URLから開く...</translation>
-    </message>
-    <message>
-        <source>Error </source>
-        <translation>エラー </translation>
-    </message>
-    <message>
-        <source>Error: Invalid image</source>
-        <translation>エラー: 不正な画像ファイル</translation>
     </message>
     <message>
         <source>URL of a supported image file:</source>

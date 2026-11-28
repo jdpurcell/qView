@@ -377,6 +377,10 @@
         <translation>错误：URL无效</translation>
     </message>
     <message>
+        <source>Error saving temporary file: %1</source>
+        <translation>保存临时文件时出错：%1</translation>
+    </message>
+    <message>
         <source>Downloading image...</source>
         <translation>下载图像...</translation>
     </message>
@@ -387,14 +391,6 @@
     <message>
         <source>Open URL...</source>
         <translation>打开URL...</translation>
-    </message>
-    <message>
-        <source>Error </source>
-        <translation>错误 </translation>
-    </message>
-    <message>
-        <source>Error: Invalid image</source>
-        <translation>错误：无效的文件</translation>
     </message>
     <message>
         <source>URL of a supported image file:</source>

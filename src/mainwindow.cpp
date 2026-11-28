@@ -18,11 +18,11 @@
 #include <QProcess>
 #include <QDesktopServices>
 #include <QContextMenuEvent>
+#include <QImageReader>
 #include <QImageWriter>
 #include <QSettings>
 #include <QStyle>
 #include <QIcon>
-#include <QMimeDatabase>
 #include <QScreen>
 #include <QCursor>
 #include <QInputDialog>
@@ -40,6 +40,11 @@
 
 namespace
 {
+struct UrlDownload : QTemporaryFile
+{
+    QString writeError;
+};
+
 class TitlebarBubble : public QLabel
 {
 public:
@@ -1022,67 +1027,107 @@ void MainWindow::setJustLaunchedWithImage(bool value)
 
 void MainWindow::openUrl(const QUrl &url)
 {
-    if (!url.isValid()) {
+    if (!url.isValid())
+    {
         QMessageBox::critical(this, tr("Error"), tr("Error: URL is invalid"));
         return;
     }
 
-    auto request = QNetworkRequest(url);
+    const auto showFileError = [this](const QString &error) {
+        QMessageBox::critical(this, tr("Error"), tr("Error saving temporary file: %1").arg(error));
+    };
+
+    auto *tempFile = new UrlDownload;
+    tempFile->setFileTemplate(QDir::tempPath() + "/" + qvApp->applicationName() + "-XXXXXX");
+    if (!tempFile->open())
+    {
+        const auto error = tempFile->errorString();
+        delete tempFile;
+        showFileError(error);
+        return;
+    }
+
+    QNetworkRequest request(url);
+    request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
     auto *reply = networkAccessManager.get(request);
-    auto *progressDialog = new QProgressDialog(tr("Downloading image..."), tr("Cancel"), 0, 100);
+    reply->setReadBufferSize(256 * 1024);
+    tempFile->setParent(reply);
+
+    auto *progressDialog = new QProgressDialog(tr("Downloading image..."), tr("Cancel"), 0, 0, this);
     progressDialog->setWindowFlag(Qt::WindowContextHelpButtonHint, false);
     progressDialog->setAutoClose(false);
     progressDialog->setAutoReset(false);
     progressDialog->setWindowTitle(tr("Open URL..."));
-    progressDialog->open();
 
-    connect(progressDialog, &QProgressDialog::canceled, reply, [reply]{
-        reply->abort();
+    const auto writeAvailableData = [reply, tempFile] {
+        const auto bytes = reply->readAll();
+        if (tempFile->write(bytes) == bytes.size())
+            return true;
+        tempFile->writeError = tempFile->errorString();
+        return false;
+    };
+
+    connect(progressDialog, &QProgressDialog::canceled, reply, &QNetworkReply::abort);
+    connect(reply, &QNetworkReply::readyRead, reply, [reply, writeAvailableData] {
+        if (!writeAvailableData())
+            reply->abort();
     });
-
-    connect(reply, &QNetworkReply::downloadProgress, progressDialog, [progressDialog](qreal bytesReceived, qreal bytesTotal){
-        auto percent = (bytesReceived/bytesTotal)*100;
-        progressDialog->setValue(qRound(percent));
-    });
-
-    connect(reply, &QNetworkReply::finished, progressDialog, [progressDialog, reply, this]{
-        if (reply->error())
+    connect(reply, &QNetworkReply::downloadProgress, progressDialog, [progressDialog](qint64 bytesReceived, qint64 bytesTotal) {
+        if (bytesTotal > 0)
         {
-            progressDialog->close();
-            QMessageBox::critical(this, tr("Error"), tr("Error ") + QString::number(reply->error()) + ": " + reply->errorString());
-
-            progressDialog->deleteLater();
-            return;
+            progressDialog->setMaximum(100);
+            progressDialog->setValue(qRound(100.0 * bytesReceived / bytesTotal));
         }
+        else
+            progressDialog->setMaximum(0);
+    });
+    connect(reply, &QNetworkReply::finished, progressDialog, [this, reply, tempFile, progressDialog, writeAvailableData, showFileError] {
+        progressDialog->hide();
+        progressDialog->deleteLater();
+        reply->deleteLater();
+        if (isClosing)
+            return;
 
-        progressDialog->setMaximum(0);
-
-        auto *tempFile = new QTemporaryFile(this);
-        tempFile->setFileTemplate(QDir::tempPath() + "/" + qvApp->applicationName() + ".XXXXXX.png");
-
-        auto *saveFutureWatcher = new QFutureWatcher<bool>();
-        connect(saveFutureWatcher, &QFutureWatcher<bool>::finished, this, [progressDialog, tempFile, saveFutureWatcher, this](){
-            progressDialog->close();
-            if (saveFutureWatcher->result())
+        QByteArray format;
+        QString imageError;
+        if (reply->error() == QNetworkReply::NoError && writeAvailableData())
+        {
+            if (tempFile->flush() && tempFile->seek(0))
             {
-                if (tempFile->open())
-                {
-                    openFile(tempFile->fileName());
-                }
+                QImageReader reader(tempFile);
+                if (reader.canRead())
+                    format = reader.format();
+                if (format.isEmpty())
+                    imageError = reader.errorString();
             }
             else
-            {
-                QMessageBox::critical(this, tr("Error"), tr("Error: Invalid image"));
-                tempFile->deleteLater();
-            }
-            progressDialog->deleteLater();
-            saveFutureWatcher->deleteLater();
-        });
+                tempFile->writeError = tempFile->errorString();
+        }
+        tempFile->close();
 
-        saveFutureWatcher->setFuture(QtConcurrent::run([reply, tempFile]{
-            return QImage::fromData(reply->readAll()).save(tempFile, "png");
-        }));
+        if (!tempFile->writeError.isEmpty())
+            showFileError(tempFile->writeError);
+        else if (reply->error() == QNetworkReply::OperationCanceledError)
+            return;
+        else if (reply->error() != QNetworkReply::NoError)
+            QMessageBox::critical(this, tr("Error"), reply->errorString());
+        else if (format.isEmpty())
+            QMessageBox::critical(this, tr("Error"), imageError);
+        else
+        {
+            if (!tempFile->rename(tempFile->fileName() + QLatin1Char('.') + QString::fromLatin1(format)))
+            {
+                showFileError(tempFile->errorString());
+                return;
+            }
+
+            // Keep the file available to other qView windows until the application exits.
+            tempFile->setParent(qvApp);
+
+            openFile(tempFile->fileName());
+        }
     });
+    progressDialog->open();
 }
 
 void MainWindow::pickUrl()

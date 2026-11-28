@@ -378,6 +378,10 @@
         <translation>Fehler: URL ist ungültig</translation>
     </message>
     <message>
+        <source>Error saving temporary file: %1</source>
+        <translation>Fehler beim Speichern der temporären Datei: %1</translation>
+    </message>
+    <message>
         <source>Downloading image...</source>
         <translation>Bild herunterladen ...</translation>
     </message>
@@ -388,14 +392,6 @@
     <message>
         <source>Open URL...</source>
         <translation>URL öffnen ...</translation>
-    </message>
-    <message>
-        <source>Error </source>
-        <translation>Fehler </translation>
-    </message>
-    <message>
-        <source>Error: Invalid image</source>
-        <translation>Fehler: ungültige Bilddatei</translation>
     </message>
     <message>
         <source>URL of a supported image file:</source>

@@ -378,6 +378,10 @@
         <translation>Erreur : l&apos;URL est invalide</translation>
     </message>
     <message>
+        <source>Error saving temporary file: %1</source>
+        <translation>Erreur lors de l’enregistrement du fichier temporaire : %1</translation>
+    </message>
+    <message>
         <source>Downloading image...</source>
         <translation>Téléchargement de l&apos;image...</translation>
     </message>
@@ -388,14 +392,6 @@
     <message>
         <source>Open URL...</source>
         <translation>Ouvrir l&apos;URL...</translation>
-    </message>
-    <message>
-        <source>Error </source>
-        <translation>Erreur </translation>
-    </message>
-    <message>
-        <source>Error: Invalid image</source>
-        <translation>Erreur : image invalide</translation>
     </message>
     <message>
         <source>URL of a supported image file:</source>

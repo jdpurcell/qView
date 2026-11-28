@@ -378,6 +378,10 @@
         <translation>오류: 유효하지 않은 URL</translation>
     </message>
     <message>
+        <source>Error saving temporary file: %1</source>
+        <translation>임시 파일을 저장하는 중 오류가 발생했습니다: %1</translation>
+    </message>
+    <message>
         <source>Downloading image...</source>
         <translation>이미지를 내려받는 중...</translation>
     </message>
@@ -388,14 +392,6 @@
     <message>
         <source>Open URL...</source>
         <translation>URL 열기...</translation>
-    </message>
-    <message>
-        <source>Error </source>
-        <translation>오류 </translation>
-    </message>
-    <message>
-        <source>Error: Invalid image</source>
-        <translation>오류: 유효하지 않은 이미지</translation>
     </message>
     <message>
         <source>URL of a supported image file:</source>

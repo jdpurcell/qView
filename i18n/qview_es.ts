@@ -378,6 +378,10 @@
         <translation>Error: URL no válido</translation>
     </message>
     <message>
+        <source>Error saving temporary file: %1</source>
+        <translation>Error al guardar el archivo temporal: %1</translation>
+    </message>
+    <message>
         <source>Downloading image...</source>
         <translation>Descargando la imagen...</translation>
     </message>
@@ -388,14 +392,6 @@
     <message>
         <source>Open URL...</source>
         <translation>Abrir un URL...</translation>
-    </message>
-    <message>
-        <source>Error </source>
-        <translation>Error </translation>
-    </message>
-    <message>
-        <source>Error: Invalid image</source>
-        <translation>Error: Imagen no válida</translation>
     </message>
     <message>
         <source>URL of a supported image file:</source>
