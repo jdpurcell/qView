@@ -26,7 +26,7 @@ public:
         qint64 fileSize = 0;
         QDateTime lastModified;
         bool isMultiFrameImage = false;
-        QSize intrinsicSize;
+        bool isSvg = false;
         int frameCount = 1;
         int frameNumber = 0;
         std::optional<ErrorData> errorData;
@@ -40,8 +40,6 @@ public:
 
     explicit QVImageLoader(QObject *parent = nullptr);
     ~QVImageLoader() override;
-
-    void setLargestDimension(int value);
 
     quint64 requestImage(const QString &absoluteFilePath, bool forceReload = false, std::optional<int> requestedFrameNumber = {});
     void setDesiredImages(const QList<DesiredImage> &desiredImages);
@@ -91,7 +89,7 @@ private:
     static QString normalizePath(const QString &path);
     static FileIdentity getFileIdentity(const QString &absoluteFilePath);
     static FileIdentity getFileIdentity(const Result &result);
-    static Result readFile(const QString &absoluteFilePath, int largestDimension, std::optional<int> requestedFrameNumber = {});
+    static Result readFile(const QString &absoluteFilePath, std::optional<int> requestedFrameNumber = {});
 
     bool isWanted(const QString &absoluteFilePath, const Entry &entry) const;
     void queueCachedDelivery(quint64 requestId, const QString &absoluteFilePath);
@@ -105,7 +103,6 @@ private:
     std::shared_ptr<int> lifetimeToken = std::make_shared<int>(0);
 
     quint64 nextRequestId = 0;
-    int largestDimension = 1920;
 };
 
 Q_DECLARE_METATYPE(QVImageLoader::Result)

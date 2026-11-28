@@ -73,7 +73,7 @@ void QVGraphicsView::resizeEvent(QResizeEvent *event)
 
     QGraphicsView::resizeEvent(event);
 
-    if (getCurrentFileDetails().isPixmapLoaded)
+    if (getCurrentFileDetails().isImageLoaded)
     {
         const QSize sizeDelta = event->size() - event->oldSize();
         scrollHelper->move(QPointF(sizeDelta.width(), sizeDelta.height()) / -2.0);
@@ -549,7 +549,7 @@ void QVGraphicsView::executeScrollAction(const Qv::ViewportScrollAction action, 
     }
     else if (action == Qv::ViewportScrollAction::Zoom)
     {
-        if (!getCurrentFileDetails().isPixmapLoaded)
+        if (!getCurrentFileDetails().isImageLoaded)
             return;
 
         const qreal fractionalWheelSteps = static_cast<qreal>(getUniAxisDelta()) / deltaPerWheelStep;
@@ -582,7 +582,7 @@ void QVGraphicsView::executeScrollAction(const Qv::ViewportScrollAction action, 
 QMimeData *QVGraphicsView::getMimeData() const
 {
     auto *mimeData = new QMimeData();
-    if (!getCurrentFileDetails().isPixmapLoaded)
+    if (!getCurrentFileDetails().isImageLoaded)
         return mimeData;
 
     mimeData->setUrls({QUrl::fromLocalFile(imageCore.getCurrentFileDetails().fileInfo.absoluteFilePath())});
@@ -623,20 +623,30 @@ void QVGraphicsView::reloadFile()
 {
     imageCore.markFolderInfoDirty();
 
-    if (getCurrentFileDetails().isPixmapLoaded)
+    if (getCurrentFileDetails().isImageLoaded)
         imageCore.loadFile(getCurrentFileDetails().fileInfo.absoluteFilePath(), true);
 }
 
 void QVGraphicsView::beforeLoad()
 {
     // If a prior pixmap is still loaded, capture its content rect
-    if (getCurrentFileDetails().isPixmapLoaded)
+    if (getCurrentFileDetails().isImageLoaded)
         lastImageContentRect = getContentRect();
+
+    // The core replaces its renderer after fileChanging returns.
+    svgItem.reset();
 }
 
 void QVGraphicsView::postLoad()
 {
     scrollHelper->cancelAnimation();
+
+    if (auto *renderer = imageCore.getSvgRenderer())
+    {
+        svgItem = std::make_unique<QVSvgItem>(renderer);
+        svgItem->setTargetColorSpace(getCurrentFileDetails().targetColorSpace);
+        scene()->addItem(svgItem.get());
+    }
 
     // Set the pixmap to the new image and reset the transform's scale to a known value
     removeExpensiveScaling();
@@ -801,7 +811,7 @@ void QVGraphicsView::applyExpensiveScaling()
 
     // Calculate scaled resolution
     const qreal dpiAdjustment = getDpiAdjustment();
-    const QSizeF mappedSize = QSizeF(getCurrentFileDetails().loadedPixmapSize) * zoomLevel * dpiAdjustment * devicePixelRatioF();
+    const QSizeF mappedSize = QSizeF(getCurrentFileDetails().baseImageSize) * zoomLevel * dpiAdjustment * devicePixelRatioF();
 
     // Set image to scaled version
     loadedPixmapItem->setPixmap(imageCore.scaleExpensively(mappedSize));
@@ -828,6 +838,11 @@ void QVGraphicsView::removeExpensiveScaling()
 
 void QVGraphicsView::pixmapChanged()
 {
+    if (svgItem)
+    {
+        svgItem->setTargetColorSpace(getCurrentFileDetails().targetColorSpace);
+        return;
+    }
     if (isExpensiveScalingRequested())
     {
         applyExpensiveScaling();
@@ -840,7 +855,7 @@ void QVGraphicsView::pixmapChanged()
 
 void QVGraphicsView::recalculateZoom()
 {
-    if (!getCurrentFileDetails().isPixmapLoaded || !calculatedZoomMode.has_value())
+    if (!getCurrentFileDetails().isImageLoaded || !calculatedZoomMode.has_value())
         return;
 
     const QSizeF imageSize = getEffectiveOriginalSize();
@@ -901,7 +916,7 @@ void QVGraphicsView::recalculateZoom()
         break;
     }
 
-    if (fitZoomLimit.has_value() && targetRatio > fitZoomLimit.value())
+    if (!svgItem && fitZoomLimit.has_value() && targetRatio > fitZoomLimit.value())
         targetRatio = fitZoomLimit.value();
 
     zoomAbsolute(targetRatio, {}, true);
@@ -1038,7 +1053,7 @@ bool QVGraphicsView::isSmoothScalingRequested() const
 
 bool QVGraphicsView::isExpensiveScalingRequested() const
 {
-    if (!isSmoothScalingRequested() || smoothScalingMode != Qv::SmoothScalingMode::Expensive || !getCurrentFileDetails().isPixmapLoaded)
+    if (svgItem || !isSmoothScalingRequested() || smoothScalingMode != Qv::SmoothScalingMode::Expensive || !getCurrentFileDetails().isImageLoaded)
         return false;
 
     // Don't go over the maximum scaling size (a small tolerance is added to cover rounding errors)
@@ -1049,7 +1064,7 @@ bool QVGraphicsView::isExpensiveScalingRequested() const
 
 QSizeF QVGraphicsView::getEffectiveOriginalSize() const
 {
-    return getUnspecializedTransform().mapRect(QRectF(QPoint(), getCurrentFileDetails().loadedPixmapSize)).size() * getDpiAdjustment();
+    return getUnspecializedTransform().mapRect(QRectF(QPoint(), getCurrentFileDetails().baseImageSize)).size() * getDpiAdjustment();
 }
 
 LogicalPixelFitter QVGraphicsView::getPixelFitter() const
@@ -1081,14 +1096,14 @@ std::optional<Qv::GoToFileMode> QVGraphicsView::getNavigationRegion(const QPoint
 
 QRect QVGraphicsView::getContentRect() const
 {
-    if (!getCurrentFileDetails().isPixmapLoaded)
+    if (!getCurrentFileDetails().isImageLoaded)
         return {};
 
     // Avoid using loadedPixmapItem and the active transform because the pixmap may have expensive scaling applied
     // which introduces a rounding error to begin with, and even worse, the error will be magnified if we're in the
     // the process of zooming in and haven't re-applied the expensive scaling yet. If that's the case, callers need
     // to know what the content rect will be once the dust settles rather than what's being temporarily displayed.
-    const QSizeF pixmapSize = getCurrentFileDetails().loadedPixmapSize;
+    const QSizeF pixmapSize = getCurrentFileDetails().baseImageSize;
     const QRectF pixmapBoundingRect = QRectF(QPoint(), pixmapSize);
     const qreal pixmapScale = zoomLevel * appliedDpiAdjustment;
     const QTransform pixmapTransform = normalizeTransformOrigin(getUnspecializedTransform().scale(pixmapScale, pixmapScale), pixmapSize);
@@ -1112,7 +1127,7 @@ void QVGraphicsView::setTransformScale(const qreal value)
 
 void QVGraphicsView::setTransformWithNormalization(const QTransform &matrix)
 {
-    setTransform(normalizeTransformOrigin(matrix, loadedPixmapItem->boundingRect().size()));
+    setTransform(normalizeTransformOrigin(matrix, svgItem ? svgItem->boundingRect().size() : loadedPixmapItem->boundingRect().size()));
 }
 
 QTransform QVGraphicsView::getUnspecializedTransform() const
@@ -1144,7 +1159,7 @@ qreal QVGraphicsView::getDpiAdjustment() const
     // example with 1:1 pixel sizing @ 100% zoom, the transform's scale must be set to the
     // inverted value. Pre-inverting it here helps keep things consistent, e.g. so that the
     // content rect calculation has the same error that will happen during painting.
-    return useOneToOnePixelSizing ? 1.0 / devicePixelRatioF() : 1.0;
+    return !svgItem && useOneToOnePixelSizing ? 1.0 / devicePixelRatioF() : 1.0;
 }
 
 void QVGraphicsView::handleDpiAdjustmentChange()

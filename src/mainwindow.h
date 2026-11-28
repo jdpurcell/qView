@@ -164,7 +164,7 @@ public:
 
     bool hasFileOrPendingLoad() const { return graphicsView->hasFileOrPendingLoad(); }
 
-    bool getIsPixmapLoaded() const { return getCurrentFileDetails().isPixmapLoaded; }
+    bool getIsImageLoaded() const { return getCurrentFileDetails().isImageLoaded; }
 
     bool getIsMovieLoaded() const { return getCurrentFileDetails().isMovieLoaded; }
 

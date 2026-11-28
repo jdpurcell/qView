@@ -1,8 +1,17 @@
+QT += core gui network widgets svg
+greaterThan(QT_MAJOR_VERSION, 5):QT += svgwidgets
+
+TEMPLATE = app
+CONFIG += c++17
+DEFINES += "VERSION=$$VERSION"
+
+macx:!CONFIG(NO_COCOA):LIBS += -framework Cocoa
+
 SOURCES += \
-    $$PWD/main.cpp \
     $$PWD/mainwindow.cpp \
     $$PWD/openwith.cpp \
     $$PWD/qvfileenumerator.cpp \
+    $$PWD/qvsvgitem.cpp \
     $$PWD/qvgraphicsview.cpp \
     $$PWD/qvmenu.cpp \
     $$PWD/qvoptionsdialog.cpp \
@@ -33,6 +42,7 @@ HEADERS += \
     $$PWD/mainwindow.h \
     $$PWD/openwith.h \
     $$PWD/qvfileenumerator.h \
+    $$PWD/qvsvgitem.h \
     $$PWD/qvgraphicsview.h \
     $$PWD/qvmenu.h \
     $$PWD/qvnamespace.h \

@@ -16,11 +16,6 @@ QVImageLoader::~QVImageLoader()
     lifetimeToken.reset();
 }
 
-void QVImageLoader::setLargestDimension(const int value)
-{
-    largestDimension = value;
-}
-
 quint64 QVImageLoader::requestImage(const QString &absoluteFilePath, const bool forceReload, const std::optional<int> requestedFrameNumber)
 {
     const QString normalizedPath = normalizePath(absoluteFilePath);
@@ -123,10 +118,20 @@ QVImageLoader::FileIdentity QVImageLoader::getFileIdentity(const Result &result)
     return {result.fileSize, result.lastModified};
 }
 
-QVImageLoader::Result QVImageLoader::readFile(const QString &absoluteFilePath, const int largestDimension, const std::optional<int> requestedFrameNumber)
+QVImageLoader::Result QVImageLoader::readFile(const QString &absoluteFilePath, const std::optional<int> requestedFrameNumber)
 {
     QImageReader imageReader(absoluteFilePath);
     imageReader.setAutoTransform(true);
+
+    const QFileInfo fileInfo(absoluteFilePath);
+    Result result;
+    result.absoluteFilePath = fileInfo.absoluteFilePath();
+    result.fileSize = fileInfo.size();
+    result.lastModified = fileInfo.lastModified();
+    const QByteArray format = imageReader.format();
+    result.isSvg = format == "svg" || format == "svgz";
+    if (result.isSvg)
+        return result; // Parse only the displayed SVG, on the renderer's owning thread.
 
     // Counting animation frames can require scanning the entire stream. Leave that to QVMovie.
     const int frameCount = imageReader.supportsOption(QImageIOHandler::Animation) ? 0 : imageReader.imageCount();
@@ -136,15 +141,9 @@ QVImageLoader::Result QVImageLoader::readFile(const QString &absoluteFilePath, c
         requestedFrameNumber.value() >= 0 && requestedFrameNumber.value() < frameCount;
     int frameNumber = useRequestedFrameNumber ? requestedFrameNumber.value() : 0;
     bool isMultiFrameImage = false;
-    QSize intrinsicSize;
     QImage image;
     if (frameNumber == 0 || imageReader.jumpToImage(frameNumber))
     {
-        if ((imageReader.format() == "svg" || imageReader.format() == "svgz") && !imageReader.size().isEmpty())
-        {
-            intrinsicSize = imageReader.size();
-            imageReader.setScaledSize(intrinsicSize.scaled(largestDimension, largestDimension, Qt::KeepAspectRatio));
-        }
         isMultiFrameImage = frameCount > 1;
         image = imageReader.read();
     }
@@ -168,19 +167,10 @@ QVImageLoader::Result QVImageLoader::readFile(const QString &absoluteFilePath, c
         }
     }
 
-    const QFileInfo fileInfo(absoluteFilePath);
-
-    Result result {
-        std::move(image),
-        fileInfo.absoluteFilePath(),
-        fileInfo.size(),
-        fileInfo.lastModified(),
-        isMultiFrameImage,
-        intrinsicSize,
-        frameCount,
-        frameNumber,
-        {}
-    };
+    result.image = std::move(image);
+    result.isMultiFrameImage = isMultiFrameImage;
+    result.frameCount = frameCount;
+    result.frameNumber = frameNumber;
 
     if (result.image.isNull())
         result.errorData = ErrorData {imageReader.error(), imageReader.errorString()};
@@ -357,7 +347,6 @@ void QVImageLoader::startJob(const QString &absoluteFilePath)
     entryIt->reloadAfterFinish = false;
     const quint64 generation = ++entryIt->generation;
     const int priority = entryIt->priority;
-    const int targetLargestDimension = largestDimension;
     const auto requestedFrameNumber = entryIt->startedFrameNumber;
     emit loadStarted(absoluteFilePath, priority);
 
@@ -371,10 +360,9 @@ void QVImageLoader::startJob(const QString &absoluteFilePath)
             dispatchContext,
             absoluteFilePath,
             generation,
-            targetLargestDimension,
             requestedFrameNumber
         ]() {
-            Result result = readFile(absoluteFilePath, targetLargestDimension, requestedFrameNumber);
+            Result result = readFile(absoluteFilePath, requestedFrameNumber);
             QMetaObject::invokeMethod(
                 dispatchContext,
                 [

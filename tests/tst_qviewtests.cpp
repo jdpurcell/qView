@@ -11,6 +11,8 @@
 
 #include "qvapplication.h"
 #include "qvimageloader.h"
+#include "qvsvgitem.h"
+#include <QPainter>
 
 class ImageLoaderTests : public QObject
 {
@@ -44,6 +46,8 @@ class ActionManagerTests : public QObject
 
 private slots:
     void testMultiFrameView();
+    void testSvgView();
+    void testSvgColorConversion();
     void testClonedActionsUntracked();
 };
 
@@ -308,7 +312,7 @@ void ImageLoaderTests::testMultiFrameCore()
     QTRY_COMPARE(files.size(), 2);
     QCOMPARE(core.getCurrentFileDetails().frameNumber, 1);
     QCOMPARE(core.getCurrentFileDetails().baseImageSize, QSize(32, 24));
-    QCOMPARE(core.getCurrentFileDetails().loadedPixmapSize, QSize(32, 24));
+    QCOMPARE(core.getLoadedPixmap().size(), QSize(32, 24));
     { // Release the reader's file handle before testing deletion on Windows.
         QImageReader reader(path);
         reader.setAutoTransform(true);
@@ -339,7 +343,7 @@ void ImageLoaderTests::testMultiFrameCore()
     QThreadPool::globalInstance()->waitForDone();
     QCoreApplication::processEvents();
     QCOMPARE(files.size(), 6);
-    QVERIFY(!core.getCurrentFileDetails().isPixmapLoaded);
+    QVERIFY(!core.getCurrentFileDetails().isImageLoaded);
 
     core.loadFile(path);
     QTRY_COMPARE(files.size(), 7);
@@ -347,7 +351,7 @@ void ImageLoaderTests::testMultiFrameCore()
     core.jumpToNextFrame();
     QTRY_COMPARE(files.size(), 8);
     QVERIFY(core.getCurrentFileDetails().errorData.has_value());
-    QVERIFY(!core.getCurrentFileDetails().isPixmapLoaded);
+    QVERIFY(!core.getCurrentFileDetails().isImageLoaded);
     QVERIFY(core.getLoadedPixmap().isNull());
     // Page failures have the same limitations as file failures: reopen to recover.
     QVERIFY(!core.getCurrentFileDetails().isMultiFrameImage);
@@ -359,7 +363,7 @@ void ImageLoaderTests::testMultiFrameCore()
     core.loadFile(path);
     QTRY_COMPARE(files.size(), 9);
     QVERIFY(!core.getCurrentFileDetails().errorData.has_value());
-    QVERIFY(core.getCurrentFileDetails().isPixmapLoaded);
+    QVERIFY(core.getCurrentFileDetails().isImageLoaded);
     QCOMPARE(core.getCurrentFileDetails().frameNumber, 0);
     QCOMPARE(core.getCurrentFileDetails().baseImageSize, QSize(16, 12));
 }
@@ -903,7 +907,7 @@ void ActionManagerTests::testMultiFrameView()
     view->jumpToNextFrame();
     QTRY_COMPARE(files.size(), 5);
     QVERIFY(view->getCurrentFileDetails().errorData.has_value());
-    QVERIFY(!view->getCurrentFileDetails().isPixmapLoaded);
+    QVERIFY(!view->getCurrentFileDetails().isImageLoaded);
     for (auto *action : qvApp->getActionManager().getAllClonesOfAction("nextframe", &window))
         QVERIFY(!action->isEnabled());
     for (auto *action : qvApp->getActionManager().getAllClonesOfAction("zoomin", &window))
@@ -913,10 +917,112 @@ void ActionManagerTests::testMultiFrameView()
     view->loadFile(path);
     QTRY_COMPARE(files.size(), 6);
     QVERIFY(!view->getCurrentFileDetails().errorData.has_value());
-    QVERIFY(view->getCurrentFileDetails().isPixmapLoaded);
+    QVERIFY(view->getCurrentFileDetails().isImageLoaded);
     for (auto *action : qvApp->getActionManager().getAllClonesOfAction("zoomin", &window))
         QVERIFY(action->isEnabled());
     window.close();
+}
+
+void ActionManagerTests::testSvgView()
+{
+    auto &settings = qvApp->getSettingsManager();
+    const bool oldLimit = settings.getBoolean("fitzoomlimitenabled");
+    const bool oldPixelSizing = settings.getBoolean("onetoonepixelsizing");
+    QSettings().setValue("options/fitzoomlimitenabled", true);
+    QSettings().setValue("options/onetoonepixelsizing", true);
+    settings.loadSettings();
+    const auto restore = qScopeGuard([&] {
+        QSettings().setValue("options/fitzoomlimitenabled", oldLimit);
+        QSettings().setValue("options/onetoonepixelsizing", oldPixelSizing);
+        settings.loadSettings();
+    });
+    QTemporaryDir dir;
+    QFile svg(dir.filePath("animated.svg"));
+    QVERIFY(svg.open(QIODevice::WriteOnly));
+    svg.write(R"(<svg xmlns="http://www.w3.org/2000/svg" width="20" height="10">
+        <g><animateTransform attributeName="transform" type="translate" from="0 0"
+            to="10 0" dur="1s" repeatCount="indefinite"/>
+            <rect width="5" height="10" fill="red"/></g></svg>)");
+    svg.close();
+
+    MainWindow window;
+    window.show();
+    auto *view = window.findChild<QVGraphicsView *>();
+    QVERIFY(view);
+    QSignalSpy files(view, &QVGraphicsView::fileChanged);
+    view->loadFile(svg.fileName());
+    QTRY_COMPARE(files.size(), 1);
+    QCOMPARE(view->getEffectiveOriginalSize(), QSizeF(20, 10));
+    view->setCalculatedZoomMode(Qv::CalculatedZoomMode::ZoomToFit);
+    QVERIFY(view->getZoomLevel() > 1);
+    view->setCalculatedZoomMode(Qv::CalculatedZoomMode::FillWindow);
+    QVERIFY(view->getZoomLevel() > 1);
+    view->setCalculatedZoomMode(Qv::CalculatedZoomMode::OriginalSize);
+    QCOMPARE(view->getZoomLevel(), 1.0);
+    view->rotateImage(90);
+    QCOMPARE(view->getEffectiveOriginalSize(), QSizeF(10, 20));
+
+    auto *item = qgraphicsitem_cast<QGraphicsSvgItem *>(view->scene()->items().first());
+    QVERIFY(item);
+    QVERIFY(item->renderer()->animated());
+    QSignalSpy frames(item->renderer(), &QSvgRenderer::repaintNeeded);
+    QTRY_VERIFY(frames.size() > 1);
+    QVERIFY(!view->getCurrentFileDetails().isMovieLoaded);
+    std::unique_ptr<QMimeData> copied(view->getMimeData());
+    QCOMPARE(qvariant_cast<QImage>(copied->imageData()).colorSpace(), QColorSpace(QColorSpace::SRgb));
+
+    view->loadFile(createTestImage(dir, "raster", Qt::blue));
+    QTRY_COMPARE(files.size(), 2);
+    QCOMPARE(view->scene()->items().size(), 1);
+    view->setCalculatedZoomMode(Qv::CalculatedZoomMode::ZoomToFit);
+    QCOMPARE(view->getZoomLevel(), 1.0);
+
+    QFile compressed(dir.filePath("shapes.svgz"));
+    QVERIFY(compressed.open(QIODevice::WriteOnly));
+    // gzip-compressed SVG with a 12 by 6 viewBox.
+    compressed.write(QByteArray::fromBase64("H4sIAAAAAAAC/xXLyw2AIAwA0FWaDkArJh4McHAVJUDiL9JQxlfv77naEvRjP6vHLHLPRKpqdDTXk8gyM30CoZWoy9U9MjAMFiYM7omrgJZNssfBIuRYUhaPE1Jwfwsvxh9KFV4AAAA="));
+    compressed.close();
+    view->loadFile(compressed.fileName());
+    QTRY_COMPARE(files.size(), 3);
+    QCOMPARE(view->getCurrentFileDetails().baseImageSize, QSize(12, 6));
+
+    QFile invalid(dir.filePath("invalid.svg"));
+    QVERIFY(invalid.open(QIODevice::WriteOnly));
+    invalid.write("<svg><broken>");
+    invalid.close();
+    view->loadFile(invalid.fileName());
+    QTRY_COMPARE(files.size(), 4);
+    QVERIFY(view->getCurrentFileDetails().errorData.has_value());
+    QCOMPARE(view->scene()->items().size(), 1);
+    window.close();
+}
+
+void ActionManagerTests::testSvgColorConversion()
+{
+    QSvgRenderer renderer(QByteArray(R"(<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10">
+        <circle cx="5" cy="5" r="3" fill="red"/></svg>)"));
+    QGraphicsScene scene;
+    auto *item = new QVSvgItem(&renderer);
+    scene.addItem(item);
+    auto render = [&](const QColorSpace &space) {
+        item->setTargetColorSpace(space);
+        QImage image(128, 96, QImage::Format_ARGB32_Premultiplied);
+        image.setDevicePixelRatio(2);
+        image.fill(Qt::transparent);
+        QPainter painter(&image);
+        painter.translate(50, -4);
+        painter.rotate(90);
+        scene.render(&painter, QRectF(0, 0, 72, 72), QRectF(0, 0, 10, 10));
+        painter.end();
+        return image;
+    };
+    QImage expected = render(QColorSpace::SRgb);
+    QVERIFY(expected.pixelColor(28, 64).alpha() == 255);
+    expected.setColorSpace(QColorSpace::SRgb);
+    expected.convertToColorSpace(QColorSpace::DisplayP3);
+    QImage actual = render(QColorSpace::DisplayP3);
+    actual.setColorSpace(QColorSpace::DisplayP3);
+    QCOMPARE(actual, expected);
 }
 
 void ActionManagerTests::testClonedActionsUntracked()

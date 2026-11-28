@@ -363,7 +363,7 @@ void MainWindow::paintEvent(QPaintEvent *event)
 
     if (viewportRect.isValid())
     {
-        if (checkerboardBackground && getIsPixmapLoaded())
+        if (checkerboardBackground && getIsImageLoaded())
         {
             const int gridSize = 16;
             const QColor darkColor = QColor(204, 204, 204);
@@ -569,7 +569,7 @@ void MainWindow::disableActions()
                 const auto &cloneData = clone->data().toStringList();
                 if (cloneData.last() == "disable")
                 {
-                    clone->setEnabled(getIsPixmapLoaded());
+                    clone->setEnabled(getIsImageLoaded());
                 }
                 else if (cloneData.last() == "framedisable")
                 {
@@ -598,9 +598,9 @@ void MainWindow::disableActions()
     const auto &openWithMenus = qvApp->getActionManager().getAllClonesOfMenu("openwith", this);
     for (const auto &menu : openWithMenus)
     {
-        menu->setEnabled(getIsPixmapLoaded());
+        menu->setEnabled(getIsImageLoaded());
 #ifdef Q_OS_MACOS
-        menu->menuAction()->setVisible(getIsPixmapLoaded());
+        menu->menuAction()->setVisible(getIsImageLoaded());
 #endif
     }
 
@@ -608,7 +608,7 @@ void MainWindow::disableActions()
     const auto &openWithPlaceholderActions = qvApp->getActionManager().getAllClonesOfAction("openwithplaceholder", this);
     for (const auto &action : openWithPlaceholderActions)
     {
-        action->setVisible(!getIsPixmapLoaded());
+        action->setVisible(!getIsImageLoaded());
     }
 #endif
 }
@@ -747,7 +747,7 @@ void MainWindow::updateWindowFilePath()
     if (!windowHandle())
         return;
 
-    const bool shouldPopulate = getIsPixmapLoaded() && !getTitlebarHidden();
+    const bool shouldPopulate = getIsImageLoaded() && !getTitlebarHidden();
     windowHandle()->setFilePath(shouldPopulate ? getCurrentFileDetails().fileInfo.absoluteFilePath() : "");
 }
 
@@ -842,7 +842,7 @@ void MainWindow::setTitlebarHidden(const bool shouldHide)
 
 void MainWindow::setWindowSize(const bool isReapplying, const bool isExplicitRequest)
 {
-    if (!getIsPixmapLoaded())
+    if (!getIsImageLoaded())
         return;
 
     //check if the program is configured to resize the window
@@ -972,7 +972,7 @@ const QJsonObject MainWindow::getSessionState() const
 
     state["titlebarHidden"] = getTitlebarHidden();
 
-    if (getIsPixmapLoaded())
+    if (getIsImageLoaded())
     {
         state["path"] = getCurrentFileDetails().fileInfo.absoluteFilePath();
 
@@ -1115,7 +1115,7 @@ void MainWindow::openWith(const OpenWith::OpenWithItem &openWithItem)
 
 void MainWindow::openContainingFolder()
 {
-    if (!getIsPixmapLoaded())
+    if (!getIsImageLoaded())
         return;
 
     const QFileInfo selectedFileInfo = getCurrentFileDetails().fileInfo;
@@ -1307,7 +1307,7 @@ void MainWindow::paste()
 
 void MainWindow::rename()
 {
-    if (!getIsPixmapLoaded())
+    if (!getIsImageLoaded())
         return;
 
     auto *renameDialog = new QVRenameDialog(this, getCurrentFileDetails().fileInfo);

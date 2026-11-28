@@ -248,7 +248,7 @@ bool QVApplication::foundLoadedImage() const
 {
     for (const MainWindow *window : activeWindows)
     {
-        if (window->getIsPixmapLoaded())
+        if (window->getIsImageLoaded())
             return true;
     }
     return false;

@@ -11,6 +11,7 @@
 #include <QFileInfo>
 #include <QTimer>
 #include <QColorSpace>
+#include <QSvgRenderer>
 
 class QVImageCore : public QObject
 {
@@ -25,14 +26,13 @@ public:
         QFileInfo fileInfo;
         QVFileEnumerator::CompatibleFileList folderFileInfoList;
         int loadedIndexInFolder = -1;
-        bool isPixmapLoaded = false;
+        bool isImageLoaded = false;
         bool isMovieLoaded = false;
         int frameCount = 1;
         int frameNumber = 0;
         bool isMultiFrameImage = false;
         // Invalid QSize() when no image is loaded, including load errors.
         QSize baseImageSize;
-        QSize loadedPixmapSize;
         QColorSpace targetColorSpace;
         std::optional<ErrorData> errorData;
 
@@ -66,7 +66,8 @@ public:
 
     QPixmap scaleExpensively(const QSizeF desiredSize);
 
-    const QImage& getSourceImage() const { return sourceImage; }
+    QImage getSourceImage() const;
+    QSvgRenderer *getSvgRenderer() const { return svgRenderer.get(); }
     const QPixmap& getLoadedPixmap() const { return loadedPixmap; }
     const QVMovie& getLoadedMovie() const { return loadedMovie; }
     const FileDetails& getCurrentFileDetails() const { return currentFileDetails; }
@@ -99,6 +100,7 @@ private:
     QVImageLoader imageLoader {this};
     QTimer preloadDebounceTimer {this};
 
+    std::unique_ptr<QSvgRenderer> svgRenderer;
     QImage sourceImage;
     QPixmap loadedPixmap;
     QVMovie loadedMovie;

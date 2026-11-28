@@ -12,6 +12,9 @@
 #include <QIcon>
 #include <QGuiApplication>
 #include <QScreen>
+#include <QPainter>
+#include <QImageReader>
+#include <QXmlStreamReader>
 
 static int findFileIndex(const QVFileEnumerator::CompatibleFileList &files, const QFileInfo &fileInfo)
 {
@@ -82,7 +85,6 @@ QVImageCore::QVImageCore(QObject *parent) : QObject(parent)
         if (largerDimension > largestDimension)
             largestDimension = largerDimension;
     }
-    imageLoader.setLargestDimension(largestDimension);
 
     // Connect to settings signal
     connect(&qvApp->getSettingsManager(), &SettingsManager::settingsUpdated, this, &QVImageCore::settingsUpdated);
@@ -139,12 +141,36 @@ void QVImageCore::loadPixmap(const ReadData &readData)
 {
     emit fileChanging();
 
-    if (readData.errorData.has_value())
+    svgRenderer.reset();
+    auto error = readData.errorData;
+    if (readData.isSvg)
+    {
+        QFile file(readData.absoluteFilePath);
+        if (!file.open(QIODevice::ReadOnly))
+        {
+            error = ErrorData {QImageReader::DeviceError, file.errorString()};
+        }
+        else
+        {
+            svgRenderer = std::make_unique<QSvgRenderer>();
+            QXmlStreamReader xml(&file);
+            // Let Qt decompress SVGZ. For plain SVG, keep the QFile as the XML
+            // reader's device so relative image paths resolve beside the SVG.
+            if (file.peek(2) == QByteArrayLiteral("\x1f\x8b"))
+                svgRenderer->load(file.readAll());
+            else
+                svgRenderer->load(&xml);
+            if (!svgRenderer->isValid() || svgRenderer->defaultSize().isEmpty())
+                error = ErrorData {QImageReader::InvalidDataError, xml.hasError() ? xml.errorString() : tr("Invalid SVG image")};
+        }
+    }
+
+    if (error.has_value())
     {
         FileDetails emptyDetails;
         emptyDetails.folderFileInfoList = currentFileDetails.folderFileInfoList;
         emptyDetails.loadedIndexInFolder = currentFileDetails.loadedIndexInFolder;
-        emptyDetails.errorData = readData.errorData;
+        emptyDetails.errorData = error;
         currentFileDetails = emptyDetails;
     }
     else
@@ -172,9 +198,8 @@ void QVImageCore::loadPixmap(const ReadData &readData)
     updateLoadedPixmap();
 
     // Set file details
-    currentFileDetails.isPixmapLoaded = true;
-    currentFileDetails.baseImageSize = readData.intrinsicSize.isValid() ? readData.intrinsicSize : loadedPixmap.size();
-    currentFileDetails.loadedPixmapSize = loadedPixmap.size();
+    currentFileDetails.isImageLoaded = true;
+    currentFileDetails.baseImageSize = svgRenderer ? svgRenderer->defaultSize() : loadedPixmap.size();
 
     currentFileDetails.isMultiFrameImage = readData.isMultiFrameImage;
     currentFileDetails.frameCount = readData.frameCount;
@@ -185,9 +210,7 @@ void QVImageCore::loadPixmap(const ReadData &readData)
     loadedMovie.setFileName("");
     loadedMovie.setFormat("");
     loadedMovie.setCacheMode(QVMovie::CacheAll);
-    const QString suffix = currentFileDetails.fileInfo.suffix().toLower();
-    const bool disableAnimation = suffix == "svg" || suffix == "svgz";
-    if (!disableAnimation)
+    if (!svgRenderer)
     {
         loadedMovie.setFileName(currentFileDetails.fileInfo.absoluteFilePath());
 
@@ -233,6 +256,7 @@ void QVImageCore::closeImage(const bool stayInDir)
 
 void QVImageCore::loadEmptyPixmap()
 {
+    svgRenderer.reset();
     sourceImage = QImage();
     loadedPixmap = QPixmap();
     loadedMovie.stop();
@@ -445,7 +469,7 @@ void QVImageCore::refreshDesiredImages(const bool includePreloads)
 
 void QVImageCore::refreshDisplayColorSpace()
 {
-    if (sourceImage.isNull() || colorSpaceConversion != Qv::ColorSpaceConversion::AutoDetect)
+    if (!currentFileDetails.isImageLoaded || colorSpaceConversion != Qv::ColorSpaceConversion::AutoDetect)
         return;
 
     const QColorSpace targetColorSpace = getTargetColorSpace();
@@ -457,8 +481,32 @@ void QVImageCore::refreshDisplayColorSpace()
     emit pixmapChanged();
 }
 
+QImage QVImageCore::getSourceImage() const
+{
+    if (!svgRenderer)
+        return sourceImage;
+
+    // Raster clipboard clients get the same screen-sized rendition as before.
+    const QSize size = svgRenderer->defaultSize().scaled(largestDimension, largestDimension, Qt::KeepAspectRatio);
+    QImage image(size.expandedTo(QSize(1, 1)), QImage::Format_ARGB32_Premultiplied);
+    if (!image.isNull())
+    {
+        image.fill(Qt::transparent);
+        QPainter painter(&image);
+        svgRenderer->render(&painter, QRectF(image.rect()));
+        painter.end();
+        image.setColorSpace(QColorSpace::SRgb);
+    }
+    return image;
+}
+
 void QVImageCore::updateLoadedPixmap()
 {
+    if (svgRenderer)
+    {
+        loadedPixmap = {};
+        return;
+    }
     QImage image = sourceImage;
     handleColorSpaceConversion(image, currentFileDetails.targetColorSpace);
     loadedPixmap = QPixmap::fromImage(std::move(image));
@@ -560,7 +608,7 @@ void QVImageCore::setSpeed(int desiredSpeed)
 
 QPixmap QVImageCore::scaleExpensively(const QSizeF desiredSize)
 {
-    if (!currentFileDetails.isPixmapLoaded)
+    if (!currentFileDetails.isImageLoaded)
         return QPixmap();
 
     // If we are really close to the original size, just return the original
@@ -592,7 +640,7 @@ void QVImageCore::settingsUpdated()
     Qv::ColorSpaceConversion oldColorSpaceConversion = colorSpaceConversion;
     colorSpaceConversion = settingsManager.getEnum<Qv::ColorSpaceConversion>("colorspaceconversion");
 
-    if (colorSpaceConversion != oldColorSpaceConversion && currentFileDetails.isPixmapLoaded && !loadInProgress)
+    if (colorSpaceConversion != oldColorSpaceConversion && currentFileDetails.isImageLoaded && !loadInProgress)
     {
         const auto initialFrameNumber = currentFileDetails.isMultiFrameImage ? std::optional(currentFileDetails.frameNumber) : std::nullopt;
         loadFile(currentFileDetails.fileInfo.absoluteFilePath(), false, {}, false, initialFrameNumber);

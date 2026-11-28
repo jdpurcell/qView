@@ -3,6 +3,7 @@
 
 #include "qvnamespace.h"
 #include "qvimagecore.h"
+#include "qvsvgitem.h"
 #include "axislocker.h"
 #include "logicalpixelfitter.h"
 #include "scrollhelper.h"
@@ -238,6 +239,7 @@ private:
     QRect lastImageContentRect;
 
     QVImageCore imageCore {this};
+    std::unique_ptr<QVSvgItem> svgItem;
 
     QTimer *expensiveScaleTimer;
     QTimer *constrainBoundsTimer;

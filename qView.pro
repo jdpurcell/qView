@@ -1,14 +1,7 @@
 TARGET = qView
 VERSION = 8.0
 
-QT += core gui network widgets svg
-
-TEMPLATE = app
-
 QMAKE_PROJECT_DEPTH = 0
-
-# allows use of version variable elsewhere
-DEFINES += "VERSION=$$VERSION"
 
 # build folder organization
 DESTDIR = bin
@@ -18,9 +11,6 @@ UI_DIR = build
 RCC_DIR = build
 
 CONFIG -= debug_and_release debug_and_release_target
-
-# enable c++17
-CONFIG += c++17
 
 # Print if this is a debug or release build
 CONFIG(debug, debug|release) {
@@ -54,7 +44,6 @@ win32 {
 macx {
     # To build without cocoa: qmake CONFIG+=NO_COCOA
     !CONFIG(NO_COCOA) {
-        LIBS += -framework Cocoa
         DEFINES += COCOA_LOADED
         message("Linked to cocoa framework")
     }
@@ -127,6 +116,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 # Ban usage of Qt's built in foreach utility for better code style
 DEFINES += QT_NO_FOREACH
 
+SOURCES += src/main.cpp
 include(src/src.pri)
 
 CONFIG += lrelease embed_translations
