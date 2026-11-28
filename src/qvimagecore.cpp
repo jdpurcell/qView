@@ -34,11 +34,10 @@ QVImageCore::QVImageCore(QObject *parent) : QObject(parent)
 {
     QImageReader::setAllocationLimit(8192); // 8 GiB
 
-    connect(&loadedMovie, &QVMovie::updated, this, [this](QRect rect){
-        QImage movieImage = loadedMovie.currentImage();
-        handleColorSpaceConversion(movieImage, currentFileDetails.targetColorSpace);
-        loadedPixmap = QPixmap::fromImage(std::move(movieImage));
-        emit animatedFrameChanged(rect);
+    connect(&loadedMovie, &QVMovie::updated, this, [this]() {
+        sourceImage = loadedMovie.currentImage();
+        updateLoadedPixmap();
+        emit pixmapChanged();
     });
 
     connect(&imageLoader, &QVImageLoader::imageReady, this,
@@ -168,16 +167,14 @@ void QVImageCore::loadPixmap(const ReadData &readData)
         return;
     }
 
-    QImage readImage = readData.image;
-    const QColorSpace targetColorSpace = getTargetColorSpace();
-    handleColorSpaceConversion(readImage, targetColorSpace);
-    loadedPixmap = QPixmap::fromImage(std::move(readImage));
+    sourceImage = readData.image;
+    currentFileDetails.targetColorSpace = getTargetColorSpace();
+    updateLoadedPixmap();
 
     // Set file details
     currentFileDetails.isPixmapLoaded = true;
     currentFileDetails.baseImageSize = readData.intrinsicSize.isValid() ? readData.intrinsicSize : loadedPixmap.size();
     currentFileDetails.loadedPixmapSize = loadedPixmap.size();
-    currentFileDetails.targetColorSpace = targetColorSpace;
 
     currentFileDetails.isMultiFrameImage = readData.isMultiFrameImage;
     currentFileDetails.frameCount = readData.frameCount;
@@ -236,6 +233,7 @@ void QVImageCore::closeImage(const bool stayInDir)
 
 void QVImageCore::loadEmptyPixmap()
 {
+    sourceImage = QImage();
     loadedPixmap = QPixmap();
     loadedMovie.stop();
     loadedMovie.setFileName("");
@@ -443,6 +441,27 @@ void QVImageCore::refreshDesiredImages(const bool includePreloads)
     }
 
     imageLoader.setDesiredImages(getDesiredImages(targetFilePath, currentFileDetails.loadedIndexInFolder, includePreloads));
+}
+
+void QVImageCore::refreshDisplayColorSpace()
+{
+    if (sourceImage.isNull() || colorSpaceConversion != Qv::ColorSpaceConversion::AutoDetect)
+        return;
+
+    const QColorSpace targetColorSpace = getTargetColorSpace();
+    if (targetColorSpace == currentFileDetails.targetColorSpace)
+        return;
+
+    currentFileDetails.targetColorSpace = targetColorSpace;
+    updateLoadedPixmap();
+    emit pixmapChanged();
+}
+
+void QVImageCore::updateLoadedPixmap()
+{
+    QImage image = sourceImage;
+    handleColorSpaceConversion(image, currentFileDetails.targetColorSpace);
+    loadedPixmap = QPixmap::fromImage(std::move(image));
 }
 
 QColorSpace QVImageCore::getTargetColorSpace() const

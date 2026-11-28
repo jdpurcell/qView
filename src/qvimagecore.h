@@ -57,6 +57,7 @@ public:
     void setSortDescending(const bool descending) { fileEnumerator.setSortDescending(descending); }
 
     void settingsUpdated();
+    void refreshDisplayColorSpace();
 
     void jumpToNextFrame();
     void jumpToPreviousFrame();
@@ -65,13 +66,14 @@ public:
 
     QPixmap scaleExpensively(const QSizeF desiredSize);
 
+    const QImage& getSourceImage() const { return sourceImage; }
     const QPixmap& getLoadedPixmap() const { return loadedPixmap; }
     const QVMovie& getLoadedMovie() const { return loadedMovie; }
     const FileDetails& getCurrentFileDetails() const { return currentFileDetails; }
     bool hasFileOrPendingLoad() const { return fileOrLoadPending; }
 
 signals:
-    void animatedFrameChanged(QRect rect);
+    void pixmapChanged();
 
     void fileChanging();
 
@@ -90,12 +92,14 @@ protected:
     static void handleColorSpaceConversion(QImage &image, const QColorSpace &targetColorSpace);
 
 private:
+    void updateLoadedPixmap();
     void jumpToImageFrame(int direction);
 
     QVFileEnumerator fileEnumerator {this};
     QVImageLoader imageLoader {this};
     QTimer preloadDebounceTimer {this};
 
+    QImage sourceImage;
     QPixmap loadedPixmap;
     QVMovie loadedMovie;
 

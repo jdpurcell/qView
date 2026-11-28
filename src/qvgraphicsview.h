@@ -91,6 +91,7 @@ public:
 
     const QVImageCore::FileDetails& getCurrentFileDetails() const { return imageCore.getCurrentFileDetails(); }
     const QVMovie& getLoadedMovie() const { return imageCore.getLoadedMovie(); }
+    void refreshDisplayColorSpace() { imageCore.refreshDisplayColorSpace(); }
     bool hasFileOrPendingLoad() const { return imageCore.hasFileOrPendingLoad(); }
     qreal getZoomLevel() const { return zoomLevel; }
 
@@ -185,7 +186,7 @@ protected:
     MainWindow* getMainWindow() const;
 
 private slots:
-    void animatedFrameChanged(QRect rect);
+    void pixmapChanged();
 
     void beforeLoad();
 

@@ -36,7 +36,7 @@ QVGraphicsView::QVGraphicsView(QWidget *parent) : QGraphicsView(parent)
             p.shouldCenter = constrainToCenterWhenSmaller;
         });
 
-    connect(&imageCore, &QVImageCore::animatedFrameChanged, this, &QVGraphicsView::animatedFrameChanged);
+    connect(&imageCore, &QVImageCore::pixmapChanged, this, &QVGraphicsView::pixmapChanged);
     connect(&imageCore, &QVImageCore::fileChanging, this, &QVGraphicsView::beforeLoad);
     connect(&imageCore, &QVImageCore::fileChanged, this, &QVGraphicsView::postLoad);
     connect(&imageCore, &QVImageCore::sortParametersChanged, this, [this]{emit sortParametersChanged();});
@@ -586,7 +586,7 @@ QMimeData *QVGraphicsView::getMimeData() const
         return mimeData;
 
     mimeData->setUrls({QUrl::fromLocalFile(imageCore.getCurrentFileDetails().fileInfo.absoluteFilePath())});
-    mimeData->setImageData(imageCore.getLoadedPixmap().toImage());
+    mimeData->setImageData(imageCore.getSourceImage());
     return mimeData;
 }
 
@@ -826,10 +826,8 @@ void QVGraphicsView::removeExpensiveScaling()
     appliedExpensiveScaleZoomLevel = 0.0;
 }
 
-void QVGraphicsView::animatedFrameChanged(QRect rect)
+void QVGraphicsView::pixmapChanged()
 {
-    Q_UNUSED(rect)
-
     if (isExpensiveScalingRequested())
     {
         applyExpensiveScaling();

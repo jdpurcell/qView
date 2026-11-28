@@ -267,6 +267,8 @@ void MainWindow::contextMenuEvent(QContextMenuEvent *event)
 
 void MainWindow::showEvent(QShowEvent *event)
 {
+    connect(windowHandle(), &QWindow::screenChanged, graphicsView, &QVGraphicsView::refreshDisplayColorSpace, Qt::UniqueConnection);
+
 #ifdef COCOA_LOADED
     // Defer full size content view until after geometry restoration (see comment in closeEvent)
     QTimer::singleShot(0, this, [this]() {
